@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="cideplus.contributionConfigureFeatures"
+            objectClass="org.eclipse.jdt.core.IJavaProject">
+         <menu
+               id="cideplus.menuFeatures"
+               label="Features"
+               path="additions">
+            <separator
+                  name="group1">
+            </separator>
+            <separator
+                  name="group2">
+            </separator>
+         </menu>
+         <action
+               class="cideplus.ui.configuration.popup.action.ConfigureFeaturesAction"
+               enablesFor="1"
+               id="cideplus.cfAction"
+               label="Configure Features..."
+               menubarPath="cideplus.menuFeatures/group1">
+         </action>
+        <action
+              class="cideplus.automation.ColorDetectionAction"
+              icon="icons/view.gif"
+              id="vbo.ColorDetection"
+              label="Automatic Feature Detection"
+              menubarPath="cideplus.menuFeatures/group1">
+           </action>
+         <action
+               class="cideplus.ui.configuration.popup.action.CleanProjectAction"
+               enablesFor="1"
+               id="cideplus.cleanAction"
+               label="Clean Project"
+               menubarPath="cideplus.menuFeatures/group2">
+         </action>
+         <action
+               class="cideplus.ui.configuration.popup.action.StatiticsAction"
+               enablesFor="1"
+               id="cideplus.actionStatitics"
+               label="Statitics..."
+               menubarPath="cideplus.menuFeatures/group2">
+         </action>
+         <action
+               class="cideplus.ui.export.action.ExportProjectAction"
+               enablesFor="1"
+               id="cideplus.action.export"
+               label="Export Project..."
+               menubarPath="cideplus.menuFeatures/group2">
+         </action>
+      </objectContribution>
+   </extension>
+
+ 
+
+     <extension
+         point="org.eclipse.ui.views">
+      <view
+            name="Features ASTView"
+            icon="$nl$/icons/view.gif"
+            category="org.eclipse.jdt.ui.java"
+            class="cideplus.ui.astview.ASTView"
+            id="cideplus.ui.astview.ASTView">
+      </view>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            name="ASTView"
+            description="Featurer AST View"
+            categoryId="org.eclipse.ui.category.views"
+            id="cideplus.ui.astview.ASTView">
+      </command>
+   </extension> 
+
+
+  <extension
+     point="org.eclipse.ui.bindings">
+  <key
+        sequence="M2+M3+Q A"
+        commandId="cideplus.ui.astview.ASTView"
+        schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+  </key>
+  <key
+        platform="carbon"
+        sequence="M2+M3+Q A"
+        commandId=""
+        schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+  </key>
+  <key
+        platform="carbon"
+        sequence="M1+M3+Q A"
+        commandId="cideplus.ui.astview.ASTView"
+        schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+  </key>
+  </extension>
+  
+  
+  <extension
+        point="org.eclipse.ui.perspectiveExtensions">
+     <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
+        <viewShortcut id="cideplus.ui.astview.ASTView"/>
+     </perspectiveExtension>
+     <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaBrowsingPerspective">
+        <viewShortcut id="cideplus.ui.astview.ASTView"/>
+     </perspectiveExtension>
+     <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaHierarchyPerspective">
+        <viewShortcut id="cideplus.ui.astview.ASTView"/>
+     </perspectiveExtension>
+  </extension>
+  
+  <extension
+         id="javaeditor"
+         point="org.eclipse.ui.editors">
+      <editor
+            name="Featurer Java Editor"
+            default="true"
+            icon="$nl$/icons/jcu_obj.gif"
+            contributorClass="org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditorActionContributor"
+            class="cideplus.ui.editor.FeaturerCompilationUnitEditor"
+            symbolicFontName="org.eclipse.jdt.ui.editors.textfont"
+            id="cideplus.FeaturerCompilationUnitEditor"
+            extensions="java">
+            <!--contentTypeBinding
+               contentTypeId="org.eclipse.jdt.core.javaSource"
+            /--> 
+      </editor>  
+   </extension>
+</plugin>
