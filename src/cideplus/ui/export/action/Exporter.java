@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -20,7 +19,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.swt.widgets.Shell;
 
 import cideplus.model.ASTNodeReference;
@@ -44,31 +42,31 @@ public class Exporter {
 		this.exportedFeatures = features;
 		featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project.getProject());
 	}
-	
+
 	public int getFileCount(IProgressMonitor monitor) throws CoreException{
 		monitor.beginTask("Preparing to export...", IProgressMonitor.UNKNOWN);
 		countProjectFiles();
 		monitor.done();
 		return projectJavaCount;
 	}
-	
+
 	/**
-	 * Exporta os arquivos para um mapa com o nome e conteúdo de cada arquivo exportado.<BR>
-	 * Para cada arquivo é adicionado 3 ao trabalho do monitor<BR>
-	 * O método getFileCount retorna o número de arquivos encontrados, esse valor é o mesmo do número de progressos desse método (mas cada progresso conta 3 unidades).
-	 * Os métodos beginTask e done do objeto monitor, devem ser chamados fora desse método. Um antes e o outro depois respectivamente.
+	 * Exporta os arquivos para um mapa com o nome e conteï¿½do de cada arquivo exportado.<BR>
+	 * Para cada arquivo ï¿½ adicionado 3 ao trabalho do monitor<BR>
+	 * O mï¿½todo getFileCount retorna o nï¿½mero de arquivos encontrados, esse valor ï¿½ o mesmo do nï¿½mero de progressos desse mï¿½todo (mas cada progresso conta 3 unidades).
+	 * Os mï¿½todos beginTask e done do objeto monitor, devem ser chamados fora desse mï¿½todo. Um antes e o outro depois respectivamente.
 	 * @param monitor
 	 * @return
 	 * @throws CoreException
-	 * @throws FeaturerException 
-	 * @throws IOException 
+	 * @throws FeaturerException
+	 * @throws IOException
 	 */
 	public Map<String, byte[]> getExportedFiles(IProgressMonitor monitor) throws CoreException, IOException, FeaturerException {
 		IPackageFragmentRoot[] allPackageFragmentRoots = project.getAllPackageFragmentRoots();
 		Map<String, byte[]> result = new LinkedHashMap<String, byte[]>();
 		for (IPackageFragmentRoot iPackageFragmentRoot : allPackageFragmentRoots) {
 			if(iPackageFragmentRoot.getKind() == IPackageFragmentRoot.K_SOURCE){
-				//todos os package roots que são source folders...
+				//todos os package roots que sï¿½o source folders...
 				monitor.setTaskName("Exporting... "+iPackageFragmentRoot.getElementName());
 				IJavaElement[] children = iPackageFragmentRoot.getChildren();
 				checkChildren(result, children, monitor);
@@ -94,9 +92,9 @@ public class Exporter {
 	 * @param result
 	 * @param iJavaElement
 	 * @param monitor
-	 * @throws CoreException 
-	 * @throws FeaturerException 
-	 * @throws IOException 
+	 * @throws CoreException
+	 * @throws FeaturerException
+	 * @throws IOException
 	 */
 	private void exportJavaFile(Map<String, byte[]> result,	ICompilationUnit comp, IProgressMonitor monitor) throws IOException, FeaturerException, CoreException {
 		if(monitor.isCanceled()){
@@ -109,9 +107,9 @@ public class Exporter {
 		String source = comp.getSource();
 		for (Iterator<ASTNodeReference> iterator = nodeReferences.iterator(); iterator.hasNext();) {
 			ASTNodeReference astNodeReference = iterator.next();
-			//elimina do source o código do nó que não será exportado
+			//elimina do source o cï¿½digo do nï¿½ que nï¿½o serï¿½ exportado
 			source = source.substring(0, astNodeReference.getOffset()) +
-					 source.substring(astNodeReference.getOffset() + astNodeReference.getByteCount(), source.length());
+					source.substring(astNodeReference.getOffset() + astNodeReference.getByteCount(), source.length());
 		}
 		//CompilationUnit ast = cideplus.automation.Util.getAst(comp, false);
 		result.put(comp.getPath().toString(), source.getBytes());
@@ -119,7 +117,7 @@ public class Exporter {
 	}
 
 	/**
-	 * Retorna a lista de nós que devem ser removidos
+	 * Retorna a lista de nï¿½s que devem ser removidos
 	 * @param manager
 	 * @return
 	 */
@@ -128,13 +126,13 @@ public class Exporter {
 		Set<ASTNodeReference> nodesToRemove = new HashSet<ASTNodeReference>();
 		for (Iterator<ASTNodeReference> iterator = allNodeReferences.iterator(); iterator.hasNext();) {
 			ASTNodeReference astNodeReference = iterator.next();
-			//iremos remover os items que não serão exportados... é importante que os nós estejam ordenados por offset decrescente
+			//iremos remover os items que nï¿½o serï¿½o exportados... ï¿½ importante que os nï¿½s estejam ordenados por offset decrescente
 			Set<Feature> nodeFeatures = manager.getFeatures(astNodeReference);
 			nodeFeatures.removeAll(exportedFeatures);
 			if(nodeFeatures.size() > 0){
-				//se ao remover da lista de features do nó.. a lista de features a ser exportada..
-				//sobrar alguma feature, significa que o nó tem uma feature que não está sendo exportada...
-				//então vamos remover esse nó
+				//se ao remover da lista de features do nï¿½.. a lista de features a ser exportada..
+				//sobrar alguma feature, significa que o nï¿½ tem uma feature que nï¿½o estï¿½ sendo exportada...
+				//entï¿½o vamos remover esse nï¿½
 				nodesToRemove.add(astNodeReference);
 			}
 		}
@@ -142,8 +140,8 @@ public class Exporter {
 	}
 
 	/**
-	 * Remove as features que estão se sobrescrevendo... é utilizado o offset e o length para o cálculo.
-	 * Ordena os nós em ordem decrescente de offset. Ou seja, offsets maiores vem primeiro.
+	 * Remove as features que estï¿½o se sobrescrevendo... ï¿½ utilizado o offset e o length para o cï¿½lculo.
+	 * Ordena os nï¿½s em ordem decrescente de offset. Ou seja, offsets maiores vem primeiro.
 	 * @param nodeReferences
 	 * @return
 	 */
@@ -178,9 +176,9 @@ public class Exporter {
 			}
 		});
 	}
-	
+
 	private String stripExtension(String elementName) {
 		return elementName.substring(0, elementName.indexOf("."));
 	}
-	
+
 }

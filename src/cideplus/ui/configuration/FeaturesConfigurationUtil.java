@@ -43,31 +43,31 @@ import cideplus.model.FeaturesUtil;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
 
 /**
- * Class utilitária para trabalhar com a configuração das features junto a Interface Gráfica
+ * Class utilitï¿½ria para trabalhar com a configuraï¿½ï¿½o das features junto a Interface Grï¿½fica
  * @author rogel
  *
  */
 public class FeaturesConfigurationUtil {
 
 	public static final String FEATURES_FILE = "features.feat";
-	
+
 	private static Map<IProject, FeaturesManager> cache = new HashMap<IProject, FeaturesManager>();
-	
+
 	public static FeaturesManager getFeaturesManager(final IProject project){
 		FeaturesManager featuresManager;
 		if((featuresManager = cache.get(project)) == null){
 			featuresManager = new FeaturesManager() {
-				
+
 				Map<ICompilationUnit, CompilationUnitFeaturesManager> cache = new HashMap<ICompilationUnit, CompilationUnitFeaturesManager>();
-				
+
 				public void saveFeatures(Set<Feature> features) throws CoreException {
 					FeaturesConfigurationUtil.saveFeatures(project, features);
 				}
-				
+
 				public Set<Feature> getFeatures() throws CoreException, IOException {
 					return FeaturesConfigurationUtil.getFeatures(project);
 				}
-				
+
 				public CompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeaturerException, CoreException {
 					CompilationUnitFeaturesManager compilationUnitFeaturesManager;
 					if((compilationUnitFeaturesManager = cache.get(compilationUnit)) == null){
@@ -79,44 +79,44 @@ public class FeaturesConfigurationUtil {
 						} else {
 							model = new CompilationUnitFeaturesModel();
 						}
-						
+
 						compilationUnitFeaturesManager = new CompilationUnitFeaturesManager() {
-							
+
 							public Set<ASTNodeReference> getNodeReferences() {
 								return model.getNodeReferences();
 							}
-							
+
 							private Set<Feature> getASTFeatures(ASTNode astNode) {
 								if(astNode == null){
 									return new HashSet<Feature>();
 								}
 								return model.getFeatures(getNodeReferenceFromAST(astNode), true);
 							}
-							
+
 							public void setFeature(ASTNode astNode, Feature feature) {
 								if(astNode == null){
 									throw new IllegalArgumentException("astNode cannot be null to set feature");
 								}
 								getASTFeatures(astNode).add(feature);
-								
+
 							}
-							
+
 							public boolean hasFeature(ASTNode astNode, Feature feature) {
 								return getASTFeatures(astNode).contains(feature);
 							}
-							
+
 							public Set<Feature> getFeatures(ASTNode astNode) {
 								return getASTFeatures(astNode);
 							}
-							
+
 							public Set<Feature> getFeatures(ASTNodeReference reference){
 								return model.getFeatures(reference);
 							}
-							
+
 							public void removeFeature(ASTNode node, Feature feature) {
 								getASTFeatures(node).remove(feature);
 							}
-							
+
 							public synchronized void commitChanges() throws CoreException {
 								ByteArrayOutputStream out = new ByteArrayOutputStream();
 								FeaturesUtil.saveFeaturesForCompilationUnit(out, model);
@@ -127,7 +127,7 @@ public class FeaturesConfigurationUtil {
 									file.create(source, true, null);
 								}
 							}
-							
+
 							public ICompilationUnit getCompilationUnit() {
 								return compilationUnit;
 							}
@@ -137,7 +137,7 @@ public class FeaturesConfigurationUtil {
 					return compilationUnitFeaturesManager;
 				}
 			};
-			//o project feature manager nao possuirá cache... apenas o compilation unit
+			//o project feature manager nao possuirï¿½ cache... apenas o compilation unit
 			//cache.put(project, featuresManager);
 		}
 		return featuresManager;
@@ -164,7 +164,7 @@ public class FeaturesConfigurationUtil {
 			featuresFile.create(new ByteArrayInputStream(out.toByteArray()), true, null);
 		}
 	}
-	
+
 	private static ASTNodeReference getNodeReferenceFromAST(ASTNode astNode) {
 		if(astNode == null){
 			throw new IllegalArgumentException("Parameter astNode cannot be null");
@@ -204,11 +204,11 @@ public class FeaturesConfigurationUtil {
 		node = node.replace('\n', ' ').replace('\r', ' ');
 		return new ASTNodeReference(node, bytes, offset);
 	}
-	
+
 	public static RGB getRGB(Feature feature){
 		return new RGB(feature.getRgb().getRed(), feature.getRgb().getGreen(), feature.getRgb().getBlue());
 	}
-	
+
 	public static RGB getCombinedRGB(Collection<Feature> featureList) {
 		RGB rgb = new RGB(0,0,0);
 		int amountRed = 0;
@@ -250,7 +250,7 @@ public class FeaturesConfigurationUtil {
 
 	public static void updateEditors(Display display, final ASTNode compilationUnit) {
 		display.asyncExec(new Runnable() {
-			
+
 			public void run() {
 				doUpdateEditors(compilationUnit);
 			}
@@ -270,7 +270,7 @@ public class FeaturesConfigurationUtil {
 						refresh(iEditorReference);
 					}
 				} else {
-					//se o compilation unit é null, atualizar todos os editores
+					//se o compilation unit ï¿½ null, atualizar todos os editores
 					refresh(iEditorReference);
 				}
 			}

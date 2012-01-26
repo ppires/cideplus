@@ -21,8 +21,8 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 
 	// The shared instance
 	private static FeaturerPlugin plugin;
-	private ASTViewPlugin astViewPlugin;
-	
+	private final ASTViewPlugin astViewPlugin;
+
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;
 	}
@@ -36,8 +36,12 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
@@ -46,8 +50,12 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		astViewPlugin.stop(context);
@@ -56,20 +64,23 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 
 	public static InputStream getFile(String path) {
 		try {
-			return FileLocator.find(getDefault().getBundle(), new Path("/icons"+path), null).openStream();
+			return FileLocator.find(getDefault().getBundle(),
+					new Path("/icons" + path), null).openStream();
 		} catch (Exception e3) {
-			throw new RuntimeException("Não foi possivel encontrar o arquivo "+path);
+			throw new RuntimeException("Nï¿½o foi possivel encontrar o arquivo "
+					+ path);
 		}
 	}
-	
+
 	public static Image getImage(Device device, String path) {
 		return new Image(device, FeaturerPlugin.getFile(path));
 	}
-	/*MÉTODOS UTILITARIOS*/
+
+	/* Mï¿½TODOS UTILITARIOS */
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static FeaturerPlugin getDefault() {

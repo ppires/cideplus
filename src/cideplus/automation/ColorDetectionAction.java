@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IProject;
@@ -40,7 +39,6 @@ import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
@@ -85,7 +83,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -115,11 +112,11 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public ColorDetectionAction() {
 		super();
 	}
-	/*MÉTODOS UTILITARIOS*/
+	/*Mï¿½TODOS UTILITARIOS*/
 	private Set<Feature> getSafeFeatures(final FeaturesManager featuresManager){
 		return Util.getSafeFeatures(featuresManager);
 	}
-	
+
 	private CompilationUnitFeaturesManager getSafeManager(IJavaProject jproject, ICompilationUnit compUnit){
 		try {
 			if(manager == null){
@@ -131,21 +128,21 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	boolean stopGrowingCache;
 	int cacheUtilization = 0;
-	private Map<ICompilationUnit, CompilationUnit> cacheAst;	
+	private Map<ICompilationUnit, CompilationUnit> cacheAst;
 	private CompilationUnit getAst(ICompilationUnit compUnit) {
 		CompilationUnit ast;
 		if(!stopGrowingCache){
 			long totalMemory = Runtime.getRuntime().totalMemory();
 			long maxMemory = Runtime.getRuntime().maxMemory();
 			long freeMemory = Runtime.getRuntime().freeMemory();
-			
-			if(maxMemory - totalMemory < 350000000){//se a memória ficar em menos de 350MB checar se precisa liberar o cache
+
+			if(maxMemory - totalMemory < 350000000){//se a memï¿½ria ficar em menos de 350MB checar se precisa liberar o cache
 				if(freeMemory < 450000000){//se tiver menos de 450mb liberar cache
-					//parar de adicionar objetos ao cache.. está com pouca memória
-					//usar apenas o que já foi feito cache
+					//parar de adicionar objetos ao cache.. estï¿½ com pouca memï¿½ria
+					//usar apenas o que jï¿½ foi feito cache
 					stopGrowingCache = true;
 				}
 			}
@@ -160,8 +157,8 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		}
 		return ast;
 	}
-	/*FIM MÉTODOS UTILITARIOS*/
-	
+	/*FIM Mï¿½TODOS UTILITARIOS*/
+
 	public void run(IAction action) {
 		try {
 			System.gc();
@@ -190,21 +187,21 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			final IProject project = getSelectedJavaProject().getCorrespondingResource().getProject();
 			seeds.clear();
 			pacotes.clear();
-			
+
 			final MeuWizard wzd = new MeuWizard(project, pacotes, seeds);
-			WizardDialog dlg = new WizardDialog(shell, wzd);		
+			WizardDialog dlg = new WizardDialog(shell, wzd);
 			dlg.setPageSize(400, 350);
-		    dlg.open();
-		    
-		    if(dlg.getReturnCode() == dlg.CANCEL) 
-		    	return;		    
-		    
-		    if((pacotes != null && pacotes.size() > 0) || (seeds != null && seeds.size() > 0)) {	
+			dlg.open();
+
+			if(dlg.getReturnCode() == dlg.CANCEL)
+				return;
+
+			if((pacotes != null && pacotes.size() > 0) || (seeds != null && seeds.size() > 0)) {
 				Job job = new WorkspaceJob("Semi-automatic Feature Extraction") {
-										
+
 					@Override
 					public IStatus runInWorkspace(IProgressMonitor monitor)
-					throws CoreException {
+							throws CoreException {
 						try {
 							monitor.beginTask("Detecting features...", IProgressMonitor.UNKNOWN);
 							execute(jproject, project, wzd, monitor);
@@ -218,24 +215,24 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 							return new Status(IStatus.ERROR, FeaturerPlugin.PLUGIN_ID, e.getMessage());
 						} finally {
 							System.out.println(cacheUtilization);
-							cacheAst = null;//zera o cache para liberar a memória
+							cacheAst = null;//zera o cache para liberar a memï¿½ria
 							ColorDetectionAction.this.manager = null;
 						}
 						return new Status(IStatus.OK, FeaturerPlugin.PLUGIN_ID, "Finish!");
 					}
-					
+
 				};
 				job.setUser(true);
 				job.schedule();
-		    	shell.setCursor(new Cursor(null, SWT.CURSOR_ARROW));
-		    }
-		    else {
-		    	shell.setCursor(new Cursor(null, SWT.CURSOR_ARROW));
+				shell.setCursor(new Cursor(null, SWT.CURSOR_ARROW));
+			}
+			else {
+				shell.setCursor(new Cursor(null, SWT.CURSOR_ARROW));
 				MessageDialog.openInformation(shell, "Semi-automatic Feature Extraction", "Please, select one seed at least!");
 				return;
-		    }
+			}
 		} catch (JavaModelException e) {
-	    	shell.setCursor(new Cursor(null, SWT.CURSOR_ARROW));
+			shell.setCursor(new Cursor(null, SWT.CURSOR_ARROW));
 			e.printStackTrace();
 			return;
 		}
@@ -244,11 +241,11 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	}
 
 	private void execute(IJavaProject jproject, IProject project, MeuWizard wzd, IProgressMonitor monitor) {
-    	Calendar start = Calendar.getInstance();
+		Calendar start = Calendar.getInstance();
 		try {
 			NumberFormat f = new DecimalFormat("00");
-			arqLog = new PrintStream("log_" + start.get(Calendar.YEAR) + "_" + f.format((start.get(Calendar.MONTH) + 1)) + "_" + 
-					f.format(start.get(Calendar.DAY_OF_MONTH)) + "_" + f.format(start.get(Calendar.HOUR)) + "_" + 
+			arqLog = new PrintStream("log_" + start.get(Calendar.YEAR) + "_" + f.format((start.get(Calendar.MONTH) + 1)) + "_" +
+					f.format(start.get(Calendar.DAY_OF_MONTH)) + "_" + f.format(start.get(Calendar.HOUR)) + "_" +
 					f.format(start.get(Calendar.MINUTE)) + "_" + f.format(start.get(Calendar.SECOND)) +".log");
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -258,61 +255,61 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		FeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project);
 		Feature selectedFeature = getSelectedFeature(wzd, featuresManager);
 
-//		searchIFDEF(jproject, selectedFeature);
+		//		searchIFDEF(jproject, selectedFeature);
 
 		System.out.println("----------------------------------------");
-    	System.out.println("Seeds:");
-    	arqLog.println("Seeds:");
-//    	for(IPackageFragment pacote : pacotes) {
-//    		System.out.println(pacote.getElementName());
-//    		arqLog.println(pacote.getElementName());
-//    	}
-//    	arqLog.println();
-//    	System.out.println("----------------------------------------");
+		System.out.println("Seeds:");
+		arqLog.println("Seeds:");
+		//    	for(IPackageFragment pacote : pacotes) {
+		//    		System.out.println(pacote.getElementName());
+		//    		arqLog.println(pacote.getElementName());
+		//    	}
+		//    	arqLog.println();
+		//    	System.out.println("----------------------------------------");
 
-    	for(IPackageFragment pacote : pacotes) {
+		for(IPackageFragment pacote : pacotes) {
 			searchPKG(jproject, pacote, selectedFeature, monitor);
-    	}
+		}
 
-    	for(String seed : seeds) {
-    		System.out.println(seed);
-    		arqLog.println(seed);
-    	}
-    	System.out.println("----------------------------------------");
-    	arqLog.println();
-    	//shell.setCursor(new Cursor(null, SWT.CURSOR_WAIT));
+		for(String seed : seeds) {
+			System.out.println(seed);
+			arqLog.println(seed);
+		}
+		System.out.println("----------------------------------------");
+		arqLog.println();
+		//shell.setCursor(new Cursor(null, SWT.CURSOR_WAIT));
 
 		monitor.setTaskName("Detecting features... Seeds: " + seeds);
-		
-    	for(String seed : seeds) {
+
+		for(String seed : seeds) {
 			if(seed.substring(0, 1).equals("2") || seed.substring(0, 1).equals("3"))
 				searchIMP(jproject, seed.substring(1), selectedFeature, monitor);
-			
+
 			searchPROJ(jproject, seed.substring(1), selectedFeature, monitor);
-    	}
-		
-    	Calendar end = Calendar.getInstance();
-    	end.add(Calendar.HOUR, -start.get(Calendar.HOUR));
-    	end.add(Calendar.MINUTE, -start.get(Calendar.MINUTE));
-    	end.add(Calendar.SECOND, -start.get(Calendar.SECOND));
-    	arqLog.println();
-    	System.out.println("Tempo de execução: " + end.get(Calendar.HOUR) + ":" + end.get(Calendar.MINUTE) + ":" + end.get(Calendar.SECOND));
+		}
+
+		Calendar end = Calendar.getInstance();
+		end.add(Calendar.HOUR, -start.get(Calendar.HOUR));
+		end.add(Calendar.MINUTE, -start.get(Calendar.MINUTE));
+		end.add(Calendar.SECOND, -start.get(Calendar.SECOND));
+		arqLog.println();
+		System.out.println("Tempo de execuï¿½ï¿½o: " + end.get(Calendar.HOUR) + ":" + end.get(Calendar.MINUTE) + ":" + end.get(Calendar.SECOND));
 		System.out.println("\nSE1: " + contSE1);
 		System.out.println("SE2: " + contSE2);
 		System.out.println("SE3: " + contSE3);
 		System.out.println("SE3 diferentes: " + se3.size());
 		System.out.println("SE4: " + contSE4);
-    	System.out.println("SE5: " + contSE5);
-    	System.out.println("SE6: " + contSE6);
-    	arqLog.println("Tempo de execução: " + end.get(Calendar.HOUR) + ":" + end.get(Calendar.MINUTE) + ":" + end.get(Calendar.SECOND));
-    	arqLog.println("SE1: " + contSE1);
-    	arqLog.println("SE2: " + contSE2);
-    	arqLog.println("SE3: " + contSE3);
-    	arqLog.println("SE3 diferentes: " + se3.size());
-    	arqLog.println("SE4: " + contSE4);
-    	arqLog.println("SE5: " + contSE5);
-    	arqLog.println("SE6: " + contSE6);
-    	//shell.setCursor(new Cursor(null, SWT.CURSOR_ARROW));
+		System.out.println("SE5: " + contSE5);
+		System.out.println("SE6: " + contSE6);
+		arqLog.println("Tempo de execuï¿½ï¿½o: " + end.get(Calendar.HOUR) + ":" + end.get(Calendar.MINUTE) + ":" + end.get(Calendar.SECOND));
+		arqLog.println("SE1: " + contSE1);
+		arqLog.println("SE2: " + contSE2);
+		arqLog.println("SE3: " + contSE3);
+		arqLog.println("SE3 diferentes: " + se3.size());
+		arqLog.println("SE4: " + contSE4);
+		arqLog.println("SE5: " + contSE5);
+		arqLog.println("SE6: " + contSE6);
+		//shell.setCursor(new Cursor(null, SWT.CURSOR_ARROW));
 		arqLog.close();
 	}
 
@@ -330,17 +327,17 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	}
 
 	public void searchPKG(IJavaProject jproject, IPackageFragment pkg, Feature feature, IProgressMonitor monitor) {
-		try {			
+		try {
 			System.out.println("Class: " + pkg.getClassFiles().length);
 			System.out.println("CU: " + pkg.getCompilationUnits().length);
 			monitor.setTaskName(""+pkg.getClassFiles().length+" classes, " +pkg.getCompilationUnits().length+" compilation units");
 			if(pkg.getKind()==IPackageFragmentRoot.K_SOURCE) {
 				/* Marca todas as CompilationUnits do pacote */
 				System.out.print("Colorindo todas as CU do pacote " + pkg.getElementName() + "... ");
-				for(ICompilationUnit compUnit : pkg.getCompilationUnits()) {	
+				for(ICompilationUnit compUnit : pkg.getCompilationUnits()) {
 					CompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
 					CompilationUnit ast = getAst(compUnit);
-					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);						
+					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);
 					//IColorManager nodeColors = source.getColorManager();
 					//nodeColors.beginBatch();
 					managerForFile.setFeature(ast, feature);
@@ -348,24 +345,24 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					//ColoredIDEPlugin.getDefault().notifyListeners(new ColorChangedEvent(this, source.getAST(), source));
 					//nodeColors.endBatch();
 				}
-				System.out.println("concluído!");
+				System.out.println("concluï¿½do!");
 			}
-			
-			
+
+
 			/* Marca os imports deste pacote <pacote.*> em todo o projeto */
 			monitor.setTaskName("Marking imports of package "+pkg.getElementName());
-			System.out.print("Colorindo todos os <import " + pkg.getElementName() + ".*>... ");			
+			System.out.print("Colorindo todos os <import " + pkg.getElementName() + ".*>... ");
 			searchIMP(jproject, pkg.getElementName().replaceAll("\\.", "/"), feature, monitor);
-			System.out.println("concluído!");
-			
-			
+			System.out.println("concluï¿½do!");
+
+
 			if (pkg.getKind() == IPackageFragmentRoot.K_SOURCE) {
 				/* Procura usos das classes das compUnits em todo o projeto */
 				System.out.println("Adicionando as classes do pacote " + pkg.getElementName() + " na lista de sementes: ");
 				for (ICompilationUnit compUnit : pkg.getCompilationUnits()) {
 					//CompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
 					CompilationUnit ast = getAst(compUnit);
-					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);			
+					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);
 					for (Object type : ast.types()) {
 						TypeDeclaration td = (TypeDeclaration) type;
 						ITypeBinding binding = td.resolveBinding();
@@ -390,7 +387,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				}
 
 			}
-			System.out.println("Concluído pacote: " + pkg.getElementName());
+			System.out.println("Concluï¿½do pacote: " + pkg.getElementName());
 		} catch(CoreException ex) {
 			throw new RuntimeException(ex.getMessage(), ex);
 		}
@@ -401,19 +398,19 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public void searchPROJ(IJavaProject jproject, String name, Feature feature, IProgressMonitor monitor) {
 		System.out.println(">> ENTROU searchPROJ: " + name);
 		try {
-			/* Para todo PACOTE do PROJETO faça: */
+			/* Para todo PACOTE do PROJETO faï¿½a: */
 			IPackageFragment[] pkgs = jproject.getPackageFragments();
 			for (IPackageFragment pkg : pkgs) {
 				ICompilationUnit[] compUnits = pkg.getCompilationUnits();
-				
+
 				for (ICompilationUnit compUnit : compUnits) {
 					CompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
 					CompilationUnit ast = getAst(compUnit);
-					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);						
+					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);
 					//IColorManager nodeColors = source.getColorManager();
 					//nodeColors.beginBatch();
-					
-					for(AbstractTypeDeclaration type : (List<AbstractTypeDeclaration>)ast.types()) {		
+
+					for(AbstractTypeDeclaration type : (List<AbstractTypeDeclaration>)ast.types()) {
 						monitor.setTaskName("Checking type ... PROJ "+type.getName());
 						if(monitor.isCanceled()){
 							throw new OperationCanceledException();
@@ -421,43 +418,43 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 						if(type instanceof TypeDeclaration) {
 							TypeDeclaration td = (TypeDeclaration)type;
 
-							/* se é a PRÓPRIA CLASSE */
-							if(td.resolveBinding().getKey().equals(name)) {							
-								/* marca, se o PAI já nao estiver marcado */
+							/* se ï¿½ a PRï¿½PRIA CLASSE */
+							if(td.resolveBinding().getKey().equals(name)) {
+								/* marca, se o PAI jï¿½ nao estiver marcado */
 								if(ast.types().size() == 1) {
-									marca(managerForFile, ast, feature);							
+									marca(managerForFile, ast, feature);
 								}
 								else if(!managerForFile.hasFeature(td.getParent(), feature)) {
 									marca(managerForFile, td, feature);
 								}
 								/* marca os IMPORTS da classe em todo o projeto */
 								searchIMP(jproject, td.resolveBinding().getKey(), feature, monitor);
-							} 
-							/* se é um FILHO da classe  */
+							}
+							/* se ï¿½ um FILHO da classe  */
 							else if(td.getSuperclassType() != null && checkType(td.getSuperclassType(), name)) {
 								/* procura por esta classe em todo projeto */
-								searchPROJ(jproject, td.resolveBinding().getKey(), feature, monitor);							
+								searchPROJ(jproject, td.resolveBinding().getKey(), feature, monitor);
 							}
-							else {							
+							else {
 								for(Type t : (List<Type>)td.superInterfaceTypes()) {
 									if(checkType(t, name)) {
 										// System.out.println("Interface: " + name);
-										/* marca o nome da interface na cláusula implements */
+										/* marca o nome da interface na clï¿½usula implements */
 										marca(managerForFile, t, feature);
 										IJavaElement ije = jproject.findElement(t.resolveBinding().getKey(), null);
 										if(ije instanceof IType) {
-											/* marca os métodos da interface */
+											/* marca os mï¿½todos da interface */
 											TreeSet<String> aux = new TreeSet<String>();
 
 											IType inter = (IType) ije;
-											for(IMethod m : inter.getMethods()) {												
-												aux.add(m.getElementName() + m.getSignature());												
-											}									
+											for(IMethod m : inter.getMethods()) {
+												aux.add(m.getElementName() + m.getSignature());
+											}
 
 											for(BodyDeclaration bd : (List<BodyDeclaration>)td.bodyDeclarations()) {
 												if(bd.getNodeType() == ASTNode.METHOD_DECLARATION) {
 													MethodDeclaration md = (MethodDeclaration)bd;
-													IMethod im = (IMethod)md.resolveBinding().getJavaElement();												
+													IMethod im = (IMethod)md.resolveBinding().getJavaElement();
 													if(aux.contains(im.getElementName() + im.getSignature()))
 														searchPROJ(jproject, md.resolveBinding().getKey(), feature, monitor);
 												}
@@ -467,16 +464,16 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 								}
 								if(!managerForFile.hasFeature(td.getParent(), feature) &&
 										!managerForFile.hasFeature(td, feature))
-									searchBODY(td.bodyDeclarations(), name, managerForFile, feature, monitor);				
+									searchBODY(td.bodyDeclarations(), name, managerForFile, feature, monitor);
 							}
-						}	
+						}
 						else {
-							System.out.println("Tipo não tratado: " + type.nodeClassForType(type.getNodeType()) + " - " + type.getName().getFullyQualifiedName());
+							System.out.println("Tipo nï¿½o tratado: " + type.nodeClassForType(type.getNodeType()) + " - " + type.getName().getFullyQualifiedName());
 						}
 					}
 
 					//ColoredIDEPlugin.getDefault().notifyListeners(new ColorChangedEvent(this, compUnit, source));
-					managerForFile.commitChanges();	
+					managerForFile.commitChanges();
 				}
 			}
 		}
@@ -485,113 +482,113 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		}
 		System.out.println(">> SAIU searchPROJ: "+ name);
 	}
-	
+
 	public void searchBODY(List<BodyDeclaration> bds, String name, CompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
 		for(BodyDeclaration bd : bds) {
 			//System.out.println(bd.nodeClassForType(bd.getNodeType()));
 			switch(bd.getNodeType()) {
 			case ASTNode.METHOD_DECLARATION: {
 				MethodDeclaration md = (MethodDeclaration)bd;
-				
-//				System.out.println("=========================================");						
-//				System.out.println(">> METODO: " + md.getName().getFullyQualifiedName() + ":" + md.resolveBinding().getKey());
-				
+
+				//				System.out.println("=========================================");
+				//				System.out.println(">> METODO: " + md.getName().getFullyQualifiedName() + ":" + md.resolveBinding().getKey());
+
 				//if(Modifier.isPublic(md.getModifiers()));
-				
+
 				String aux[] = name.split("&");
 				if(aux.length > 1) {
-					assert aux.length > 2;				
-					
-					if(md.resolveBinding().getKey().equals(aux[0])) {						
+					assert aux.length > 2;
+
+					if(md.resolveBinding().getKey().equals(aux[0])) {
 						SingleVariableDeclaration arg = (SingleVariableDeclaration)md.parameters().get(Integer.parseInt(aux[1]));
 						marca(managerForFile, arg, feature);
 						searchSTM(md.getBody(), arg.resolveBinding().getKey(), managerForFile, feature, monitor);
 					}
 					searchSTM(md.getBody(), name, managerForFile, feature, monitor);
-					break;					
+					break;
 				}
-				
+
 				if(md.getReturnType2() != null && checkType(md.getReturnType2(), name)) {
-					/* colore a declaração toda */
-					searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey(), feature, monitor);				
+					/* colore a declaraï¿½ï¿½o toda */
+					searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey(), feature, monitor);
 				}
 				else if(md.resolveBinding().getKey().equals(name)) {
-					/* colore a declaração toda */				
+					/* colore a declaraï¿½ï¿½o toda */
 					marca(managerForFile, md, feature);
 				}
 				else {
-					/* procura nos parâmetros */
+					/* procura nos parï¿½metros */
 					int cont = 0;
 					for(SingleVariableDeclaration svd : (List<SingleVariableDeclaration>) md.parameters()) {
 						if(svd.resolveBinding().getKey().equals(name) || checkType(svd.getType(), name)) {
-							/* adiciona "&999" ao BindingKey para referenciar o número do parâmetro */
+							/* adiciona "&999" ao BindingKey para referenciar o nï¿½mero do parï¿½metro */
 							searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey() + "&" + cont, feature, monitor);
 						}
 						cont++;
-					}					
+					}
 					searchSTM(md.getBody(), name, managerForFile, feature, monitor);
-				}				
+				}
 				break;
 			}
-			
+
 			case ASTNode.FIELD_DECLARATION: {
 				FieldDeclaration fd = (FieldDeclaration)bd;
 				List<VariableDeclarationFragment> frag = fd.fragments();
-				
-				if(checkType(fd.getType(), name)) {					
-					for(VariableDeclarationFragment vd : frag) {									
+
+				if(checkType(fd.getType(), name)) {
+					for(VariableDeclarationFragment vd : frag) {
 						searchBODY(bds, vd.resolveBinding().getKey(), managerForFile, feature, monitor);
 					}
 					break;
 				}
-				
+
 				boolean todos = true, achou = false;
-				
-				for(VariableDeclarationFragment vd : frag) {									
-//					System.out.println(">> CAMPO: " + vd.getName().getFullyQualifiedName() + ":" + vd.resolveBinding().getKey());
+
+				for(VariableDeclarationFragment vd : frag) {
+					//					System.out.println(">> CAMPO: " + vd.getName().getFullyQualifiedName() + ":" + vd.resolveBinding().getKey());
 					if(vd.resolveBinding().getKey().equals(name)) {
-						marca(managerForFile, vd, feature);						
+						marca(managerForFile, vd, feature);
 						achou = true;
 					}
-					else 
+					else
 						if(searchEXP(vd.getInitializer(), name, managerForFile, feature, monitor)) {
-//							System.out.println(">> SE4 (FD):" + vd.getName() + ": " + fd.getType().resolveBinding().getQualifiedName());
+							//							System.out.println(">> SE4 (FD):" + vd.getName() + ": " + fd.getType().resolveBinding().getQualifiedName());
 							if(podeMarcar(vd, managerForFile, feature))
 								log(4, vd);
-							searchBODY(bds, vd.resolveBinding().getKey(), managerForFile, feature, monitor);							
+							searchBODY(bds, vd.resolveBinding().getKey(), managerForFile, feature, monitor);
 						}
 					todos &= managerForFile.hasFeature(vd, feature);
 				}
-				
+
 				if(achou && todos) {
-					/* Se todos os fields da declaração são da feature, colore a declaracao */
+					/* Se todos os fields da declaraï¿½ï¿½o sï¿½o da feature, colore a declaracao */
 					marca(managerForFile, fd, feature);
-					for(VariableDeclarationFragment vd : frag) {									
+					for(VariableDeclarationFragment vd : frag) {
 						managerForFile.removeFeature(vd, feature);
-					}										
-				}									
+					}
+				}
 				break;
 			}
-			
+
 			case ASTNode.TYPE_DECLARATION: {
 				TypeDeclaration td = (TypeDeclaration)bd;
 				searchBODY(td.bodyDeclarations(), name, managerForFile, feature, monitor);
 				break;
 			}
-			
+
 			case ASTNode.INITIALIZER: {
 				Initializer init = (Initializer)bd;
-				searchSTM(init.getBody(), name, managerForFile, feature, monitor);						
+				searchSTM(init.getBody(), name, managerForFile, feature, monitor);
 				break;
 			}
-			
+
 			default: {
-				System.out.println("BodyDeclaration não tratada <" + bd.nodeClassForType(bd.getNodeType()) + ">");
-			}				
+				System.out.println("BodyDeclaration nï¿½o tratada <" + bd.nodeClassForType(bd.getNodeType()) + ">");
+			}
 			}
 		}
 	}
-	
+
 	public void searchSTM(Statement stm, String name, CompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
 		if(stm == null) return;
 		//System.out.println(ASTNode.nodeClassForType(z.getNodeType()).getName());
@@ -602,11 +599,11 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			Boolean todos  = true;
 			for(Statement stmaux : stms) {
 				searchSTM(stmaux, name, managerForFile, feature, monitor);
-				todos &= (managerForFile.hasFeature(stmaux, feature));				
+				todos &= (managerForFile.hasFeature(stmaux, feature));
 			}
 			if(todos && !stms.isEmpty()) {
 				if(b.getParent() != null && b.getParent().getNodeType() == ASTNode.CATCH_CLAUSE) {
-					break;					
+					break;
 				}
 				for(Statement stmaux : stms) {
 					managerForFile.removeFeature(stmaux, feature);
@@ -615,53 +612,53 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					System.out.println("TIPO DO PAI: "+b.getParent().nodeClassForType(b.getParent().getNodeType()));
 					if(b.getParent().getNodeType() == ASTNode.METHOD_DECLARATION) {
 						MethodDeclaration md = (MethodDeclaration)b.getParent();
-						searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey(), feature, monitor);						
+						searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey(), feature, monitor);
 					}
-					else 
-						marca(managerForFile, b, feature);					
+					else
+						marca(managerForFile, b, feature);
 				}
 				else
 					marca(managerForFile, b, feature);
-			}				
+			}
 			break;
-		}		
+		}
 		case ASTNode.VARIABLE_DECLARATION_STATEMENT: {
-			VariableDeclarationStatement vdstm = (VariableDeclarationStatement) stm;			
-			
-			if(checkType(vdstm.getType(), name)) {				
+			VariableDeclarationStatement vdstm = (VariableDeclarationStatement) stm;
+
+			if(checkType(vdstm.getType(), name)) {
 				marca(managerForFile, vdstm, feature);
 				List<VariableDeclarationFragment> frag = vdstm.fragments();
-				for(VariableDeclarationFragment vd : frag) {			
-					searchSTM((Statement)vdstm.getParent(), vd.resolveBinding().getKey(), managerForFile, feature, monitor);				
+				for(VariableDeclarationFragment vd : frag) {
+					searchSTM((Statement)vdstm.getParent(), vd.resolveBinding().getKey(), managerForFile, feature, monitor);
 				}
 				break;
 			}
-				
+
 			List<VariableDeclarationFragment> frag = vdstm.fragments();
 			boolean todos = true, achou = false;
-			for(VariableDeclarationFragment vd : frag) {									
-//				System.out.println(">> LOCAL: " + vd.getName().getFullyQualifiedName() + ":" + vd.resolveBinding().getKey());
-				
+			for(VariableDeclarationFragment vd : frag) {
+				//				System.out.println(">> LOCAL: " + vd.getName().getFullyQualifiedName() + ":" + vd.resolveBinding().getKey());
+
 				if(searchEXP(vd.getInitializer(), name, managerForFile, feature, monitor)) {
 					if(podeMarcar(vd, managerForFile, feature)) {
-//						System.out.println(">> SE4 (VD):" + vd.getName() + ": " + vdstm.getType().resolveBinding().getQualifiedName());
+						//						System.out.println(">> SE4 (VD):" + vd.getName() + ": " + vdstm.getType().resolveBinding().getQualifiedName());
 						marca(managerForFile, vd, feature);
 						log(4, vd);
 					}
 					achou = true;
-					/* Todos os próximos acessos a variável colorida devem ser coloridos.(?) */
+					/* Todos os prï¿½ximos acessos a variï¿½vel colorida devem ser coloridos.(?) */
 					searchSTM((Statement)vdstm.getParent(), vd.resolveBinding().getKey(), managerForFile, feature, monitor);
 				}
 				todos &= managerForFile.hasFeature(vd, feature);
 			}
-			
+
 			if(achou && todos) {
 				marca(managerForFile, vdstm, feature);
-				for(VariableDeclarationFragment vd : frag) {									
+				for(VariableDeclarationFragment vd : frag) {
 					managerForFile.removeFeature(vd, feature);
-				}										
+				}
 			}
-												
+
 			break;
 		}
 		case ASTNode.EXPRESSION_STATEMENT: {
@@ -674,74 +671,74 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		case ASTNode.RETURN_STATEMENT: {
 			ReturnStatement rstm = (ReturnStatement)stm;
 			if(searchEXP(rstm.getExpression(), name, managerForFile, feature, monitor)) {
-				/* SE a EXP do RETURN for colorida, colorir o método todo(?) */
+				/* SE a EXP do RETURN for colorida, colorir o mï¿½todo todo(?) */
 				/*
-				ASTNode aux = rstm.getParent();				
-				
+				ASTNode aux = rstm.getParent();
+
 				while(aux != null && aux.getNodeType() != ASTNode.METHOD_DECLARATION)
 					aux = aux.getParent();
 				if(aux != null) {
 					MethodDeclaration md = (MethodDeclaration)aux;
-					
+
 					if(!seeds.contains("4" + md.resolveBinding().getKey()) &&
 						!(md.getReturnType2() != null &&
 						 (seeds.contains("2" + md.getReturnType2().resolveBinding().getKey()) ||
 						  seeds.contains("3" + md.getReturnType2().resolveBinding().getKey()))) &&
 						!seeds.contains("2" + ((TypeDeclaration)md.getParent()).resolveBinding().getKey())) {
 						System.out.println(">> SE2: " + ((MethodDeclaration)aux).resolveBinding().getName());
-						contE2++;						
+						contE2++;
 					}
 					searchPROJ(nodeColors.getSource().getCompilationUnit().getJavaProject(), ((MethodDeclaration)aux).resolveBinding().getKey(), feature);
 				}
 				else
-				*/
-					marca(managerForFile, rstm, feature); // surreal!!! colore só o return???
+				 */
+				marca(managerForFile, rstm, feature); // surreal!!! colore sï¿½ o return???
 			}
 			break;
 		}
 		case ASTNode.IF_STATEMENT: {
 			IfStatement ifstm = (IfStatement)stm;
-			
+
 			searchSTM(ifstm.getThenStatement(), name, managerForFile, feature, monitor);
-			searchSTM(ifstm.getElseStatement(), name, managerForFile, feature, monitor);		
+			searchSTM(ifstm.getElseStatement(), name, managerForFile, feature, monitor);
 
 			if(searchEXP(ifstm.getExpression(), name , managerForFile, feature, monitor)) { // E1
-				if(managerForFile.hasFeature(ifstm.getThenStatement(), feature) && 
+				if(managerForFile.hasFeature(ifstm.getThenStatement(), feature) &&
 						(ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) {
 					marca(managerForFile, ifstm, feature);
 				}
-				else if(ifstm.getThenStatement() != null && (ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) { 
+				else if(ifstm.getThenStatement() != null && (ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) {
 					marca(managerForFile, ifstm.getThenStatement(), feature);
-					marca(managerForFile, ifstm, feature);				
+					marca(managerForFile, ifstm, feature);
 				}
 				else {
 					marca(managerForFile, ifstm.getExpression(), feature);
-					if(podeMarcar(ifstm, managerForFile, feature)) log(5, ifstm);						
-				}				
+					if(podeMarcar(ifstm, managerForFile, feature)) log(5, ifstm);
+				}
 			}
 			else {
-				if(managerForFile.hasFeature(ifstm.getThenStatement(), feature) && 
+				if(managerForFile.hasFeature(ifstm.getThenStatement(), feature) &&
 						(ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) { // E2
 					if(hasSideEffect(ifstm.getExpression())) { // SE6
-						if(podeMarcar(ifstm, managerForFile, feature)) log(6, ifstm);						
+						if(podeMarcar(ifstm, managerForFile, feature)) log(6, ifstm);
 					}
 					marca(managerForFile, ifstm, feature);
 				}
 			}
-			
+
 			break;
 		}
 		case ASTNode.SWITCH_STATEMENT: {
-			SwitchStatement swstm = (SwitchStatement)stm;			
+			SwitchStatement swstm = (SwitchStatement)stm;
 			if(searchEXP(swstm.getExpression(), name , managerForFile, feature, monitor)){
-				marca(managerForFile, swstm, feature);			
+				marca(managerForFile, swstm, feature);
 			}
 			else {
 				List<Statement> stms = swstm.statements();
 				Boolean todos  = true;
 				for(Statement stmaux : stms) {
 					searchSTM(stmaux, name, managerForFile, feature, monitor);
-					todos &= (managerForFile.hasFeature(stmaux, feature));				
+					todos &= (managerForFile.hasFeature(stmaux, feature));
 				}
 				if(todos && !stms.isEmpty()) {
 					for(Statement stmaux : stms) {
@@ -750,26 +747,26 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					if(hasSideEffect(swstm.getExpression())) { // SE6
 						if(podeMarcar(swstm, managerForFile, feature)) log(6, swstm);
 					}
-					marca(managerForFile, swstm, feature);			
+					marca(managerForFile, swstm, feature);
 				}
 			}
 			break;
-		}	
-		case ASTNode.SWITCH_CASE: {			
-//			SwitchCase swcstm = (SwitchCase)stm;
-//			swcstm.
-//			if(searchEXP(swcstm.getExpression(), name , nodeColors, feature)){
-//				marca(nodeColors, swcstm, feature);			
-//			}
+		}
+		case ASTNode.SWITCH_CASE: {
+			//			SwitchCase swcstm = (SwitchCase)stm;
+			//			swcstm.
+			//			if(searchEXP(swcstm.getExpression(), name , nodeColors, feature)){
+			//				marca(nodeColors, swcstm, feature);
+			//			}
 			break;
 		}
 		case ASTNode.SYNCHRONIZED_STATEMENT: {
 			SynchronizedStatement sstm = (SynchronizedStatement)stm;
 			if(searchEXP(sstm.getExpression(), name, managerForFile, feature, monitor))
-				marca(managerForFile, sstm, feature);				
+				marca(managerForFile, sstm, feature);
 			else {
 				searchSTM(sstm.getBody(), name, managerForFile, feature, monitor);
-				if(managerForFile.hasFeature(sstm.getBody(), feature)) { 
+				if(managerForFile.hasFeature(sstm.getBody(), feature)) {
 					if(hasSideEffect(sstm.getExpression())) { // SE6
 						if(podeMarcar(sstm, managerForFile, feature)) log(6, sstm);
 					}
@@ -786,9 +783,9 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				searchEXP(e, name, nodeColors, feature);
 			}
 			for(Expression e : (List<Expression>)forstm.updaters()) {
-				searchEXP(e, name, nodeColors, feature);				
+				searchEXP(e, name, nodeColors, feature);
 			}
-			*/
+			 */
 			if(searchEXP(forstm.getExpression(), name, managerForFile, feature, monitor)) {
 				marca(managerForFile, forstm.getBody(), feature);
 				marca(managerForFile, forstm, feature);
@@ -804,22 +801,22 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		}
 		case ASTNode.ENHANCED_FOR_STATEMENT: {
 			EnhancedForStatement forstm = (EnhancedForStatement)stm;
-			SingleVariableDeclaration formal = forstm.getParameter();			
+			SingleVariableDeclaration formal = forstm.getParameter();
 			if(formal.resolveBinding().getKey().equals(name) ||
-				checkType(formal.getType(), name) ||
-				searchEXP(forstm.getExpression(), name, managerForFile, feature, monitor)) {
+					checkType(formal.getType(), name) ||
+					searchEXP(forstm.getExpression(), name, managerForFile, feature, monitor)) {
 				marca(managerForFile, forstm.getBody(), feature);
 				marca(managerForFile, forstm, feature);
 			}
 			else {
 				searchSTM(forstm.getBody(), name, managerForFile, feature, monitor);
-				if(managerForFile.hasFeature(forstm.getBody(), feature)) { 
+				if(managerForFile.hasFeature(forstm.getBody(), feature)) {
 					if(podeMarcar(forstm, managerForFile, feature)) log(6, forstm);
 					marca(managerForFile, forstm, feature);
 				}
 			}
 			break;
-			
+
 		}
 		case ASTNode.DO_STATEMENT: {
 			DoStatement dostm = (DoStatement)stm;
@@ -829,7 +826,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			}
 			else {
 				searchSTM(dostm.getBody(), name, managerForFile, feature, monitor);
-				if(managerForFile.hasFeature(dostm.getBody(), feature)) { 
+				if(managerForFile.hasFeature(dostm.getBody(), feature)) {
 					if(podeMarcar(dostm, managerForFile, feature) && hasSideEffect(dostm.getExpression())) log(6, dostm);
 					marca(managerForFile, dostm, feature);
 				}
@@ -839,17 +836,17 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		case ASTNode.WHILE_STATEMENT: {
 			WhileStatement wstm = (WhileStatement)stm;
 			if(searchEXP(wstm.getExpression(), name, managerForFile, feature, monitor)) {
-				marca(managerForFile, wstm.getBody(), feature);				
-				marca(managerForFile, wstm, feature);				
+				marca(managerForFile, wstm.getBody(), feature);
+				marca(managerForFile, wstm, feature);
 			}
 			else {
 				searchSTM(wstm.getBody(), name, managerForFile, feature, monitor);
-				if(managerForFile.hasFeature(wstm.getBody(), feature)) { 
+				if(managerForFile.hasFeature(wstm.getBody(), feature)) {
 					if(podeMarcar(wstm, managerForFile, feature) && hasSideEffect(wstm.getExpression())) log(6, wstm);
 					marca(managerForFile, wstm, feature);
 				}
 			}
-			break;			
+			break;
 		}
 		case ASTNode.TRY_STATEMENT: {
 			TryStatement tstm = (TryStatement)stm;
@@ -857,49 +854,49 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			searchSTM(tstm.getBody(), name, managerForFile, feature, monitor);
 			// catch
 			for(CatchClause cc : (List<CatchClause>) tstm.catchClauses()) {
-				/* Exceção capturada na cláusula Catch */
+				/* Exceï¿½ï¿½o capturada na clï¿½usula Catch */
 				if(checkType(cc.getException().getType(), name))
 					marca(managerForFile, cc.getException(), feature);
-				else {					
+				else {
 					searchSTM(cc.getBody(), name, managerForFile, feature, monitor);
-				}				
-				//if(nodeColors.hasColor(cc.getBody(), feature)) 
-					//marca(nodeColors, cc, feature);
+				}
+				//if(nodeColors.hasColor(cc.getBody(), feature))
+				//marca(nodeColors, cc, feature);
 			}
 			// finally
 			searchSTM(tstm.getFinally(), name, managerForFile, feature, monitor);
-			
-			// bloco try todo colorido e não tem finally, marcar todo o try/catch
-			if(tstm.getFinally() == null && managerForFile.hasFeature(tstm.getBody(), feature)) 
+
+			// bloco try todo colorido e nï¿½o tem finally, marcar todo o try/catch
+			if(tstm.getFinally() == null && managerForFile.hasFeature(tstm.getBody(), feature))
 				marca(managerForFile, tstm, feature);
 			break;
 		}
 		case ASTNode.THROW_STATEMENT: {
 			ThrowStatement trstm = (ThrowStatement)stm;
 			if(searchEXP(trstm.getExpression(), name, managerForFile, feature, monitor))
-				marca(managerForFile, trstm, feature);				
+				marca(managerForFile, trstm, feature);
 			break;
-		}	
+		}
 		case ASTNode.CONSTRUCTOR_INVOCATION: {
-			ConstructorInvocation ci = (ConstructorInvocation)stm;			
+			ConstructorInvocation ci = (ConstructorInvocation)stm;
 
 			String aux[] = name.split("&");
 			if(aux.length > 1) {
 				assert aux.length > 2;
-				
+
 				if(ci.resolveConstructorBinding().getKey().equals(aux[0])) {
 					Expression arg = (Expression)ci.arguments().get(Integer.parseInt(aux[1]));
 					marca(managerForFile, arg, feature);
 				}
-				break;	
+				break;
 			}
 
 			if(ci.resolveConstructorBinding().getKey().equals(name))
-				marca(managerForFile, ci, feature);			
-			
-			List<Expression> args = ci.arguments();			
-			for(Expression arg : args) {				
-				if(searchEXP(arg, name, managerForFile, feature, monitor)) {					
+				marca(managerForFile, ci, feature);
+
+			List<Expression> args = ci.arguments();
+			for(Expression arg : args) {
+				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
 					if(podeMarcar(ci, managerForFile, feature)) {
 						if(ci.resolveConstructorBinding() != null)
 							se3.add(ci.resolveConstructorBinding().getKey());
@@ -908,8 +905,8 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					}
 					break; // novidade
 				}
-			}			
-			break;		
+			}
+			break;
 		}
 		case ASTNode.SUPER_CONSTRUCTOR_INVOCATION: {
 			SuperConstructorInvocation ci = (SuperConstructorInvocation)stm;
@@ -917,23 +914,23 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			String aux[] = name.split("&");
 			if(aux.length > 1) {
 				assert aux.length > 2;
-				
+
 				if(ci.resolveConstructorBinding().getKey().equals(aux[0])) {
 					Expression arg = (Expression)ci.arguments().get(Integer.parseInt(aux[1]));
 					marca(managerForFile, arg, feature);
 				}
-				break;	
+				break;
 			}
 
 			if(searchEXP(ci.getExpression(), name, managerForFile, feature, monitor))
-				marca(managerForFile, ci, feature);			
-				
+				marca(managerForFile, ci, feature);
+
 			if(ci.resolveConstructorBinding().getKey().equals(name))
-				marca(managerForFile, ci, feature);			
-			
-			List<Expression> args = ci.arguments();			
-			for(Expression arg : args) {				
-				if(searchEXP(arg, name, managerForFile, feature, monitor)) {					
+				marca(managerForFile, ci, feature);
+
+			List<Expression> args = ci.arguments();
+			for(Expression arg : args) {
+				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
 					if(podeMarcar(ci, managerForFile, feature)) {
 						if(ci.resolveConstructorBinding() != null)
 							se3.add(ci.resolveConstructorBinding().getKey());
@@ -942,31 +939,31 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					}
 					break; // novidade
 				}
-			}			
-			break;			
-		
+			}
+			break;
+
 		}
-		}		
+		}
 	}
-	
+
 	public boolean searchEXP(Expression exp, String name, CompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
 		if(exp == null) return false;
 		switch(exp.getNodeType()) {
-		case ASTNode.CONDITIONAL_EXPRESSION: {// ternário
+		case ASTNode.CONDITIONAL_EXPRESSION: {// ternï¿½rio
 			ConditionalExpression cond = (ConditionalExpression)exp;
-			boolean a = searchEXP(cond.getExpression(), name, managerForFile, feature, monitor); 
+			boolean a = searchEXP(cond.getExpression(), name, managerForFile, feature, monitor);
 			boolean b = searchEXP(cond.getThenExpression(), name, managerForFile, feature, monitor);
 			boolean c = searchEXP(cond.getElseExpression(), name, managerForFile, feature, monitor);
-			
+
 			if((a || b || c) && !(a && b && c)) {
 				if(podeMarcar(cond, managerForFile, feature)) log(1, cond);
 			}
-				
+
 			/* tem que ver isso aqui no futuro !!! */
 			return a || b || c;
 		}
 		case ASTNode.INSTANCEOF_EXPRESSION: {
-			InstanceofExpression inst = (InstanceofExpression)exp;			
+			InstanceofExpression inst = (InstanceofExpression)exp;
 			boolean a = searchEXP(inst.getLeftOperand(), name, managerForFile, feature, monitor);
 			boolean b = checkType(inst.getRightOperand(), name);
 			if((a || b) && !(a && b)) {
@@ -978,21 +975,21 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			ParenthesizedExpression par = (ParenthesizedExpression)exp;
 			return searchEXP(par.getExpression(), name, managerForFile, feature, monitor);
 		}
-		case ASTNode.CAST_EXPRESSION: {			
+		case ASTNode.CAST_EXPRESSION: {
 			CastExpression cast = (CastExpression)exp;
-			boolean a = searchEXP(cast.getExpression(), name, managerForFile, feature, monitor); 
+			boolean a = searchEXP(cast.getExpression(), name, managerForFile, feature, monitor);
 			boolean b = checkType(cast.getType(), name);
 			if((a || b) && !(a && b)) {
 				if(podeMarcar(cast, managerForFile, feature)) log(1, cast);
-			}			
+			}
 			return a || b;
 		}
-		case ASTNode.PREFIX_EXPRESSION: {			
+		case ASTNode.PREFIX_EXPRESSION: {
 			PrefixExpression pre = (PrefixExpression)exp;
 			return searchEXP(pre.getOperand(), name, managerForFile, feature, monitor);
 		}
-		case ASTNode.POSTFIX_EXPRESSION: {	
-			PostfixExpression pos = (PostfixExpression)exp;			
+		case ASTNode.POSTFIX_EXPRESSION: {
+			PostfixExpression pos = (PostfixExpression)exp;
 			return searchEXP(pos.getOperand(), name, managerForFile, feature, monitor);
 		}
 		case ASTNode.INFIX_EXPRESSION: {
@@ -1009,15 +1006,15 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			}
 			if(contMarcada > 0 && contMarcada < cont) {
 				if(podeMarcar(inf, managerForFile, feature)) log(1, inf);
-			}				
+			}
 			return contMarcada > 0;
-		}	
+		}
 		case ASTNode.ASSIGNMENT: {
 			Assignment asg = (Assignment)exp;
 			boolean esq = searchEXP(asg.getLeftHandSide(), name, managerForFile, feature, monitor);
-			boolean dir = searchEXP(asg.getRightHandSide(), name, managerForFile, feature, monitor);			
+			boolean dir = searchEXP(asg.getRightHandSide(), name, managerForFile, feature, monitor);
 			if(!esq && dir) {
-//				System.out.println(">> SE4 (ASSIGN): " + asg.toString());
+				//				System.out.println(">> SE4 (ASSIGN): " + asg.toString());
 				if(podeMarcar(asg, managerForFile, feature)) log(4, asg);
 				switch(asg.getLeftHandSide().getNodeType()) {
 				case ASTNode.SIMPLE_NAME: {
@@ -1027,37 +1024,37 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					break;
 				}
 				case ASTNode.FIELD_ACCESS: {
-					searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), ((FieldAccess)asg.getLeftHandSide()).resolveFieldBinding().getKey(), feature, monitor);					
-					break;					
+					searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), ((FieldAccess)asg.getLeftHandSide()).resolveFieldBinding().getKey(), feature, monitor);
+					break;
 				}
 				default:
 					System.out.println("ERRO: "+asg.getLeftHandSide().nodeClassForType(asg.getLeftHandSide().getNodeType()));
 				}
 				return false;
 			}
-			return esq;				
-		}		
+			return esq;
+		}
 		case ASTNode.CLASS_INSTANCE_CREATION: {
 			ClassInstanceCreation cic = (ClassInstanceCreation)exp;
 			List<Expression> args = cic.arguments();
 
 			String aux[] = name.split("&");
 			if(aux.length > 1) {
-				//System.out.println("É CIC: "+cic.toString()+"\nAux:" + name);
+				//System.out.println("ï¿½ CIC: "+cic.toString()+"\nAux:" + name);
 				assert aux.length > 2;
-				
+
 				if(cic.resolveConstructorBinding().getKey().equals(aux[0])) {
 					Expression arg = (Expression)cic.arguments().get(Integer.parseInt(aux[1]));
 					marca(managerForFile, arg, feature);
 				}
-				return false;	
+				return false;
 			}
 			else if(checkType(cic.getType(), name)) {
-				for(Expression arg : args) 			
+				for(Expression arg : args)
 					managerForFile.removeFeature(arg, feature);
-				return true;			
+				return true;
 			}
-				
+
 			for(Expression arg : args) {
 				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
 					if(podeMarcar(cic, managerForFile, feature)) {
@@ -1074,13 +1071,13 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				AnonymousClassDeclaration acd  = cic.getAnonymousClassDeclaration();
 				searchBODY(acd.bodyDeclarations(), name, managerForFile, feature, monitor);
 			}
-			
+
 			break;
-		}			
+		}
 		case ASTNode.SUPER_METHOD_INVOCATION: {
 			SuperMethodInvocation mi = (SuperMethodInvocation)exp;
-			List<Expression> args = mi.arguments();	
-			
+			List<Expression> args = mi.arguments();
+
 			String aux[] = name.split("&");
 			if(aux.length > 1) {
 				assert aux.length > 2;
@@ -1088,16 +1085,16 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					Expression arg = (Expression)mi.arguments().get(Integer.parseInt(aux[1]));
 					marca(managerForFile, arg, feature);
 				}
-				return false;	
+				return false;
 			}
 			else if(mi.resolveMethodBinding().getKey().equals(name)) {
-				for(Expression arg : args) 			
+				for(Expression arg : args)
 					managerForFile.removeFeature(arg, feature);
-				return true;			
+				return true;
 			}
-			
-			for(Expression arg : args) {				
-				if(searchEXP(arg, name, managerForFile, feature, monitor)) {					
+
+			for(Expression arg : args) {
+				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
 					if(podeMarcar(mi, managerForFile, feature)) {
 						if(mi.resolveMethodBinding() != null)
 							se3.add(mi.resolveMethodBinding().getKey());
@@ -1107,7 +1104,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					return true; // novidade
 				}
 			}
-			break;			
+			break;
 		}
 		case ASTNode.METHOD_INVOCATION: {
 			MethodInvocation mi = (MethodInvocation)exp;
@@ -1117,7 +1114,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			if(searchEXP(mi.getExpression(), name, managerForFile, feature, monitor))
 				return true;
 			/* fim verificar */
-			
+
 			String aux[] = name.split("&");
 			if(aux.length > 1) {
 				assert aux.length > 2;
@@ -1125,17 +1122,17 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					Expression arg = (Expression)mi.arguments().get(Integer.parseInt(aux[1]));
 					marca(managerForFile, arg, feature);
 				}
-				return false;	
+				return false;
 			}
 			else if(mi.resolveMethodBinding().getKey().equals(name)) {
-				for(Expression arg : args) 			
+				for(Expression arg : args)
 					managerForFile.removeFeature(arg, feature);
-				return true;			
+				return true;
 			}
-			
+
 			//int cont = 0;
-			for(Expression arg : args) {				
-				if(searchEXP(arg, name, managerForFile, feature, monitor)) {					
+			for(Expression arg : args) {
+				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
 					if(podeMarcar(mi, managerForFile, feature)) {
 						if(mi.resolveMethodBinding() != null)
 							se3.add(mi.resolveMethodBinding().getKey());
@@ -1143,51 +1140,51 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 						//marca(nodeColors, cic, feature);
 					}
 					return true; // novidade
-					/* Localiza a decaracao do método para marcar o argumento */
-//					searchPROJ(nodeColors.getSource().getCompilationUnit().getJavaProject(), mi.resolveMethodBinding().getKey() + "&" + cont, feature);
+					/* Localiza a decaracao do mï¿½todo para marcar o argumento */
+					//					searchPROJ(nodeColors.getSource().getCompilationUnit().getJavaProject(), mi.resolveMethodBinding().getKey() + "&" + cont, feature);
 				}
 				//cont++;
 			}
-			break;		
+			break;
 		}
 		case ASTNode.THIS_EXPRESSION: {
 			ThisExpression te = (ThisExpression)exp;
-			
+
 			if(te.resolveTypeBinding().getKey().equals(name))
 				return true;
-			break;			
-		}			
+			break;
+		}
 		case ASTNode.SUPER_FIELD_ACCESS: {
-			SuperFieldAccess fa = (SuperFieldAccess)exp;	
-			
-			
-//			if(searchEXP(fa.getExpression(), name, nodeColors, feature))
-//				return true;
+			SuperFieldAccess fa = (SuperFieldAccess)exp;
+
+
+			//			if(searchEXP(fa.getExpression(), name, nodeColors, feature))
+			//				return true;
 			return searchEXP(fa.getQualifier(), name, managerForFile, feature, monitor);
 		}
 		case ASTNode.FIELD_ACCESS: {
 			/*
-			 * A().B, onde A é uma EXPRESSION e B é um SimpleName
+			 * A().B, onde A ï¿½ uma EXPRESSION e B ï¿½ um SimpleName
 			 */
 			FieldAccess fa = (FieldAccess)exp;
 			if(searchEXP(fa.getExpression(), name, managerForFile, feature, monitor))
 				return true;
-			
+
 			return searchEXP(fa.getName(), name, managerForFile, feature, monitor);
-		}	
+		}
 		case ASTNode.QUALIFIED_NAME: {
 			/*
-			 * A.B, onde A é um NAME e B é um SimpleName
+			 * A.B, onde A ï¿½ um NAME e B ï¿½ um SimpleName
 			 */
 			QualifiedName qn = (QualifiedName)exp;
-			
+
 			if(searchEXP(qn.getQualifier(), name, managerForFile, feature, monitor))
 				return true;
 			return searchEXP(qn.getName(), name, managerForFile, feature, monitor);
-		}		
-		case ASTNode.SIMPLE_NAME: {		
-			SimpleName sn = (SimpleName)exp;			
-			//System.out.println(sn.resolveBinding().getKey());			
+		}
+		case ASTNode.SIMPLE_NAME: {
+			SimpleName sn = (SimpleName)exp;
+			//System.out.println(sn.resolveBinding().getKey());
 			if(sn.resolveBinding().getKey().equals(name) || (sn.resolveTypeBinding() != null && sn.resolveTypeBinding().getKey().equals(name)))
 				return true;
 			break;
@@ -1197,27 +1194,27 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			if(tl.getType() == null || tl.getType().resolveBinding() == null)
 				return false;
 			else
-				return checkType(tl.getType(), name);	
-			
+				return checkType(tl.getType(), name);
+
 		}
-//		default: {
-//			System.out.println("Expression não tratada: " + exp.nodeClassForType(exp.getNodeType()) + exp.toString());			
-//		}			
+		//		default: {
+		//			System.out.println("Expression nï¿½o tratada: " + exp.nodeClassForType(exp.getNodeType()) + exp.toString());
+		//		}
 		}
 		return false;
 	}
 
 	public void searchIMP(IJavaProject jproject, String name, Feature feature, IProgressMonitor monitor) {
 		try {
-			/* Para todo PACOTE do PROJETO faça: */
+			/* Para todo PACOTE do PROJETO faï¿½a: */
 			if(name == null)
 				return;
 			IPackageFragment[] pkgs = jproject.getPackageFragments();
-			if(pkgs == null) 
+			if(pkgs == null)
 				return;
 			for (IPackageFragment pkg : pkgs) {
 				ICompilationUnit[] compUnits = pkg.getCompilationUnits();
-				if(compUnits == null) 
+				if(compUnits == null)
 					continue;
 				for (ICompilationUnit compUnit : compUnits) {
 					monitor.setTaskName("Checking compilation unit "+compUnit.getElementName());
@@ -1225,21 +1222,21 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 						throw new OperationCanceledException();
 					}
 					monitor.setTaskName("Checking type ... IMP "+compUnit.getElementName());
-					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);						
+					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);
 					//IColorManager nodeColors = source.getColorManager();
 					CompilationUnitFeaturesManager manager = getSafeManager(jproject, compUnit);
 					CompilationUnit ast = getAst(manager.getCompilationUnit());
-					//nodeColors.beginBatch();		
+					//nodeColors.beginBatch();
 					for(ImportDeclaration imp : (List<ImportDeclaration>)ast.imports()) {
 						//if(imp.getName().getFullyQualifiedName().equals(name) &&
-						
+
 						if(imp.resolveBinding() != null && imp.resolveBinding().getKey().equals(name) &&
-								!manager.hasFeature(imp, feature) && 
+								!manager.hasFeature(imp, feature) &&
 								!manager.hasFeature(imp.getParent(), feature)) {
 							marca(manager, imp, feature);
-						}						
-					}				
-					manager.commitChanges();		
+						}
+					}
+					manager.commitChanges();
 				}
 			}
 		}
@@ -1247,26 +1244,26 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public boolean checkType(Type t, String name) {
 		if(t.isParameterizedType()) {
 			ParameterizedType pt = (ParameterizedType)t;
 			boolean r = checkType(pt.getType(), name);
-			
-			for(Type aux : (List<Type>)pt.typeArguments()) 
+
+			for(Type aux : (List<Type>)pt.typeArguments())
 				r |= checkType(aux, name);
-			
+
 			return r;
 		}
 		else {
 			return t.resolveBinding().getKey().equals(name);
 		}
 	}
-	
+
 	private IJavaProject getSelectedJavaProject() {
 		if (selection instanceof IStructuredSelection) {
 			Object selected = ((IStructuredSelection) selection)
-			.getFirstElement();
+					.getFirstElement();
 			if (selected instanceof IJavaProject)
 				return (IJavaProject) selected;
 		}
@@ -1276,7 +1273,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public boolean hasSideEffect(Expression exp) {
 		if(exp == null) return false;
 		switch(exp.getNodeType()) {
-		case ASTNode.CONDITIONAL_EXPRESSION: {// ternário
+		case ASTNode.CONDITIONAL_EXPRESSION: {// ternï¿½rio
 			ConditionalExpression cond = (ConditionalExpression)exp;
 			if(hasSideEffect(cond.getExpression()))
 				return true;
@@ -1287,25 +1284,25 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			return false;
 		}
 		case ASTNode.INSTANCEOF_EXPRESSION: {
-			InstanceofExpression inst = (InstanceofExpression)exp;			
+			InstanceofExpression inst = (InstanceofExpression)exp;
 			return hasSideEffect(inst.getLeftOperand());
 		}
 		case ASTNode.PARENTHESIZED_EXPRESSION: {
 			ParenthesizedExpression par = (ParenthesizedExpression)exp;
 			return hasSideEffect(par.getExpression());
 		}
-		case ASTNode.CAST_EXPRESSION: {			
+		case ASTNode.CAST_EXPRESSION: {
 			CastExpression cast = (CastExpression)exp;
-			return hasSideEffect(cast.getExpression()); 
+			return hasSideEffect(cast.getExpression());
 		}
-		case ASTNode.PREFIX_EXPRESSION: {			
+		case ASTNode.PREFIX_EXPRESSION: {
 			PrefixExpression pre = (PrefixExpression)exp;
 			if(pre.getOperator().equals(Operator.DECREMENT) || pre.getOperator().equals(Operator.INCREMENT))
 				return true;
 			else
-				return hasSideEffect(pre.getOperand());			
+				return hasSideEffect(pre.getOperand());
 		}
-		case ASTNode.POSTFIX_EXPRESSION: {	
+		case ASTNode.POSTFIX_EXPRESSION: {
 			PostfixExpression pos = (PostfixExpression)exp;
 			if(pos.getOperator().equals(Operator.DECREMENT) || pos.getOperator().equals(Operator.INCREMENT))
 				return true;
@@ -1323,18 +1320,18 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					return true;
 			}
 			return false;
-		}	
+		}
 		case ASTNode.ASSIGNMENT: {
 			Assignment asg = (Assignment)exp;
-			return true;				
-		}		
+			return true;
+		}
 		case ASTNode.CLASS_INSTANCE_CREATION: {
 			ClassInstanceCreation cic = (ClassInstanceCreation)exp;
 			return true;
-		}			
+		}
 		case ASTNode.SUPER_METHOD_INVOCATION: {
 			SuperMethodInvocation mi = (SuperMethodInvocation)exp;
-			return true;		
+			return true;
 		}
 		case ASTNode.METHOD_INVOCATION: {
 			MethodInvocation mi = (MethodInvocation)exp;
@@ -1342,45 +1339,45 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		}
 		case ASTNode.THIS_EXPRESSION: {
 			ThisExpression te = (ThisExpression)exp;
-			return false;	
-		}			
+			return false;
+		}
 		case ASTNode.SUPER_FIELD_ACCESS: {
-			SuperFieldAccess fa = (SuperFieldAccess)exp;	
+			SuperFieldAccess fa = (SuperFieldAccess)exp;
 			return hasSideEffect(fa.getQualifier());
 		}
 		case ASTNode.FIELD_ACCESS: {
 			/*
-			 * A().B, onde A é uma EXPRESSION e B é um SimpleName
+			 * A().B, onde A ï¿½ uma EXPRESSION e B ï¿½ um SimpleName
 			 */
 			FieldAccess fa = (FieldAccess)exp;
 			if(hasSideEffect(fa.getExpression()))
 				return true;
 			else
 				return false;
-		}	
+		}
 		case ASTNode.QUALIFIED_NAME: {
 			/*
-			 * A.B, onde A é um NAME e B é um SimpleName
+			 * A.B, onde A ï¿½ um NAME e B ï¿½ um SimpleName
 			 */
 			QualifiedName qn = (QualifiedName)exp;
-			
+
 			if(hasSideEffect(qn.getQualifier()))
 				return true;
-			else		
+			else
 				return false;
-		}		
-		case ASTNode.SIMPLE_NAME: {		
-			SimpleName sn = (SimpleName)exp;			
-			return false;			
+		}
+		case ASTNode.SIMPLE_NAME: {
+			SimpleName sn = (SimpleName)exp;
+			return false;
 		}
 		case ASTNode.TYPE_LITERAL: {
 			TypeLiteral tl = (TypeLiteral)exp;
-			return false;		
+			return false;
 		}
 		default: {
-			System.out.println(">>> Expression não tratada (hasSideEffect): " + exp.nodeClassForType(exp.getNodeType()) + " - " + exp.toString());
+			System.out.println(">>> Expression nï¿½o tratada (hasSideEffect): " + exp.nodeClassForType(exp.getNodeType()) + " - " + exp.toString());
 			return false;
-		}			
+		}
 		}
 	}
 
@@ -1391,7 +1388,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		shell = targetPart.getSite().getShell();
 	}
-	
+
 	private void marca(CompilationUnitFeaturesManager managerForFile, ASTNode n, Feature c) {
 		if(podeMarcar(n, managerForFile, c))
 			managerForFile.setFeature(n, c);
@@ -1400,7 +1397,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	private boolean podeMarcar(ASTNode n, CompilationUnitFeaturesManager managerForFile, Feature c) {
 		ASTNode aux = n;
 		boolean pode = managerForFile.hasFeature(aux, c);
-		while(aux != null && !pode) {			
+		while(aux != null && !pode) {
 			aux = aux.getParent();
 			if(aux != null) {
 				//System.out.println(">>"+aux.nodeClassForType(aux.getNodeType()));
@@ -1413,13 +1410,13 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 						else
 							pode |= seeds.contains("2" + ((TypeDeclaration)aux).resolveBinding().getKey());
 					}
-				
+
 				pode |= managerForFile.hasFeature(aux, c);
 			}
 		}
 		return !pode;
 	}
-	
+
 	private void log(int se, ASTNode n) {
 		switch(se) {
 		case 1:
@@ -1441,74 +1438,74 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			contSE6++;
 			break;
 		}
-		
+
 		if(n.getRoot().getNodeType() == n.COMPILATION_UNIT) {
 			String msg = "SE" + se + "~" +
-						n.nodeClassForType(n.getNodeType()).getSimpleName() + "~"+
-						((CompilationUnit)n.getRoot()).getJavaElement().getPath().toOSString() + "~" +
-						n.getStartPosition() + "~" +
-						n.getLength() + "~\"" +
-						n.toString() + "\"";		
+					n.nodeClassForType(n.getNodeType()).getSimpleName() + "~"+
+					((CompilationUnit)n.getRoot()).getJavaElement().getPath().toOSString() + "~" +
+					n.getStartPosition() + "~" +
+					n.getLength() + "~\"" +
+					n.toString() + "\"";
 			System.out.println(msg);
-			arqLog.println(msg);			
+			arqLog.println(msg);
 		}
 		else
 			System.out.println(">>>>>> Erro no LOG. Verifique!");
 	}
-	
-//	public void searchIFDEF(IJavaProject jproject, Feature feature) {
-//		try {
-//			/* Para todo PACOTE do PROJETO faça: */
-//			IPackageFragment[] pkgs = jproject.getPackageFragments();
-//			if(pkgs == null) 
-//				return;
-//			for (IPackageFragment pkg : pkgs) {
-//				ICompilationUnit[] compUnits = pkg.getCompilationUnits();
-//				if(compUnits == null) 
-//					continue;
-//				for (ICompilationUnit compUnit : compUnits) {
-//					CompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
-//					CompilationUnit ast = getAst(compUnit);
-////					IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);						
-////					IColorManager nodeColors = source.getColorManager();
-//					Stack<Integer> pilha = new Stack<Integer>();
-//					
-//					for(Comment co : (List<Comment>)ast.getCommentList()) {
-//						if(co.isLineComment()) {
-//							int tam = co.getLength();
-//							int pos = co.getStartPosition();
-//							String com = compUnit.getSource().substring(pos, pos+tam);
-//							/* //#if defined(LOGGING) 
-//							 * //#if defined(ACTIVITYDIAGRAM)
-//							 * //#if defined(UMLSTATEDIAGRAM)
-//							 * //#if defined(COGNITIVE) 
-//							 * */
-//							if(com.startsWith("//#if")) {
-//								if(com.contains("defined(LOGGING)"))// &&  !com.contains("defined(UMLSTATEDIAGRAM)") )
-//									pilha.push(pos);
-//								else
-//									pilha.push(-1);
-//							}
-//							else if(com.startsWith("//#endif")) {
-//								int aux = pilha.pop();
-//								if(aux != -1) {
-//									ToggleTextColorContext context = new ToggleTextColorContext(source, new TextSelection(aux, pos+tam - aux + 1));
-//									context.run(feature, true);		
-//									if(context.getSelectedNodes().isEmpty()) {
-//										System.out.println(">> Zero nós marcados: " + compUnit.getSource().substring(aux, pos+tam));
-//										System.out.println(">> Local: " + compUnit.getElementName() + "; posição: " + co.getStartPosition());										
-//									}
-//								}								
-//							}
-//								
-//						}
-//						
-//					}
-//				}
-//			}
-//		}
-//		catch(CoreException e){
-//			e.printStackTrace();
-//		}
-//	}
+
+	//	public void searchIFDEF(IJavaProject jproject, Feature feature) {
+	//		try {
+	//			/* Para todo PACOTE do PROJETO faï¿½a: */
+	//			IPackageFragment[] pkgs = jproject.getPackageFragments();
+	//			if(pkgs == null)
+	//				return;
+	//			for (IPackageFragment pkg : pkgs) {
+	//				ICompilationUnit[] compUnits = pkg.getCompilationUnits();
+	//				if(compUnits == null)
+	//					continue;
+	//				for (ICompilationUnit compUnit : compUnits) {
+	//					CompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
+	//					CompilationUnit ast = getAst(compUnit);
+	////					IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);
+	////					IColorManager nodeColors = source.getColorManager();
+	//					Stack<Integer> pilha = new Stack<Integer>();
+	//
+	//					for(Comment co : (List<Comment>)ast.getCommentList()) {
+	//						if(co.isLineComment()) {
+	//							int tam = co.getLength();
+	//							int pos = co.getStartPosition();
+	//							String com = compUnit.getSource().substring(pos, pos+tam);
+	//							/* //#if defined(LOGGING)
+	//							 * //#if defined(ACTIVITYDIAGRAM)
+	//							 * //#if defined(UMLSTATEDIAGRAM)
+	//							 * //#if defined(COGNITIVE)
+	//							 * */
+	//							if(com.startsWith("//#if")) {
+	//								if(com.contains("defined(LOGGING)"))// &&  !com.contains("defined(UMLSTATEDIAGRAM)") )
+	//									pilha.push(pos);
+	//								else
+	//									pilha.push(-1);
+	//							}
+	//							else if(com.startsWith("//#endif")) {
+	//								int aux = pilha.pop();
+	//								if(aux != -1) {
+	//									ToggleTextColorContext context = new ToggleTextColorContext(source, new TextSelection(aux, pos+tam - aux + 1));
+	//									context.run(feature, true);
+	//									if(context.getSelectedNodes().isEmpty()) {
+	//										System.out.println(">> Zero nï¿½s marcados: " + compUnit.getSource().substring(aux, pos+tam));
+	//										System.out.println(">> Local: " + compUnit.getElementName() + "; posiï¿½ï¿½o: " + co.getStartPosition());
+	//									}
+	//								}
+	//							}
+	//
+	//						}
+	//
+	//					}
+	//				}
+	//			}
+	//		}
+	//		catch(CoreException e){
+	//			e.printStackTrace();
+	//		}
+	//	}
 }

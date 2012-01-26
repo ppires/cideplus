@@ -11,28 +11,28 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.TreeItem;
 
 public class MeuWizard extends Wizard {
-	private IProject p;
-	private WizardPagina1 p1;
-	private WizardPagina2 p2;
+	private IProject project;
+	private WizardPagina1 page1;
+	private WizardPagina2 page2;
 	private TreeSet<String> seeds;
 	private ArrayList<IPackageFragment> pacotes;
 	public int feature = -1;
 	
 	public MeuWizard(IProject project, ArrayList<IPackageFragment> pacotes, TreeSet<String> seeds) {
-		this.p = project;
-		this.p1 = new WizardPagina1("SelectFeatures", this.p);
-		this.p2 = new WizardPagina2("SelectFeatures2", this.p);
+		this.project = project;
+		this.page1 = new WizardPagina1("SelectFeatures", this.project);
+		this.page2 = new WizardPagina2("SelectFeatures2", this.project);
 		this.seeds = seeds;		
 		this.pacotes = pacotes;
-		addPage(this.p1);		
-		addPage(this.p2);	
+		addPage(this.page1);		
+		addPage(this.page2);	
 	}
 
 	public boolean performFinish() {
-		if(this.p1.combo.getSelectionIndex() > -1 && this.p2.tree.getSelectionCount() > 0) {
-			this.feature = this.p1.combo.getSelectionIndex();
+		if(this.page1.combo.getSelectionIndex() > -1 && this.page2.tree.getSelectionCount() > 0) {
+			this.feature = this.page1.combo.getSelectionIndex();
 			this.seeds.clear();
-			for(TreeItem i : this.p2.tree.getSelection()) {
+			for(TreeItem i : this.page2.tree.getSelection()) {
 				if(i.getData() instanceof String)
 					this.seeds.add((String)i.getData());
 				else if(i.getData() instanceof IPackageFragmentRoot) {
