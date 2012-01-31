@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+
+	<!-- Popup Menu do package explorer -->
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
@@ -54,7 +56,32 @@
          </action>
       </objectContribution>
    </extension>
-
+ 
+   <!-- Popup menu do editor -->
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+         id="cideplus.ui.editorViewerContribution" 
+         targetID="cideplus.FeaturerCompilationUnitEditor.EditorContext">
+         <action
+               label="Mark Feature..."
+               class="cideplus.ui.editor.popup.actions.MarkFeatureInEditorAction"
+               id="cideplus.ui.editor.popup.markFeaturePopupAction"
+               menubarPath="additions">
+         </action>
+      </viewerContribution>
+   </extension>
+ 
+	<!-- Marker das features -->
+	<extension 
+	      point="org.eclipse.core.resources.markers" 
+	      id="cideplus.markers.featuresMarker"
+	      name="Features Marker">
+	   <super type="org.eclipse.core.resources.textmarker"/>
+	   <super type="org.eclipse.core.resources.marker"/>
+	   <persistent value="true"/>
+	   <attribute name="feature_id"/>
+	</extension> 
  
 
      <extension
