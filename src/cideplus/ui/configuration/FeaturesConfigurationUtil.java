@@ -250,7 +250,6 @@ public class FeaturesConfigurationUtil {
 
 	public static void updateEditors(Display display, final ASTNode compilationUnit) {
 		display.asyncExec(new Runnable() {
-
 			public void run() {
 				doUpdateEditors(compilationUnit);
 			}

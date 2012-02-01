@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
@@ -28,20 +30,34 @@ public class FeaturesMarkerFactory {
 		HashMap<String, Object> attributes = createMarkerAttributes(selection, feature_id);
 		IMarker marker = resource.createMarker(FEATURES_MARKER_ID);
 		marker.setAttributes(attributes);
+
+		Object compUnitAdapter = resource.getAdapter(CompilationUnit.class);
+		CompilationUnit compUnit = null;
+		if (compUnitAdapter != null) {
+			compUnit = (CompilationUnit) compUnitAdapter;
+			System.out.println("Made cast...");
+		}
+		System.out.println("compUnit: " + compUnit);
+		if (resource instanceof IFile) {
+			System.out.println("IFile");
+		}
+
+
+
+
+		//		FeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(resource.getProject());
+		//		CompilationUnitFeaturesManager safe_manager = manager.getManagerForFile(compUnit);
+		//		CompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
+		//		CompilationUnit ast = resource.getAdapter(CompilationUnit);
+		//		//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);
+		//		//IColorManager nodeColors = source.getColorManager();
+		//		//nodeColors.beginBatch();
+		//		managerForFile.setFeature(ast, feature);
+		//		managerForFile.commitChanges();
+
+
 		return marker;
 	}
-
-	//	public static void createMarker(IResource resource, ITextSelection selection)
-	//	throws CoreException {
-	//		int char_end = selection.getOffset() + selection.getLength();
-	//		HashMap<String, Object>map = new HashMap<String, Object>();
-	//		MarkerUtilities.setLineNumber(map, selection.getStartLine());
-	//		MarkerUtilities.setCharStart(map, selection.getOffset());
-	//		MarkerUtilities.setCharEnd(map, char_end);
-	//		map.put("feature_id", new Integer(666));
-	//		MarkerUtilities.createMarker(resource, map, MARKER_ID);
-	//		System.out.println("marker created!");
-	//	}
 
 	//	public static void addAnnotation(IMarker marker, ITextSelection selection) {
 	//		ITextEditor editor = PluginUtils.getCurrentTextEditor();
@@ -78,7 +94,7 @@ public class FeaturesMarkerFactory {
 
 
 	/* Returns a list of markers that are linked to the resource or any sub resource of the resource */
-	public static List<IMarker> findAllMarkers(IResource  resource) {
+	public static List<IMarker> findAllRelatedMarkers(IResource  resource) {
 		try {
 			return Arrays.asList(resource.findMarkers(FEATURES_MARKER_ID, true, IResource.DEPTH_INFINITE));
 		} catch (CoreException e) {
@@ -96,10 +112,16 @@ public class FeaturesMarkerFactory {
 		}
 	}
 
+	private static HashMap<String, Object> createMarkerAttributes(ITextSelection selection, int feature_id) {
+		HashMap<String, Object> attributes = new HashMap<String, Object>();
+		//MarkerUtilities.setLineNumber(attributes, selection.getStartLine());
+		MarkerUtilities.setCharStart(attributes, selection.getOffset());
+		MarkerUtilities.setCharEnd(attributes, selection.getOffset() + selection.getLength());
+		attributes.put("feature_id", new Integer(feature_id));
+		attributes.put("length", new Integer(selection.getLength()));
+		return attributes;
+	}
 
-	/*
-	 * Returns the selection of the package explorer
-	 */
 	public static TreeSelection getTreeSelection() {
 		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
 		if(selection instanceof TreeSelection){
@@ -124,13 +146,11 @@ public class FeaturesMarkerFactory {
 		}
 	}
 
-	private static HashMap<String, Object> createMarkerAttributes(ITextSelection selection, int feature_id) {
-		HashMap<String, Object> attributes = new HashMap<String, Object>();
-		//MarkerUtilities.setLineNumber(attributes, selection.getStartLine());
-		MarkerUtilities.setCharStart(attributes, selection.getOffset());
-		MarkerUtilities.setCharEnd(attributes, selection.getOffset() + selection.getLength());
-		attributes.put("feature_id", new Integer(feature_id));
-		return attributes;
+	public static void printAllMarkers() {
+		for (IMarker marker : findAllMarkers()) {
+			printMarker(marker);
+			System.out.println(System.getProperty("line.separator"));
+		}
 	}
 }
 

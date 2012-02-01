@@ -129,9 +129,12 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		}
 	}
 
+
+
 	boolean stopGrowingCache;
 	int cacheUtilization = 0;
 	private Map<ICompilationUnit, CompilationUnit> cacheAst;
+
 	private CompilationUnit getAst(ICompilationUnit compUnit) {
 		CompilationUnit ast;
 		if(!stopGrowingCache){
@@ -345,7 +348,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					//ColoredIDEPlugin.getDefault().notifyListeners(new ColorChangedEvent(this, source.getAST(), source));
 					//nodeColors.endBatch();
 				}
-				System.out.println("conclu�do!");
+				System.out.println("concluído!");
 			}
 
 

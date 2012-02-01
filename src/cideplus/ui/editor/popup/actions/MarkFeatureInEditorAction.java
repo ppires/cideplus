@@ -1,6 +1,5 @@
 package cideplus.ui.editor.popup.actions;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
@@ -30,7 +29,6 @@ public class MarkFeatureInEditorAction implements IEditorActionDelegate {
 	 */
 	public void run(IAction action) {
 		ITextSelection selection = PluginUtils.getCurrentTextSelection();
-		System.out.println("offset: " + selection.getOffset() + " length: " + selection.getLength());
 		try {
 			IResource resource = PluginUtils.getCurrentFile();
 			FeaturesMarkerFactory.createMarker(resource, selection, 1);
@@ -39,11 +37,7 @@ public class MarkFeatureInEditorAction implements IEditorActionDelegate {
 			e.printStackTrace();
 		}
 
-		System.out.println("-----");
-		for(IMarker marker: FeaturesMarkerFactory.findAllMarkers()) {
-			FeaturesMarkerFactory.printMarker(marker);
-			System.out.println(System.getProperty("line.separator"));
-		}
+		//		FeaturesMarkerFactory.printAllMarkers();
 	}
 
 	/**
