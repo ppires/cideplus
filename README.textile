@@ -1,7 +1,7 @@
-*CIDE+*
+h1. CIDE+
 
 The extraction of non-trivial software product lines (SPL) from a legacy application is a time-consuming task. First, developers need to identify the components responsible for the implementation of each program feature. Next, they must locate the lines of code that reference the components discovered in the previous step. Finally, they must extract such lines to independent modules or they must annotate the lines in some way. In order to speed up product line extraction, CIDE+ is a tool that supports a semi-automatic approach to annotate the code of optional features in SPL. The proposed approach is based on an existing tool to product line development, called CIDE, that enhances standard IDE with the ability to associate background colors to the lines of code that implement a feature.
 
 According to our approach, SPL developers must initially supply a set of syntactic elements -- including for example packages, classes, methods, and fields -- associated to the features under extraction. These elements are called the feature seeds, or just seeds. Our annotation algorithm is a fixed-point algorithm with two phases. In the first phase, called color propagation, the program elements that reference the seeds are visually annotated with a color reported by the developer.
 
-*More info at: http://homepages.dcc.ufmg.br/~mtov/cideplus/*
+"More info here.":http://homepages.dcc.ufmg.br/~mtov/cideplus/*
