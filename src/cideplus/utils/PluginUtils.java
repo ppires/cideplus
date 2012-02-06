@@ -3,18 +3,27 @@ package cideplus.utils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
+
 
 public class PluginUtils {
 
 	//private static Shell shell = null;
+
+	private PluginUtils() {
+
+	}
 
 	/* retorna o workspace root */
 	public static IWorkspaceRoot getWorkspaceRoot() {
@@ -28,7 +37,14 @@ public class PluginUtils {
 
 	/* retorna o editor sendo usado */
 	public static IEditorPart getCurrentEditor() {
-		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window != null) {
+			IWorkbenchPage page = window.getActivePage();
+			if (page != null) {
+				return page.getActiveEditor();
+			}
+		}
+		return null;
 	}
 
 	/* se o editor sendo usado for do tipo TextEditor, retorna ele. retorna null caso contrário */
@@ -76,13 +92,24 @@ public class PluginUtils {
 		return null;
 	}
 
-	public static IDocument getCurrentDocument() {
-		ITextEditor editor = getCurrentTextEditor();
-		if (editor != null) {
-			return editor.getDocumentProvider().getDocument(editor.getEditorInput());
+	public static ICompilationUnit getCurrentCompilationUnit() {
+		System.out.println("Getting current compilation unit!");
+		//IEditorInput inputElement = getCurrentEditor().getEditorInput();
+		IJavaElement editorCU = EditorUtility.getActiveEditorJavaInput();
+		if (editorCU instanceof ICompilationUnit) {
+			System.out.println("First if");
+			return (ICompilationUnit) editorCU;
+		}
+		else {
+			editorCU = editorCU.getAncestor(IJavaElement.COMPILATION_UNIT);
+			if (editorCU instanceof ICompilationUnit) {
+				System.out.println("Second if");
+				return (ICompilationUnit) editorCU;
+			}
 		}
 		return null;
 	}
+
 
 	/* mostra um popup com title e text */
 	public static void showPopup(String title, String text) {
@@ -93,4 +120,12 @@ public class PluginUtils {
 	public static void showPopup(String text) {
 		showPopup("CIDE+", text);
 	}
+
+	//	public static IDocument getCurrentDocument() {
+	//		ITextEditor editor = getCurrentTextEditor();
+	//		if (editor != null) {
+	//			return editor.getDocumentProvider().getDocument(editor.getEditorInput());
+	//		}
+	//		return null;
+	//	}
 }

@@ -9,7 +9,7 @@ import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
-import cideplus.ui.presentation.FeaturesMarkerFactory;
+import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 import cideplus.utils.PluginUtils;
 
 public class MarkFeatureInEditorAction implements IEditorActionDelegate {

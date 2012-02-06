@@ -143,7 +143,7 @@ public class FeaturesConfigurationUtil {
 		return featuresManager;
 	}
 
-	private static Set<Feature> getFeatures(IProject project) throws CoreException, IOException {
+	public static Set<Feature> getFeatures(IProject project) throws CoreException, IOException {
 		IFile featuresFile = project.getFile(FEATURES_FILE);
 		Set<Feature> features;
 		if(featuresFile.exists()){

@@ -17,15 +17,15 @@ public class MeuWizard extends Wizard {
 	private TreeSet<String> seeds;
 	private ArrayList<IPackageFragment> pacotes;
 	public int feature = -1;
-	
+
 	public MeuWizard(IProject project, ArrayList<IPackageFragment> pacotes, TreeSet<String> seeds) {
 		this.project = project;
 		this.page1 = new WizardPagina1("SelectFeatures", this.project);
 		this.page2 = new WizardPagina2("SelectFeatures2", this.project);
-		this.seeds = seeds;		
+		this.seeds = seeds;
 		this.pacotes = pacotes;
-		addPage(this.page1);		
-		addPage(this.page2);	
+		addPage(this.page1);
+		addPage(this.page2);
 	}
 
 	public boolean performFinish() {
@@ -37,11 +37,12 @@ public class MeuWizard extends Wizard {
 					this.seeds.add((String)i.getData());
 				else if(i.getData() instanceof IPackageFragmentRoot) {
 					MessageDialog.openInformation(this.getShell(), "Semi-automatic Feature Extraction", "PackageRoot not supported yet!");
+					return false;
 				}
 				else if(i.getData() instanceof IPackageFragment) {
 					pacotes.add((IPackageFragment)i.getData());
 				}
-			}			
+			}
 		}
 		return true;
 	}

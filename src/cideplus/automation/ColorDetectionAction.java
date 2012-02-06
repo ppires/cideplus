@@ -112,7 +112,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public ColorDetectionAction() {
 		super();
 	}
-	/*M�TODOS UTILITARIOS*/
+	/*MÉTODOS UTILITARIOS*/
 	private Set<Feature> getSafeFeatures(final FeaturesManager featuresManager){
 		return Util.getSafeFeatures(featuresManager);
 	}

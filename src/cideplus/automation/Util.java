@@ -26,6 +26,7 @@ public class Util {
 		return getAst(compUnit, true);
 		//return SharedASTProvider.getAST(compUnit, SharedASTProvider.WAIT_YES, new NullProgressMonitor());
 	}
+
 	public static CompilationUnit getAst(ICompilationUnit compUnit, boolean resolveBindings) {
 		ASTParser astParser = ASTParser.newParser(AST.JLS3);
 		astParser.setResolveBindings(true);
