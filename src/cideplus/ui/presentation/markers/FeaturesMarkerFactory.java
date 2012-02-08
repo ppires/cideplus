@@ -60,7 +60,7 @@ public class FeaturesMarkerFactory {
 
 		FeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(resource.getProject());
 
-		// Finding feature
+		// Finding AST node
 		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), selection.getOffset(), selection.getLength());
 		if (node == null) {
 			System.out.println("No node found...");

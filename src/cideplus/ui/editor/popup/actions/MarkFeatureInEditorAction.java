@@ -6,13 +6,14 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IActionDelegate;
-import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
 import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 import cideplus.utils.PluginUtils;
 
-public class MarkFeatureInEditorAction implements IEditorActionDelegate {
+public class MarkFeatureInEditorAction implements IWorkbenchWindowActionDelegate {
 
 	//	private Shell shell;
 	//	private ITextSelection selection;
@@ -49,5 +50,15 @@ public class MarkFeatureInEditorAction implements IEditorActionDelegate {
 
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 		//		System.out.println("setActiveEditor()");
+	}
+
+	public void dispose() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void init(IWorkbenchWindow window) {
+		// TODO Auto-generated method stub
+
 	}
 }
