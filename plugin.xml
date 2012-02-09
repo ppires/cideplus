@@ -8,15 +8,13 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="popup:cideplus.FeaturerCompilationUnitEditor.EditorContext?before=additions">
-         <!--separator
-               name="cideplus.featuresGroupMenu"
-               visible="true"/-->
          <menu 
                id="cideplus.editor.features.menu"
                label="Features...">
             <dynamic 
                   class="cideplus.ui.editor.popup.actions.MenuContentProvider"
-                  id="cideplus.menus.dynamicContentProvider"/>
+                  id="cideplus.menus.dynamicContentProvider" >
+            </dynamic>
          </menu>               
       </menuContribution>
    </extension>
@@ -26,9 +24,15 @@
             id="cideplus.commands.category.markFeature"
             name="Features Category"/>
       <command
-            categoryId= "cideplus.commands.category.markFeature"
             id="cideplus.commands.markFeature"
-            name="Mark Feature"/>
+            name="Mark Feature in Editor"
+            categoryId= "cideplus.commands.category.markFeature">
+         <commandParameter
+               id="cideplus.commands.markFeature.featureIdParameter"
+               name="Feature ID"
+               optional="false">
+         </commandParameter>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
