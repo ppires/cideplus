@@ -186,7 +186,7 @@ public class ColorPresentation implements ITextPresentationListener {
 				}
 			}
 		}
-		FeaturesConfigurationUtil.updateEditors(PluginUtils.getDefaultShell().getDisplay(), null);
+		FeaturesConfigurationUtil.updateEditors(PluginUtils.getActiveShell().getDisplay(), null);
 	}
 
 	private CompilationUnitFeaturesManager getManager(ITypeRoot input) {

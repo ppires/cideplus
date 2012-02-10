@@ -1,10 +1,13 @@
 package cideplus.utils;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.ITextSelection;
@@ -31,7 +34,7 @@ public class PluginUtils {
 	}
 
 	/* retorna o shell sendo usado */
-	public static Shell getDefaultShell() {
+	public static Shell getActiveShell() {
 		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 	}
 
@@ -58,6 +61,19 @@ public class PluginUtils {
 		}
 	}
 
+	public static IProject getCurrentProject() {
+		IFile file = getCurrentFile();
+		if (file != null) {
+			return file.getProject();
+		}
+		return null;
+	}
+
+	public static IJavaProject getCurrentJavaProject() {
+		IProject project = getCurrentProject();
+		return JavaCore.create(project);
+	}
+
 	/* retorna o arquivo sendo editado */
 	public static IFile getCurrentFile() {
 		ITextEditor editor = getCurrentTextEditor();
@@ -75,7 +91,7 @@ public class PluginUtils {
 	}
 
 	/* retorna a current selection */
-	public static ISelection getCurrentSelection() {
+	public static ISelection getCurrentEditorSelection() {
 		ITextEditor editor = getCurrentTextEditor();
 		if (editor != null) {
 			return editor.getSelectionProvider().getSelection();
@@ -83,14 +99,20 @@ public class PluginUtils {
 		return null;
 	}
 
-	/* retorna a current selection se ela for uma TextSelection */
-	public static ITextSelection getCurrentTextSelection() {
-		ISelection selection = getCurrentSelection();
+	/* Retorna a current selection */
+	public static ISelection getCurrentSelection() {
+		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
+	}
+
+	/* retorna o texto selecionado no editor. */
+	public static ITextSelection getCurrentEditorTextSelection() {
+		ISelection selection = getCurrentEditorSelection();
 		if (selection instanceof ITextSelection) {
 			return (ITextSelection) selection;
 		}
 		return null;
 	}
+
 
 	public static ICompilationUnit getCurrentCompilationUnit() {
 		System.out.println("Getting current compilation unit!");
@@ -113,7 +135,7 @@ public class PluginUtils {
 
 	/* mostra um popup com title e text */
 	public static void showPopup(String title, String text) {
-		MessageDialog.openInformation(getDefaultShell(), title, text);
+		MessageDialog.openInformation(getActiveShell(), title, text);
 	}
 
 	/* Overloaded para colocar título default do popup */
@@ -128,4 +150,14 @@ public class PluginUtils {
 	//		}
 	//		return null;
 	//	}
+
+	//	/* retorna a current selection se ela for uma TreeSelection */
+	//	public static TreeSelection getTreeSelection() {
+	//		ISelection selection = getCurrentSelection();
+	//		if(selection instanceof TreeSelection){
+	//			return (TreeSelection)selection;
+	//		}
+	//		return null;
+	//	}
+
 }

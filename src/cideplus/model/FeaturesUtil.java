@@ -10,9 +10,22 @@ import java.io.PrintWriter;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.dom.ASTNode;
+
+import cideplus.automation.Util;
+import cideplus.model.ASTUtils.NodeFinder;
+import cideplus.model.exceptions.FeatureNotFoundException;
+import cideplus.ui.configuration.CompilationUnitFeaturesManager;
+import cideplus.ui.configuration.FeaturesConfigurationUtil;
+import cideplus.ui.configuration.FeaturesManager;
+import cideplus.utils.PluginUtils;
+
 /**
- * Classe utilitária para trabalhar com as features.
- * As funcionalidades dessa classe são independentes da interface gráfica
+ * Classe utilitï¿½ria para trabalhar com as features.
+ * As funcionalidades dessa classe sï¿½o independentes da interface grï¿½fica
  * @author rogel
  *
  */
@@ -24,7 +37,7 @@ public class FeaturesUtil {
 	private static final String FEATURES_SEPARATOR = "\06>>>FEATURES:";
 
 	/**
-	 * Lê as features de determinado arquivo
+	 * Lï¿½ as features de determinado arquivo
 	 * @param contents
 	 * @return
 	 * @throws IOException
@@ -67,8 +80,8 @@ public class FeaturesUtil {
 			writer.close();
 		}
 	}
-	
-	public static CompilationUnitFeaturesModel loadFeaturesForCompilationUnit(Set<Feature> projectFeatures, InputStream in) throws IOException, FeaturerException {
+
+	public static CompilationUnitFeaturesModel loadFeaturesForCompilationUnit(Set<Feature> projectFeatures, InputStream in) throws IOException, FeatureNotFoundException {
 		CompilationUnitFeaturesModel model = new CompilationUnitFeaturesModel();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		String linha = null;
@@ -94,12 +107,12 @@ public class FeaturesUtil {
 			if(features != null){
 				astWriter.flush();
 				String astString = new String(astOut.toByteArray());
-				for (int i : features) {
-					Feature featureObj = new Feature(i);
+				for (int feature_id : features) {
+					Feature featureObj = new Feature(feature_id);
 					if(!projectFeatures.contains(featureObj)){
-						throw new FeaturerException("The project does not contain the feature with ID "+i+".");
+						throw new FeatureNotFoundException(feature_id);
 					}
-					//pegar o feature completo do projeto, não apenas com o ID
+					//pegar o feature completo do projeto, nÃ£o apenas com o ID
 					for (Feature feature : projectFeatures) {
 						if(featureObj.equals(feature)){
 							featureObj = feature;
@@ -113,7 +126,7 @@ public class FeaturesUtil {
 		}
 		return model;
 	}
-	
+
 	public static void saveFeaturesForCompilationUnit(OutputStream out, CompilationUnitFeaturesModel model){
 		PrintWriter writer = new PrintWriter(out);
 		try {
@@ -138,4 +151,20 @@ public class FeaturesUtil {
 		}
 	}
 
+	public static void markFeature(int feature_id, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
+		IProject project = PluginUtils.getCurrentProject();
+		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
+		FeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
+		CompilationUnitFeaturesManager managerForFile = null;
+		managerForFile = manager.getManagerForFile(compUnit);
+		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), offset, length);
+		if (node == null) {
+			System.out.println("No node found...");
+		}
+		else {
+			Feature feature = FeaturesConfigurationUtil.getFeature(feature_id, project);
+			managerForFile.setFeature(node, feature);
+			managerForFile.commitChanges();
+		}
+	}
 }

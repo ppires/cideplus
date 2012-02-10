@@ -29,7 +29,7 @@ public class MarkFeatureInEditorAction implements IWorkbenchWindowActionDelegate
 	 * @see IActionDelegate#run(IAction)
 	 */
 	public void run(IAction action) {
-		ITextSelection selection = PluginUtils.getCurrentTextSelection();
+		ITextSelection selection = PluginUtils.getCurrentEditorTextSelection();
 		try {
 			IResource resource = PluginUtils.getCurrentFile();
 			FeaturesMarkerFactory.createMarker(resource, selection, 1);

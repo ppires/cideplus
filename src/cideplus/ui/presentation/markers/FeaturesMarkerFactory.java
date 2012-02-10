@@ -1,32 +1,17 @@
 package cideplus.ui.presentation.markers;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
-import cideplus.automation.Util;
-import cideplus.model.Feature;
-import cideplus.model.FeaturerException;
-import cideplus.model.ASTUtils.NodeFinder;
-import cideplus.ui.configuration.CompilationUnitFeaturesManager;
-import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.configuration.FeaturesManager;
 import cideplus.utils.PluginUtils;
 
 public class FeaturesMarkerFactory {
@@ -40,55 +25,6 @@ public class FeaturesMarkerFactory {
 		HashMap<String, Object> attributes = createMarkerAttributes(selection, feature_id);
 		IMarker marker = resource.createMarker(FEATURES_MARKER_ID);
 		marker.setAttributes(attributes);
-
-		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
-		FeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(resource.getProject());
-		CompilationUnitFeaturesManager managerForFile;
-
-		// Getting manager
-		try {
-			managerForFile = manager.getManagerForFile(compUnit);
-		} catch (IOException e) {
-			System.out.println("IOException");
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (FeaturerException e) {
-			System.out.println("FeaturerException");
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-
-		FeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(resource.getProject());
-
-		// Finding AST node
-		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), selection.getOffset(), selection.getLength());
-		if (node == null) {
-			System.out.println("No node found...");
-		}
-		else {
-			Set<Feature> features;
-
-			try {
-				features = featuresManager.getFeatures();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
-
-			System.out.println("total features: " + features.size());
-			Iterator<Feature> it = features.iterator();
-			if (it.hasNext()) {
-				Feature feature = it.next();
-				System.out.println(feature);
-				managerForFile.setFeature(node, feature);
-				managerForFile.commitChanges();
-			}
-			else {
-				System.out.println("no features...");
-			}
-		}
-
 
 		return marker;
 	}
@@ -156,13 +92,6 @@ public class FeaturesMarkerFactory {
 		return attributes;
 	}
 
-	public static TreeSelection getTreeSelection() {
-		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
-		if(selection instanceof TreeSelection){
-			return (TreeSelection)selection;
-		}
-		return null;
-	}
 
 	public static void printMarker(IMarker marker) {
 		try {

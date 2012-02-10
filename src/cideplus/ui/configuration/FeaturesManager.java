@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 
 import cideplus.model.Feature;
-import cideplus.model.FeaturerException;
+import cideplus.model.exceptions.FeatureNotFoundException;
 
 public interface FeaturesManager {
 
@@ -15,5 +15,5 @@ public interface FeaturesManager {
 	
 	void saveFeatures(Set<Feature> features) throws CoreException;
 	
-	CompilationUnitFeaturesManager getManagerForFile(ICompilationUnit file) throws IOException, FeaturerException, CoreException;
+	CompilationUnitFeaturesManager getManagerForFile(ICompilationUnit file) throws IOException, FeatureNotFoundException, CoreException;
 }

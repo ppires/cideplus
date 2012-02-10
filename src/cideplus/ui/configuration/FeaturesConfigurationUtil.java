@@ -38,9 +38,10 @@ import org.eclipse.ui.PlatformUI;
 import cideplus.model.ASTNodeReference;
 import cideplus.model.CompilationUnitFeaturesModel;
 import cideplus.model.Feature;
-import cideplus.model.FeaturerException;
 import cideplus.model.FeaturesUtil;
+import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
+import cideplus.utils.PluginUtils;
 
 /**
  * Class utilit�ria para trabalhar com a configura��o das features junto a Interface Gr�fica
@@ -68,9 +69,10 @@ public class FeaturesConfigurationUtil {
 					return FeaturesConfigurationUtil.getFeatures(project);
 				}
 
-				public CompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeaturerException, CoreException {
+				public CompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeatureNotFoundException, CoreException {
 					CompilationUnitFeaturesManager compilationUnitFeaturesManager;
 					if((compilationUnitFeaturesManager = cache.get(compilationUnit)) == null){
+						PluginUtils.showPopup("(compilationUnitFeaturesManager = cache.get(compilationUnit)) == null");
 						IPath path = compilationUnit.getPath().removeFileExtension().addFileExtension("feat");
 						final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 						final CompilationUnitFeaturesModel model;
@@ -152,6 +154,18 @@ public class FeaturesConfigurationUtil {
 			features = new TreeSet<Feature>();
 		}
 		return features;
+	}
+
+	//	TODO: Não iterar nas features para buscar o id.
+	public static Feature getFeature(int feature_id, IProject project) throws CoreException, IOException {
+		Set<Feature> features = getFeatures(project);
+		for (Feature feature : features) {
+			if (feature.getId() == feature_id) {
+				return feature;
+			}
+		}
+		//		throw new FeatureNotFoundException(feature_id);
+		return null;
 	}
 
 	private static void saveFeatures(IProject project, Set<Feature> features) throws CoreException {

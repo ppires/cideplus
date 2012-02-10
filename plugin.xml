@@ -7,7 +7,7 @@
          id="cideplus.ui.editor.menuMarkFeature"
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="popup:cideplus.FeaturerCompilationUnitEditor.EditorContext?before=additions">
+            locationURI="popup:cideplus.FeaturerCompilationUnitEditor.EditorContext?after=additions">
          <menu 
                id="cideplus.editor.features.menu"
                label="Features...">
@@ -18,6 +18,8 @@
          </menu>               
       </menuContribution>
    </extension>
+   
+   <!-- Command p/ criar feature -->
    <extension
          point="org.eclipse.ui.commands">
       <category
@@ -41,7 +43,27 @@
             commandId="cideplus.commands.markFeature">
       </handler>
    </extension>
-  
+   
+   
+   <!-- Command para configurar features. Deve substituir a action! -->
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="cideplus.commands.category.configureFeatures"
+            name="Features Category"/>
+      <command
+            id="cideplus.commands.configureFeatures"
+            name="Configure Features"
+            categoryId= "cideplus.commands.category.configureFeatures">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="cideplus.commands.handlers.ConfigureFeaturesHandler"
+            commandId="cideplus.commands.configureFeatures">
+      </handler>
+   </extension>  
   
   
 	<!-- Popup Menu do package explorer -->

@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import cideplus.model.ASTNodeReference;
 import cideplus.model.Feature;
-import cideplus.model.FeaturerException;
+import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.configuration.CompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
 import cideplus.ui.configuration.FeaturesManager;
@@ -58,10 +58,10 @@ public class Exporter {
 	 * @param monitor
 	 * @return
 	 * @throws CoreException
-	 * @throws FeaturerException
+	 * @throws FeatureNotFoundException
 	 * @throws IOException
 	 */
-	public Map<String, byte[]> getExportedFiles(IProgressMonitor monitor) throws CoreException, IOException, FeaturerException {
+	public Map<String, byte[]> getExportedFiles(IProgressMonitor monitor) throws CoreException, IOException, FeatureNotFoundException {
 		IPackageFragmentRoot[] allPackageFragmentRoots = project.getAllPackageFragmentRoots();
 		Map<String, byte[]> result = new LinkedHashMap<String, byte[]>();
 		for (IPackageFragmentRoot iPackageFragmentRoot : allPackageFragmentRoots) {
@@ -75,7 +75,7 @@ public class Exporter {
 		return result;
 	}
 
-	private void checkChildren(Map<String, byte[]> result, IJavaElement[] children, IProgressMonitor monitor) throws CoreException, IOException, FeaturerException {
+	private void checkChildren(Map<String, byte[]> result, IJavaElement[] children, IProgressMonitor monitor) throws CoreException, IOException, FeatureNotFoundException {
 		for (IJavaElement iJavaElement : children) {
 			if(iJavaElement instanceof ICompilationUnit){
 				exportJavaFile(result, (ICompilationUnit)iJavaElement, monitor);
@@ -93,10 +93,10 @@ public class Exporter {
 	 * @param iJavaElement
 	 * @param monitor
 	 * @throws CoreException
-	 * @throws FeaturerException
+	 * @throws FeatureNotFoundException
 	 * @throws IOException
 	 */
-	private void exportJavaFile(Map<String, byte[]> result,	ICompilationUnit comp, IProgressMonitor monitor) throws IOException, FeaturerException, CoreException {
+	private void exportJavaFile(Map<String, byte[]> result,	ICompilationUnit comp, IProgressMonitor monitor) throws IOException, FeatureNotFoundException, CoreException {
 		if(monitor.isCanceled()){
 			throw new OperationCanceledException();
 		}
