@@ -10,7 +10,7 @@
             locationURI="popup:cideplus.FeaturerCompilationUnitEditor.EditorContext?after=additions">
          <menu 
                id="cideplus.editor.features.menu"
-               label="Features...">
+               label="Features">
             <dynamic 
                   class="cideplus.ui.editor.popup.actions.MenuContentProvider"
                   id="cideplus.menus.dynamicContentProvider" >
@@ -45,7 +45,8 @@
    </extension>
    
    
-   <!-- Command para configurar features. Deve substituir a action! -->
+   <!-- Command para configurar features. -->
+   <!-- Deve substituir a action definida diretamente no menu. -->
    <extension
          point="org.eclipse.ui.commands">
       <category
@@ -118,85 +119,16 @@
                label="Export Project..."
                menubarPath="cideplus.menuFeatures/group2">
          </action>
+         <action
+               class="cideplus.ui.configuration.popup.action.RefreshFeaturesAction"
+               enablesFor="1"
+               id="cideplus.refreshFeatures"
+               label="Refresh Features"
+               menubarPath="cideplus.menuFeatures/group2">
+         </action>         
       </objectContribution>
    </extension>
  
-   <!-- Popup menu do editor -->
-   
-   
-   
-   
-   <!--extension
-         point="org.eclipse.ui.popupMenus">
-      <viewerContribution
-         id="cideplus.ui.editorViewerContribution" 
-         targetID="cideplus.FeaturerCompilationUnitEditor.EditorContext">
-         <action
-               label="Mark Feature..."
-               class="cideplus.ui.editor.popup.actions.MarkFeatureInEditorAction"
-               id="cideplus.ui.editor.popup.markFeaturePopupAction"
-               menubarPath="additions">
-         </action>
-      </viewerContribution>
-   </extension-->   
-   
-   
-   
-   <!--extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="popup:cideplus.FeaturerCompilationUnitEditor?after=additions"
-            allPopups="true">
-         <menu
-               label="Manually Mark Feature!"
-               id="cideplus.menus.markFeatureInEditorMenu"
-               commandId="cideplus.commands.markFeature" />
-         <action
-               id="cideplus.ui.editor.popup.markFeaturePopupAction"
-               menubarPath="additions"
-               label="Mark Feature..."
-               class="cideplus.ui.editor.popup.actions.MarkFeatureInEditorAction" >
-         </action>         
-      </menuContribution>
-   </extension-->   
-   
-   <!-- Command para marcar feature no editor -->
-   <!--extension point="org.eclipse.ui.commands">
-      <command
-            id="cideplus.commands.markFeature"
-            name="Mark Feature">
-      </command>
-   </extension-->
-   
-   <!-- Action de marcar feture no editor. Linkada com o command acima -->
-   <!--extension point = "org.eclipse.ui.actionSets">
-      <actionSet 
-            id="cideplus.actions.featuresActionsSet"
-            label="Editor Features Actions"
-		    visible="true">
-         <action
-               id="cideplus.ui.editor.popup.markFeaturePopupAction"
-               menubarPath="additions"
-               label="Mark Feature..."
-               class="cideplus.ui.editor.popup.actions.MarkFeatureInEditorAction"
-               definitionId="cideplus.commands.markFeature" >
-         </action>
-	   </actionSet>
-   </extension-->
-
-   <!--extension
-         point="org.eclipse.ui.popupMenus">
-      <viewerContribution
-         id="cideplus.ui.editorViewerContribution" 
-         targetID="cideplus.FeaturerCompilationUnitEditor.EditorContext">
-         <action
-               label="Mark Feature..."
-               class="cideplus.ui.editor.popup.actions.MarkFeatureInEditorAction"
-               id="cideplus.ui.editor.popup.markFeaturePopupAction"
-               menubarPath="additions">
-         </action>
-      </viewerContribution>
-   </extension-->
  
 	<!-- Marker das features -->
 	<extension 
@@ -205,22 +137,60 @@
 	      name="Features Marker">
 	   <super type="org.eclipse.core.resources.textmarker"/>
 	   <super type="org.eclipse.core.resources.marker"/>
-	   <persistent value="false"/>
+	   <persistent value="true"/>
 	   <attribute name="feature_id"/>
 	   <attribute name="length" />
 	</extension> 
  
+	<!-- Declaração da annotation p/ mostrar no editor os markers das features -->
+	<extension 
+			point="org.eclipse.ui.editors.annotationTypes">
+		<type
+				markerSeverity="0"
+				super="org.eclipse.ui.workbench.texteditor.info"
+				name="cideplus.ui.editor.featureAnnotation"
+				markerType="cideplus.markers.featuresMarker"/>
+	</extension>	
+	
+	<!-- Definição da feature annotation -->
+	<extension 
+			point="org.eclipse.ui.editors.markerAnnotationSpecification"
+			id="cideplus.ui.featuresAnnotationSpecification" 
+			name="FeaturesAnnotation">
+	   <specification 
+	   			symbolicIcon="info"
+		        annotationType="cideplus.ui.editor.featureAnnotation"
+		        label="FeatureAnnotation"
+				icon="icons/view.gif"
+	            highlightPreferenceKey="featureHighlighting"
+	            highlightPreferenceValue="false"
+				overviewRulerPreferenceKey="clruler"
+				overviewRulerPreferenceValue="true"
+				verticalRulerPreferenceKey="clvertical"
+				verticalRulerPreferenceValue="true"
+				colorPreferenceKey="clcolor"
+				colorPreferenceValue="255,255,0"
+				textPreferenceKey="cltext"
+				textPreferenceValue="true"
+				textStylePreferenceKey="clstyle"
+				textStylePreferenceValue="IBEAM">
+		</specification>
+	</extension>
 
+
+
+
+	
      <extension
-         point="org.eclipse.ui.views">
-      <view
-            name="Features ASTView"
-            icon="$nl$/icons/view.gif"
-            category="org.eclipse.jdt.ui.java"
-            class="cideplus.ui.astview.ASTView"
-            id="cideplus.ui.astview.ASTView">
-      </view>
-   </extension>
+           point="org.eclipse.ui.views">
+        <view
+              name="Features ASTView"
+              icon="$nl$/icons/view.gif"
+              category="org.eclipse.jdt.ui.java"
+              class="cideplus.ui.astview.ASTView"
+              id="cideplus.ui.astview.ASTView">
+        </view>
+     </extension>
    
    <extension
          point="org.eclipse.ui.commands">

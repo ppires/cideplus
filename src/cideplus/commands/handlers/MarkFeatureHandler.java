@@ -6,7 +6,6 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.ITextSelection;
@@ -14,7 +13,6 @@ import org.eclipse.jface.text.ITextSelection;
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 import cideplus.utils.PluginUtils;
 
 public class MarkFeatureHandler extends AbstractHandler implements IHandler {
@@ -30,8 +28,9 @@ public class MarkFeatureHandler extends AbstractHandler implements IHandler {
 		int featureId = Integer.parseInt(event.getParameter(paramFeatureId));
 
 		ITextSelection selection = PluginUtils.getCurrentEditorTextSelection();
+		System.out.println("offset: " + selection.getOffset() + "     length: " + selection.getLength());
 		if (selection == null || selection.isEmpty()) {
-			MessageDialog.openError(PluginUtils.getActiveShell(), "No Selection Found", "Text must be selected in order to mark a feature.");
+			MessageDialog.openError(PluginUtils.getActiveShell(), "CIDE+", "You must select some text in order to mark a feature.");
 		}
 		else {
 			try {
@@ -50,20 +49,8 @@ public class MarkFeatureHandler extends AbstractHandler implements IHandler {
 				e.printStackTrace();
 			}
 
-
-			try {
-
-				/* Create marker for the newly created feature */
-				IResource resource = PluginUtils.getCurrentFile();
-				FeaturesMarkerFactory.createMarker(resource, selection, featureId);
-
-				/* Refresh the editor */
-				FeaturesConfigurationUtil.updateEditors(PluginUtils.getActiveShell().getDisplay(), null);
-
-			} catch (CoreException e) {
-				MessageDialog.openError(PluginUtils.getActiveShell(), "Could Not Create Marker", e.getMessage());
-				e.printStackTrace();
-			}
+			/* Refresh the editor */
+			FeaturesConfigurationUtil.updateEditors(PluginUtils.getActiveShell().getDisplay(), null);
 		}
 
 		return null;

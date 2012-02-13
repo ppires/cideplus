@@ -9,6 +9,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
@@ -18,15 +20,36 @@ public class FeaturesMarkerFactory {
 
 	public static final String FEATURES_MARKER_ID = "cideplus.markers.featuresMarker";
 
-	/*
-	 * Creates a Marker
-	 */
-	public static IMarker createMarker(IResource resource, ITextSelection selection, int feature_id) throws CoreException {
-		HashMap<String, Object> attributes = createMarkerAttributes(selection, feature_id);
+
+	public static IMarker createMarker(IResource resource, int offset, int length, int featureId) throws CoreException {
+		HashMap<String, Object> attributes = createMarkerAttributes(offset, length, featureId);
 		IMarker marker = resource.createMarker(FEATURES_MARKER_ID);
 		marker.setAttributes(attributes);
-
 		return marker;
+	}
+
+	public static IMarker createMarker(IResource resource, ITextSelection selection, int featureId) throws CoreException {
+		IMarker marker = createMarker(resource, selection.getOffset(), selection.getLength(), featureId);
+		return marker;
+	}
+
+	public static IMarker createMarker(ASTNode node, int featureId) throws CoreException {
+		//		CompilationUnit compUnit = node.getRoot()
+		//		IResource resource = ((CompilationUnit) node.getRoot()).getJavaElement();
+		ASTNode root = node.getRoot();
+		if (root.getNodeType() == ASTNode.COMPILATION_UNIT) {
+			Object resource = ((CompilationUnit) root).getJavaElement().getAdapter(IResource.class);
+			if (resource != null) {
+				System.out.println("found resource! " + resource);
+				IMarker marker = createMarker((IResource) resource, node.getStartPosition(), node.getLength(), featureId);
+				return marker;
+			}
+			else {
+				System.out.println("resource == null!!!");
+				return null;
+			}
+		}
+		return null;
 	}
 
 	//	public static void addAnnotation(IMarker marker, ITextSelection selection) {
@@ -82,13 +105,13 @@ public class FeaturesMarkerFactory {
 		}
 	}
 
-	private static HashMap<String, Object> createMarkerAttributes(ITextSelection selection, int feature_id) {
+	private static HashMap<String, Object> createMarkerAttributes(int offset, int length, int feature_id) {
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
 		//MarkerUtilities.setLineNumber(attributes, selection.getStartLine());
-		MarkerUtilities.setCharStart(attributes, selection.getOffset());
-		MarkerUtilities.setCharEnd(attributes, selection.getOffset() + selection.getLength());
+		MarkerUtilities.setCharStart(attributes, offset);
+		MarkerUtilities.setCharEnd(attributes, offset + length);
 		attributes.put("feature_id", new Integer(feature_id));
-		attributes.put("length", new Integer(selection.getLength()));
+		attributes.put("length", new Integer(length));
 		return attributes;
 	}
 

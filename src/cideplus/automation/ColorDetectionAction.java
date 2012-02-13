@@ -112,6 +112,8 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public ColorDetectionAction() {
 		super();
 	}
+
+
 	/*MÉTODOS UTILITARIOS*/
 	private Set<Feature> getSafeFeatures(final FeaturesManager featuresManager){
 		return Util.getSafeFeatures(featuresManager);
@@ -128,7 +130,6 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			throw new RuntimeException(e);
 		}
 	}
-
 
 
 	boolean stopGrowingCache;
@@ -160,7 +161,10 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		}
 		return ast;
 	}
-	/*FIM M�TODOS UTILITARIOS*/
+	/*FIM MÉTODOS UTILITARIOS*/
+
+
+
 
 	public void run(IAction action) {
 		try {

@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -21,6 +22,7 @@ import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.configuration.CompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
 import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 import cideplus.utils.PluginUtils;
 
 /**
@@ -151,12 +153,12 @@ public class FeaturesUtil {
 		}
 	}
 
+	/* Marca uma feature. Cria um marker para a feature recem criada. */
 	public static void markFeature(int feature_id, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
 		IProject project = PluginUtils.getCurrentProject();
 		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
 		FeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
-		CompilationUnitFeaturesManager managerForFile = null;
-		managerForFile = manager.getManagerForFile(compUnit);
+		CompilationUnitFeaturesManager managerForFile = manager.getManagerForFile(compUnit);
 		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), offset, length);
 		if (node == null) {
 			System.out.println("No node found...");
@@ -165,6 +167,10 @@ public class FeaturesUtil {
 			Feature feature = FeaturesConfigurationUtil.getFeature(feature_id, project);
 			managerForFile.setFeature(node, feature);
 			managerForFile.commitChanges();
+
+			/* Create marker for the newly created feature */
+			IResource resource = PluginUtils.getCurrentFile();
+			FeaturesMarkerFactory.createMarker(resource, node.getStartPosition(), node.getLength(), feature_id);
 		}
 	}
 }

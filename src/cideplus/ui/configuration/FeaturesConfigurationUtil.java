@@ -41,7 +41,7 @@ import cideplus.model.Feature;
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
-import cideplus.utils.PluginUtils;
+import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 
 /**
  * Class utilit�ria para trabalhar com a configura��o das features junto a Interface Gr�fica
@@ -72,7 +72,7 @@ public class FeaturesConfigurationUtil {
 				public CompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeatureNotFoundException, CoreException {
 					CompilationUnitFeaturesManager compilationUnitFeaturesManager;
 					if((compilationUnitFeaturesManager = cache.get(compilationUnit)) == null){
-						PluginUtils.showPopup("(compilationUnitFeaturesManager = cache.get(compilationUnit)) == null");
+						//						PluginUtils.showPopup("(compilationUnitFeaturesManager = cache.get(compilationUnit)) == null");
 						IPath path = compilationUnit.getPath().removeFileExtension().addFileExtension("feat");
 						final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 						final CompilationUnitFeaturesModel model;
@@ -101,6 +101,13 @@ public class FeaturesConfigurationUtil {
 								}
 								getASTFeatures(astNode).add(feature);
 
+								/* Um marker associado com cada feature. */
+								try {
+									FeaturesMarkerFactory.createMarker(astNode, feature.getId());
+								} catch (CoreException e) {
+									System.out.println("Could not create marker for feature " + feature.getName());
+									e.printStackTrace();
+								}
 							}
 
 							public boolean hasFeature(ASTNode astNode, Feature feature) {

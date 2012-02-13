@@ -50,6 +50,7 @@ public class ColorDetectionView extends ViewPart {
 		public Image getColumnImage(Object obj, int index) {
 			return getImage(obj);
 		}
+		@Override
 		public Image getImage(Object obj) {
 			return PlatformUI.getWorkbench().
 					getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
@@ -68,6 +69,7 @@ public class ColorDetectionView extends ViewPart {
 	 * This is a callback that will allow us
 	 * to create the viewer and initialize it.
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer = new ListViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -112,7 +114,7 @@ public class ColorDetectionView extends ViewPart {
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
-	
+
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(action1);
 		manager.add(action2);
@@ -120,6 +122,7 @@ public class ColorDetectionView extends ViewPart {
 
 	private void makeActions() {
 		action1 = new Action() {
+			@Override
 			public void run() {
 				showMessage("Action 1 executed");
 			}
@@ -127,9 +130,10 @@ public class ColorDetectionView extends ViewPart {
 		action1.setText("Action 1");
 		action1.setToolTipText("Action 1 tooltip");
 		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		
+				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+
 		action2 = new Action() {
+			@Override
 			public void run() {
 				showMessage("Action 2 executed");
 			}
@@ -139,6 +143,7 @@ public class ColorDetectionView extends ViewPart {
 		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
 				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 		doubleClickAction = new Action() {
+			@Override
 			public void run() {
 				ISelection selection = viewer.getSelection();
 				Object obj = ((IStructuredSelection)selection).getFirstElement();
@@ -156,14 +161,15 @@ public class ColorDetectionView extends ViewPart {
 	}
 	private void showMessage(String message) {
 		MessageDialog.openInformation(
-			viewer.getControl().getShell(),
-			"Automatic Feature Extraction",
-			message);
+				viewer.getControl().getShell(),
+				"Automatic Feature Extraction",
+				message);
 	}
 
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
+	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}

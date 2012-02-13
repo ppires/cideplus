@@ -3,7 +3,6 @@ package cideplus.ui.presentation;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -22,7 +21,6 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import cideplus.model.Feature;
 import cideplus.ui.astview.EditorUtility;
@@ -30,7 +28,6 @@ import cideplus.ui.astview.NodeProperty;
 import cideplus.ui.configuration.CompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
-import cideplus.utils.PluginUtils;
 
 public class ColorPresentation implements ITextPresentationListener {
 
@@ -58,11 +55,6 @@ public class ColorPresentation implements ITextPresentationListener {
 
 		// Apply presentation to AST
 		checkRange(root, offset, length, manager, textPresentation);
-
-		//		// Apply presentation to markers
-		//		for (IMarker marker : FeaturesMarkerFactory.findAllMarkers()) {
-		//			checkRange(marker, offset, length, manager, textPresentation);
-		//		}
 	}
 
 	private void checkRange(Object node, int offset, int length, CompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
@@ -81,8 +73,6 @@ public class ColorPresentation implements ITextPresentationListener {
 					checkRange(o, offset, length, manager, textPresentation);
 				}
 			}
-		} else if (node instanceof IMarker) {
-			checkMarker((IMarker) node, offset, length, manager, textPresentation);
 		} else if (node != null) {
 			// System.out.println("unknown "+node.getClass());
 		}
@@ -146,48 +136,6 @@ public class ColorPresentation implements ITextPresentationListener {
 
 	}
 
-	private void checkMarker(IMarker marker, int offset, int length, CompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
-		Set<Feature> features = manager.getFeatures(root);
-		if (features.size() > 0) {
-			RGB combinedRGB = FeaturesConfigurationUtil.getCombinedRGB(features);
-
-			if (offset <= MarkerUtilities.getCharStart(marker) && MarkerUtilities.getCharEnd(marker) <= offset + length) {
-				//				System.out.println(offset+
-				//						":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
-				//								+ astNode.getLength())+":"+(offset+length));
-				StyleRange range = new StyleRange();
-				range.background = new Color(null, combinedRGB);
-				range.start = MarkerUtilities.getCharStart(marker);
-				range.length = marker.getAttribute("length", -1);
-				textPresentation.mergeStyleRange(range);
-			} else if (offset > MarkerUtilities.getCharStart(marker)) {
-				//				System.out.println(offset+
-				//						":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
-				//								+ astNode.getLength())+":"+(offset+length));
-				StyleRange range = new StyleRange();
-				range.background = new Color(null, combinedRGB);
-				range.start = offset;
-				if (MarkerUtilities.getCharEnd(marker) > offset + length) {
-					range.length = length;
-				} else {
-					range.length = marker.getAttribute("length", -1) - (offset - MarkerUtilities.getCharStart(marker));
-				}
-				textPresentation.mergeStyleRange(range);
-			} else if (offset <= MarkerUtilities.getCharStart(marker) && MarkerUtilities.getCharEnd(marker) > offset + length) {
-				// System.out.println(offset+
-				// ":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
-				// + astNode.getLength())+":"+(offset+length));
-				StyleRange range = new StyleRange();
-				range.background = new Color(null, combinedRGB);
-				range.start = MarkerUtilities.getCharStart(marker);
-				range.length = length - (MarkerUtilities.getCharStart(marker) - offset);
-				if (range.length > 0) {
-					textPresentation.mergeStyleRange(range);
-				}
-			}
-		}
-		FeaturesConfigurationUtil.updateEditors(PluginUtils.getActiveShell().getDisplay(), null);
-	}
 
 	private CompilationUnitFeaturesManager getManager(ITypeRoot input) {
 		IProject project = input.getJavaProject().getProject();
@@ -214,6 +162,7 @@ public class ColorPresentation implements ITextPresentationListener {
 			}
 		};
 		WorkingCopyOwner copyOwner = new WorkingCopyOwner() {
+			@Override
 			public IProblemRequestor getProblemRequestor(
 					ICompilationUnit workingCopy) {
 				return problemRequestor;
@@ -231,7 +180,7 @@ public class ColorPresentation implements ITextPresentationListener {
 	}
 
 	/**
-	 * L� as informacoes atualizadas das features
+	 * Lê as informacoes atualizadas das features
 	 */
 	public void refreshFeatures() {
 		this.manager = getManager(input);
