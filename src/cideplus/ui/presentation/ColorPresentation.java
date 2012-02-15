@@ -21,19 +21,18 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.text.edits.RangeMarker;
 
 import cideplus.model.Feature;
 import cideplus.ui.astview.EditorUtility;
 import cideplus.ui.astview.NodeProperty;
-import cideplus.ui.configuration.CompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
 
 public class ColorPresentation implements ITextPresentationListener {
 
 	private CompilationUnit root;
-	private CompilationUnitFeaturesManager manager;
+	private ICompilationUnitFeaturesManager manager;
 	private ITypeRoot input;
 
 	public ColorPresentation(ISourceViewer sourceViewer, FeaturerCompilationUnitEditor compilationUnitEditor) {
@@ -54,8 +53,8 @@ public class ColorPresentation implements ITextPresentationListener {
 		int offset = textPresentation.getExtent().getOffset();
 		int length = textPresentation.getExtent().getLength();
 
-		List<RangeMarker> rangeMarkers = manager.getRangeMarkers();
-		System.out.println("range markers size: " + rangeMarkers.size());
+		//		List<RangeMarker> rangeMarkers = ((CompilationUnitFeaturesManager) manager).getRangeMarkers();
+		//		System.out.println("range markers size: " + rangeMarkers.size());
 
 		// Apply presentation to AST
 		checkRange(root, offset, length, manager, textPresentation);
@@ -68,7 +67,7 @@ public class ColorPresentation implements ITextPresentationListener {
 		//		}
 	}
 
-	private void checkRange(Object node, int offset, int length, CompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
+	private void checkRange(Object node, int offset, int length, ICompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
 		if (node instanceof ASTNode) {
 			//			System.out.println("---" + System.getProperty("line.separator") + "checkRange!");
 			//			System.out.println("   node: " + node);
@@ -88,7 +87,7 @@ public class ColorPresentation implements ITextPresentationListener {
 		}
 	}
 
-	private void checkNode(ASTNode astNode, int offset, int length, CompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
+	private void checkNode(ASTNode astNode, int offset, int length, ICompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
 		//		System.out.println("checking " + astNode.toString().replace('\n', ' '));
 		Set<Feature> features = manager.getFeatures(astNode);
 		if (features.size() > 0) {
@@ -196,7 +195,7 @@ public class ColorPresentation implements ITextPresentationListener {
 	//	}
 
 
-	private CompilationUnitFeaturesManager getManager(ITypeRoot input) {
+	private ICompilationUnitFeaturesManager getManager(ITypeRoot input) {
 		IProject project = input.getJavaProject().getProject();
 		final IProblemRequestor problemRequestor = new IProblemRequestor() { // strange:
 			// don't
@@ -227,7 +226,7 @@ public class ColorPresentation implements ITextPresentationListener {
 				return problemRequestor;
 			}
 		};
-		CompilationUnitFeaturesManager managerForFile;
+		ICompilationUnitFeaturesManager managerForFile;
 		try {
 			managerForFile = FeaturesConfigurationUtil.getFeaturesManager(
 					project).getManagerForFile(

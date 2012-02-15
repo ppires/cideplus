@@ -9,11 +9,11 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.dialogs.MessageDialog;
 
 import cideplus.model.Feature;
-import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.configuration.IFeaturesManager;
 
 public class Util {
 
-	public static Set<Feature> getSafeFeatures(final FeaturesManager featuresManager){
+	public static Set<Feature> getSafeFeatures(final IFeaturesManager featuresManager){
 		try {
 			return featuresManager.getFeatures();
 		} catch (Exception e) {

@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import cideplus.FeaturerPlugin;
-import cideplus.ui.configuration.CompilationUnitFeaturesManager;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
 
 public class WizardPagina2 extends WizardPage {
@@ -55,7 +55,7 @@ public class WizardPagina2 extends WizardPage {
 	}
 
 	/*M�TODOS UTILITARIOS*/
-	private CompilationUnitFeaturesManager getSafeCompilationUnit(ICompilationUnit cu) {
+	private ICompilationUnitFeaturesManager getSafeCompilationUnit(ICompilationUnit cu) {
 		try {
 			return FeaturesConfigurationUtil.getFeaturesManager(project).getManagerForFile(cu);
 		} catch (Exception e) {
@@ -144,7 +144,7 @@ public class WizardPagina2 extends WizardPage {
 								/* TIPO SOURCE */
 								if(pkg.getKind() ==	IPackageFragmentRoot.K_SOURCE) {
 									for(ICompilationUnit cu : pkg.getCompilationUnits()) {
-										CompilationUnitFeaturesManager cuManager = getSafeCompilationUnit(cu);
+										ICompilationUnitFeaturesManager cuManager = getSafeCompilationUnit(cu);
 										//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(cu);
 										CompilationUnit ast = getAst(cu);
 

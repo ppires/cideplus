@@ -16,7 +16,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 import cideplus.model.Feature;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.configuration.IFeaturesManager;
 import cideplus.utils.PluginUtils;
 
 public class MenuContentProvider extends CompoundContributionItem {
@@ -64,7 +64,7 @@ public class MenuContentProvider extends CompoundContributionItem {
 	}
 
 	private void setFeatures() {
-		FeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(PluginUtils.getCurrentProject());
+		IFeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(PluginUtils.getCurrentProject());
 		try {
 			features = featuresManager.getFeatures();
 		} catch (IOException e) {

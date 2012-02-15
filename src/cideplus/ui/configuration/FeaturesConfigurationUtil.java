@@ -3,11 +3,9 @@ package cideplus.ui.configuration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -19,19 +17,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.text.edits.RangeMarker;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -54,14 +43,14 @@ public class FeaturesConfigurationUtil {
 
 	public static final String FEATURES_FILE = "features.feat";
 
-	private static Map<IProject, FeaturesManager> cache = new HashMap<IProject, FeaturesManager>();
+	private static Map<IProject, IFeaturesManager> projectCache = new HashMap<IProject, IFeaturesManager>();
 
-	public static FeaturesManager getFeaturesManager(final IProject project){
-		FeaturesManager featuresManager;
-		if((featuresManager = cache.get(project)) == null){
-			featuresManager = new FeaturesManager() {
+	public static IFeaturesManager getFeaturesManager(final IProject project){
+		IFeaturesManager featuresManager;
+		if((featuresManager = projectCache.get(project)) == null){
+			featuresManager = new IFeaturesManager() {
 
-				Map<ICompilationUnit, CompilationUnitFeaturesManager> cache = new HashMap<ICompilationUnit, CompilationUnitFeaturesManager>();
+				Map<ICompilationUnit, ICompilationUnitFeaturesManager> compUnitCache = new HashMap<ICompilationUnit, ICompilationUnitFeaturesManager>();
 
 				public void saveFeatures(Set<Feature> features) throws CoreException {
 					FeaturesConfigurationUtil.saveFeatures(project, features);
@@ -71,9 +60,9 @@ public class FeaturesConfigurationUtil {
 					return FeaturesConfigurationUtil.getFeatures(project);
 				}
 
-				public CompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeatureNotFoundException, CoreException {
-					CompilationUnitFeaturesManager compilationUnitFeaturesManager;
-					if((compilationUnitFeaturesManager = cache.get(compilationUnit)) == null){
+				public ICompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeatureNotFoundException, CoreException {
+					ICompilationUnitFeaturesManager compilationUnitFeaturesManager;
+					if((compilationUnitFeaturesManager = compUnitCache.get(compilationUnit)) == null){
 						//						PluginUtils.showPopup("(compilationUnitFeaturesManager = cache.get(compilationUnit)) == null");
 						IPath path = compilationUnit.getPath().removeFileExtension().addFileExtension("feat");
 						final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
@@ -84,9 +73,8 @@ public class FeaturesConfigurationUtil {
 							model = new CompilationUnitFeaturesModel();
 						}
 
-						compilationUnitFeaturesManager = new CompilationUnitFeaturesManager() {
-
-							List<RangeMarker> rangeMarkers = new ArrayList<RangeMarker>();
+						//						compilationUnitFeaturesManager = new CompilationUnitFeaturesManager(model, compilationUnit);
+						compilationUnitFeaturesManager = new ICompilationUnitFeaturesManager() {
 
 							public Set<ASTNodeReference> getNodeReferences() {
 								return model.getNodeReferences();
@@ -113,16 +101,12 @@ public class FeaturesConfigurationUtil {
 									e.printStackTrace();
 								}
 
-								/* Cria um RangeMarker para trackear as modificações no texto */
+								//								/* Cria um RangeMarker para trackear as modificações no texto */
 								//								if (rangeMarkers == null)
 								//									rangeMarkers = new ArrayList<RangeMarker>();
-								RangeMarker rangeMarker = new RangeMarker(astNode.getStartPosition(), astNode.getLength());
-								rangeMarkers.add(rangeMarker);
-								System.out.println("Added new range marker to list! size(): " + rangeMarkers.size());
-							}
-
-							public List<RangeMarker> getRangeMarkers() {
-								return rangeMarkers;
+								//								RangeMarker rangeMarker = new RangeMarker(astNode.getStartPosition(), astNode.getLength());
+								//								rangeMarkers.add(rangeMarker);
+								//								System.out.println("Added new range marker to list! size(): " + rangeMarkers.size());
 							}
 
 							public boolean hasFeature(ASTNode astNode, Feature feature) {
@@ -156,12 +140,12 @@ public class FeaturesConfigurationUtil {
 								return compilationUnit;
 							}
 						};
-						cache.put(compilationUnit, compilationUnitFeaturesManager);
+						compUnitCache.put(compilationUnit, compilationUnitFeaturesManager);
 					}
 					return compilationUnitFeaturesManager;
 				}
 			};
-			//o project feature manager nao possuir� cache... apenas o compilation unit
+			//o project feature manager nao possuirá cache... apenas o compilation unit
 			//cache.put(project, featuresManager);
 		}
 		return featuresManager;
@@ -202,43 +186,44 @@ public class FeaturesConfigurationUtil {
 	}
 
 	private static ASTNodeReference getNodeReferenceFromAST(ASTNode astNode) {
-		if(astNode == null){
-			throw new IllegalArgumentException("Parameter astNode cannot be null");
-		}
-		int bytes = astNode.getLength();
-		int offset = astNode.getStartPosition();
-		String node = "";
-		do {
-			node += "$$";
-			if(astNode instanceof CompilationUnit){
-				node += "COMPILATION UNIT;;";
-			} else if (astNode instanceof TypeDeclaration) {
-				node += astNode.getClass().getSimpleName()+": "+((TypeDeclaration)astNode).getName()+" <<==\n";
-			} else if (astNode instanceof MethodDeclaration) {
-				Type returnType = ((MethodDeclaration)astNode).getReturnType2();
-				SimpleName methodName = ((MethodDeclaration)astNode).getName();
-				@SuppressWarnings("rawtypes")
-				List parameters = ((MethodDeclaration)astNode).parameters();
-				node += astNode.getClass().getSimpleName()+": "+returnType+" "+methodName+parameters+" <<==\n";
-			} else if (astNode instanceof Block) {
-				Block block = (Block) astNode;
-				node += astNode.getClass().getSimpleName()+": "+block.properties()+"  <<==\n";
-			} else if (astNode instanceof IfStatement) {
-				IfStatement statement = (IfStatement) astNode;
-				node += astNode.getClass().getSimpleName()+": "+statement.getExpression()+"  <<==\n";
-			} else if (astNode instanceof DoStatement) {
-				DoStatement statement = (DoStatement) astNode;
-				node += astNode.getClass().getSimpleName()+": "+statement.getExpression()+"  <<==\n";
-			} else if(astNode instanceof ForStatement) {
-				ForStatement statement = (ForStatement) astNode;
-				node += astNode.getClass().getSimpleName()+": "+statement.initializers()+" "+statement.getExpression()+" "+statement.updaters()+"  <<==\n";
-			} else {
-				node += astNode.getClass().getSimpleName()+": "+astNode+" <<==\n";
-			}
-			astNode = astNode.getParent();
-		} while(astNode != null);
-		node = node.replace('\n', ' ').replace('\r', ' ');
-		return new ASTNodeReference(node, bytes, offset);
+		return new ASTNodeReference(astNode);
+		//		if(astNode == null){
+		//			throw new IllegalArgumentException("Parameter astNode cannot be null");
+		//		}
+		//		int bytes = astNode.getLength();
+		//		int offset = astNode.getStartPosition();
+		//		String node = "";
+		//		do {
+		//			node += "$$";
+		//			if(astNode instanceof CompilationUnit){
+		//				node += "COMPILATION UNIT;;";
+		//			} else if (astNode instanceof TypeDeclaration) {
+		//				node += astNode.getClass().getSimpleName()+": "+((TypeDeclaration)astNode).getName()+" <<==\n";
+		//			} else if (astNode instanceof MethodDeclaration) {
+		//				Type returnType = ((MethodDeclaration)astNode).getReturnType2();
+		//				SimpleName methodName = ((MethodDeclaration)astNode).getName();
+		//				@SuppressWarnings("rawtypes")
+		//				List parameters = ((MethodDeclaration)astNode).parameters();
+		//				node += astNode.getClass().getSimpleName()+": "+returnType+" "+methodName+parameters+" <<==\n";
+		//			} else if (astNode instanceof Block) {
+		//				Block block = (Block) astNode;
+		//				node += astNode.getClass().getSimpleName()+": "+block.properties()+"  <<==\n";
+		//			} else if (astNode instanceof IfStatement) {
+		//				IfStatement statement = (IfStatement) astNode;
+		//				node += astNode.getClass().getSimpleName()+": "+statement.getExpression()+"  <<==\n";
+		//			} else if (astNode instanceof DoStatement) {
+		//				DoStatement statement = (DoStatement) astNode;
+		//				node += astNode.getClass().getSimpleName()+": "+statement.getExpression()+"  <<==\n";
+		//			} else if(astNode instanceof ForStatement) {
+		//				ForStatement statement = (ForStatement) astNode;
+		//				node += astNode.getClass().getSimpleName()+": "+statement.initializers()+" "+statement.getExpression()+" "+statement.updaters()+"  <<==\n";
+		//			} else {
+		//				node += astNode.getClass().getSimpleName()+": "+astNode+" <<==\n";
+		//			}
+		//			astNode = astNode.getParent();
+		//		} while(astNode != null);
+		//		node = node.replace('\n', ' ').replace('\r', ' ');
+		//		return new ASTNodeReference(node, bytes, offset);
 	}
 
 	public static RGB getRGB(Feature feature){
@@ -281,7 +266,7 @@ public class FeaturesConfigurationUtil {
 	}
 
 	public static void clean() {
-		cache = new HashMap<IProject, FeaturesManager>();
+		projectCache = new HashMap<IProject, IFeaturesManager>();
 	}
 
 	public static void updateEditors(Display display, final ASTNode compilationUnit) {

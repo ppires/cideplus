@@ -19,9 +19,9 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import cideplus.automation.Util;
 import cideplus.model.ast.utils.NodeFinder;
 import cideplus.model.exceptions.FeatureNotFoundException;
-import cideplus.ui.configuration.CompilationUnitFeaturesManager;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.configuration.IFeaturesManager;
 import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 import cideplus.utils.PluginUtils;
 
@@ -157,8 +157,8 @@ public class FeaturesUtil {
 	public static void markFeature(int feature_id, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
 		IProject project = PluginUtils.getCurrentProject();
 		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
-		FeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
-		CompilationUnitFeaturesManager managerForFile = manager.getManagerForFile(compUnit);
+		IFeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
+		ICompilationUnitFeaturesManager managerForFile = manager.getManagerForFile(compUnit);
 		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), offset, length);
 		if (node == null) {
 			System.out.println("No node found...");

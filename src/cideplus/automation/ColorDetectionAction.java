@@ -94,9 +94,9 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import cideplus.FeaturerPlugin;
 import cideplus.model.Feature;
-import cideplus.ui.configuration.CompilationUnitFeaturesManager;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.configuration.IFeaturesManager;
 
 public class ColorDetectionAction implements IObjectActionDelegate {
 
@@ -107,7 +107,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	private int contSE1, contSE2, contSE3, contSE4, contSE5, contSE6;
 	private HashSet<String> se3;
 	private PrintStream arqLog;
-	private FeaturesManager manager;
+	private IFeaturesManager manager;
 
 	public ColorDetectionAction() {
 		super();
@@ -115,11 +115,11 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 
 
 	/*MÉTODOS UTILITARIOS*/
-	private Set<Feature> getSafeFeatures(final FeaturesManager featuresManager){
+	private Set<Feature> getSafeFeatures(final IFeaturesManager featuresManager){
 		return Util.getSafeFeatures(featuresManager);
 	}
 
-	private CompilationUnitFeaturesManager getSafeManager(IJavaProject jproject, ICompilationUnit compUnit){
+	private ICompilationUnitFeaturesManager getSafeManager(IJavaProject jproject, ICompilationUnit compUnit){
 		try {
 			if(manager == null){
 				manager = FeaturesConfigurationUtil.getFeaturesManager(jproject.getProject());
@@ -259,7 +259,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			return;
 		}
 
-		FeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project);
+		IFeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project);
 		Feature selectedFeature = getSelectedFeature(wzd, featuresManager);
 
 		//		searchIFDEF(jproject, selectedFeature);
@@ -321,7 +321,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	}
 
 	private Feature getSelectedFeature(MeuWizard wzd,
-			FeaturesManager featuresManager) {
+			IFeaturesManager featuresManager) {
 		Feature selectedFeature = null;
 		int i = 0;
 		for (cideplus.model.Feature feat : getSafeFeatures(featuresManager)) {
@@ -342,7 +342,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				/* Marca todas as CompilationUnits do pacote */
 				System.out.print("Colorindo todas as CU do pacote " + pkg.getElementName() + "... ");
 				for(ICompilationUnit compUnit : pkg.getCompilationUnits()) {
-					CompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
+					ICompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
 					CompilationUnit ast = getAst(compUnit);
 					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);
 					//IColorManager nodeColors = source.getColorManager();
@@ -411,7 +411,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				ICompilationUnit[] compUnits = pkg.getCompilationUnits();
 
 				for (ICompilationUnit compUnit : compUnits) {
-					CompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
+					ICompilationUnitFeaturesManager managerForFile = getSafeManager(jproject, compUnit);
 					CompilationUnit ast = getAst(compUnit);
 					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);
 					//IColorManager nodeColors = source.getColorManager();
@@ -490,7 +490,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		System.out.println(">> SAIU searchPROJ: "+ name);
 	}
 
-	public void searchBODY(List<BodyDeclaration> bds, String name, CompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
+	public void searchBODY(List<BodyDeclaration> bds, String name, ICompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
 		for(BodyDeclaration bd : bds) {
 			//System.out.println(bd.nodeClassForType(bd.getNodeType()));
 			switch(bd.getNodeType()) {
@@ -596,7 +596,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		}
 	}
 
-	public void searchSTM(Statement stm, String name, CompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
+	public void searchSTM(Statement stm, String name, ICompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
 		if(stm == null) return;
 		//System.out.println(ASTNode.nodeClassForType(z.getNodeType()).getName());
 		switch(stm.getNodeType()) {
@@ -953,7 +953,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		}
 	}
 
-	public boolean searchEXP(Expression exp, String name, CompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
+	public boolean searchEXP(Expression exp, String name, ICompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
 		if(exp == null) return false;
 		switch(exp.getNodeType()) {
 		case ASTNode.CONDITIONAL_EXPRESSION: {// tern�rio
@@ -1231,7 +1231,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					monitor.setTaskName("Checking type ... IMP "+compUnit.getElementName());
 					//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(compUnit);
 					//IColorManager nodeColors = source.getColorManager();
-					CompilationUnitFeaturesManager manager = getSafeManager(jproject, compUnit);
+					ICompilationUnitFeaturesManager manager = getSafeManager(jproject, compUnit);
 					CompilationUnit ast = getAst(manager.getCompilationUnit());
 					//nodeColors.beginBatch();
 					for(ImportDeclaration imp : (List<ImportDeclaration>)ast.imports()) {
@@ -1396,12 +1396,12 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		shell = targetPart.getSite().getShell();
 	}
 
-	private void marca(CompilationUnitFeaturesManager managerForFile, ASTNode n, Feature c) {
+	private void marca(ICompilationUnitFeaturesManager managerForFile, ASTNode n, Feature c) {
 		if(podeMarcar(n, managerForFile, c))
 			managerForFile.setFeature(n, c);
 	}
 
-	private boolean podeMarcar(ASTNode n, CompilationUnitFeaturesManager managerForFile, Feature c) {
+	private boolean podeMarcar(ASTNode n, ICompilationUnitFeaturesManager managerForFile, Feature c) {
 		ASTNode aux = n;
 		boolean pode = managerForFile.hasFeature(aux, c);
 		while(aux != null && !pode) {

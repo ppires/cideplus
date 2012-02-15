@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Label;
 
 import cideplus.model.Feature;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.configuration.IFeaturesManager;
 
 public class WizardPagina1 extends WizardPage {
 	private IProject project;
@@ -56,7 +56,7 @@ public class WizardPagina1 extends WizardPage {
 		Label label = new Label(composite, SWT.NONE);
 		label.setText("Select a feature to extract:");
 		combo = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
-		final FeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project);
+		final IFeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project);
 		combo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				getContainer().updateButtons();				
@@ -113,7 +113,7 @@ public class WizardPagina1 extends WizardPage {
 		setControl(composite);
 	}
 
-	private Set<Feature> getSafeFeatures(final FeaturesManager featuresManager){
+	private Set<Feature> getSafeFeatures(final IFeaturesManager featuresManager){
 		try {
 			return featuresManager.getFeatures();
 		} catch (Exception e) {

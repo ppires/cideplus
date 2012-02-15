@@ -107,9 +107,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import cideplus.model.Feature;
 import cideplus.ui.astview.action.SetFeatureAction;
-import cideplus.ui.configuration.CompilationUnitFeaturesManager;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.configuration.IFeaturesManager;
 
 
 public class ASTView extends ViewPart implements IShowInSource {
@@ -416,8 +416,8 @@ public class ASTView extends ViewPart implements IShowInSource {
 	private ASTInputKindAction[] fASTInputKindActions;
 	private int fCurrentInputKind;
 
-	private FeaturesManager featuresManager;
-	private CompilationUnitFeaturesManager compilationUnitFeaturesManager;
+	private IFeaturesManager featuresManager;
+	private ICompilationUnitFeaturesManager compilationUnitFeaturesManager;
 
 	private ITextEditor fEditor;
 	private ITypeRoot fTypeRoot;
@@ -469,7 +469,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 
 
 
-	public CompilationUnitFeaturesManager getCompilationUnitFeaturesManager() {
+	public ICompilationUnitFeaturesManager getCompilationUnitFeaturesManager() {
 		return compilationUnitFeaturesManager;
 	}
 

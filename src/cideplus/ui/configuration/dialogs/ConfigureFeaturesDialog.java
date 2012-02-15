@@ -33,10 +33,10 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import cideplus.model.Feature;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.configuration.IFeaturesManager;
 
 /**
- * Caixa de diálogo para configuração das features do projeto.
+ * Caixa de diï¿½logo para configuraï¿½ï¿½o das features do projeto.
  * @see ConfigureFeaturesDialog.configure
  * @author rogel
  *
@@ -46,7 +46,7 @@ public class ConfigureFeaturesDialog extends Dialog {
 	private IJavaProject javaProject;
 	protected Set<Feature> features;
 
-	private FeaturesManager featuresManager;
+	private IFeaturesManager featuresManager;
 	protected TableViewer tableViewer;
 	protected Table table;
 
@@ -57,13 +57,13 @@ public class ConfigureFeaturesDialog extends Dialog {
 		featuresManager = FeaturesConfigurationUtil.getFeaturesManager(javaProject.getProject());
 	}
 
-	public FeaturesManager getFeaturesManager() {
+	public IFeaturesManager getFeaturesManager() {
 		return featuresManager;
 	}
 	
 	
 	/**
-	 * Mostra a caixa de diálogo para configuração das features do projeto
+	 * Mostra a caixa de diï¿½logo para configuraï¿½ï¿½o das features do projeto
 	 * @throws CoreException 
 	 * @throws IOException 
 	 */
@@ -111,7 +111,7 @@ public class ConfigureFeaturesDialog extends Dialog {
 	}
 
 	/* 
-	 * CÓDIGO DE CRIAÇÃO DOS COMPONENTES DA VIEW
+	 * Cï¿½DIGO DE CRIAï¿½ï¿½O DOS COMPONENTES DA VIEW
 	 */
 	
 	protected void createToolBar(Composite comp) {

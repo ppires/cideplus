@@ -24,16 +24,16 @@ import org.eclipse.swt.widgets.Shell;
 import cideplus.model.ASTNodeReference;
 import cideplus.model.Feature;
 import cideplus.model.exceptions.FeatureNotFoundException;
-import cideplus.ui.configuration.CompilationUnitFeaturesManager;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.configuration.IFeaturesManager;
 
 public class Exporter {
 
 	private Shell shell;
 	private IJavaProject project;
 	private int projectJavaCount;
-	private FeaturesManager featuresManager;
+	private IFeaturesManager featuresManager;
 	private Set<Feature> exportedFeatures;
 
 	public Exporter(Shell shell, IJavaProject project, Set<Feature> features) {
@@ -101,7 +101,7 @@ public class Exporter {
 			throw new OperationCanceledException();
 		}
 		monitor.setTaskName("Exporting... "+comp.getParent().getElementName()+"."+stripExtension(comp.getElementName()));
-		CompilationUnitFeaturesManager manager = featuresManager.getManagerForFile(comp);
+		ICompilationUnitFeaturesManager manager = featuresManager.getManagerForFile(comp);
 		Set<ASTNodeReference> nodesToRemove = getNodesToRemove(manager);
 		Set<ASTNodeReference> nodeReferences = removeOverridenAndOrder(nodesToRemove);
 		String source = comp.getSource();
@@ -121,7 +121,7 @@ public class Exporter {
 	 * @param manager
 	 * @return
 	 */
-	protected Set<ASTNodeReference> getNodesToRemove(CompilationUnitFeaturesManager manager) {
+	protected Set<ASTNodeReference> getNodesToRemove(ICompilationUnitFeaturesManager manager) {
 		Set<ASTNodeReference> allNodeReferences = manager.getNodeReferences();
 		Set<ASTNodeReference> nodesToRemove = new HashSet<ASTNodeReference>();
 		for (Iterator<ASTNodeReference> iterator = allNodeReferences.iterator(); iterator.hasNext();) {

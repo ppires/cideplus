@@ -30,9 +30,9 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import cideplus.model.ASTNodeReference;
 import cideplus.model.Feature;
-import cideplus.ui.configuration.CompilationUnitFeaturesManager;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.configuration.FeaturesManager;
+import cideplus.ui.configuration.IFeaturesManager;
 
 public class StatiticsAction implements IObjectActionDelegate {
 
@@ -96,7 +96,7 @@ public class StatiticsAction implements IObjectActionDelegate {
 	private List<Statitics> doStatitics(final IProgressMonitor monitor) throws CoreException {
 		final List<Statitics> statiticsList = new ArrayList<StatiticsAction.Statitics>();
 		statiticsList.add(new Statitics());//adicionar uma estatistica para o conjunto geral
-		final FeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project.getProject());
+		final IFeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project.getProject());
 		Set<Feature> features;
 		try {
 			features = featuresManager.getFeatures();
@@ -123,7 +123,7 @@ public class StatiticsAction implements IObjectActionDelegate {
 						IJavaElement java = JavaCore.create(file, project);
 						if(java instanceof ICompilationUnit){
 							try {
-								CompilationUnitFeaturesManager manager = featuresManager.getManagerForFile((ICompilationUnit)java);
+								ICompilationUnitFeaturesManager manager = featuresManager.getManagerForFile((ICompilationUnit)java);
 								for (Statitics statitics : statiticsList) {
 									//gerar todas as estatisticas para o compilationUnit
 									statitics.bytesCounted += countBytes(manager, statitics);
@@ -148,15 +148,15 @@ public class StatiticsAction implements IObjectActionDelegate {
 		return statiticsList;
 	}
 	
-	private int countNodesNonOverriden(CompilationUnitFeaturesManager manager, Statitics statitics) {
+	private int countNodesNonOverriden(ICompilationUnitFeaturesManager manager, Statitics statitics) {
 		return countNodes(manager, getNonOverridenNodeReferences(manager), statitics);
 	}
 	
-	private int countBytesNonOverriden(CompilationUnitFeaturesManager manager, Statitics statitics) {
+	private int countBytesNonOverriden(ICompilationUnitFeaturesManager manager, Statitics statitics) {
 		return countBytes(manager, getNonOverridenNodeReferences(manager), statitics);
 	}
 
-	private Set<ASTNodeReference> getNonOverridenNodeReferences(CompilationUnitFeaturesManager manager) {
+	private Set<ASTNodeReference> getNonOverridenNodeReferences(ICompilationUnitFeaturesManager manager) {
 		Set<ASTNodeReference> nodeReferences = copy(manager.getNodeReferences());
 		for (Iterator<ASTNodeReference> iterator = nodeReferences.iterator(); iterator.hasNext();) {
 			ASTNodeReference astNodeReference = iterator.next();
@@ -176,17 +176,17 @@ public class StatiticsAction implements IObjectActionDelegate {
 		return set;
 	}
 
-	private int countNodes(CompilationUnitFeaturesManager manager, Statitics statitics) {
+	private int countNodes(ICompilationUnitFeaturesManager manager, Statitics statitics) {
 		return countNodes(manager, manager.getNodeReferences(), statitics);
 	}
 
-	private int countNodes(CompilationUnitFeaturesManager manager, Set<ASTNodeReference> nodeReferences, Statitics statitics) {
+	private int countNodes(ICompilationUnitFeaturesManager manager, Set<ASTNodeReference> nodeReferences, Statitics statitics) {
 		int count = 0;
 		for (ASTNodeReference astNodeReference : nodeReferences) {
 			Set<Feature> features = manager.getFeatures(astNodeReference);
 			for (Feature feature : features) {
 				if(statitics.isForFeature(feature)){
-					//se as estatiticas que estao sendo calculadas, são para determinada feature, aplicar o valor e passar para o proximo nó
+					//se as estatiticas que estao sendo calculadas, sï¿½o para determinada feature, aplicar o valor e passar para o proximo nï¿½
 					count += 1;
 					break;
 				}
@@ -195,17 +195,17 @@ public class StatiticsAction implements IObjectActionDelegate {
 		return count;
 	}
 	
-	private int countBytes(CompilationUnitFeaturesManager manager, Statitics statitics) {
+	private int countBytes(ICompilationUnitFeaturesManager manager, Statitics statitics) {
 		return countBytes(manager, manager.getNodeReferences(), statitics);
 	}
 
-	private int countBytes(CompilationUnitFeaturesManager manager, Set<ASTNodeReference> nodeReferences, Statitics statitics) {
+	private int countBytes(ICompilationUnitFeaturesManager manager, Set<ASTNodeReference> nodeReferences, Statitics statitics) {
 		int count = 0;
 		for (ASTNodeReference astNodeReference : nodeReferences) {
 			Set<Feature> features = manager.getFeatures(astNodeReference);
 			for (Feature feature : features) {
 				if(statitics.isForFeature(feature)){
-					//se as estatiticas que estao sendo calculadas, são para determinada feature, aplicar o valor e passar para o proximo nó
+					//se as estatiticas que estao sendo calculadas, sï¿½o para determinada feature, aplicar o valor e passar para o proximo nï¿½
 					count += astNodeReference.getByteCount();
 					break;
 				}

@@ -48,7 +48,7 @@ import org.eclipse.ui.PlatformUI;
 
 import cideplus.model.Feature;
 import cideplus.model.RGB;
-import cideplus.ui.configuration.CompilationUnitFeaturesManager;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
 
 public class ASTViewLabelProvider extends StyledCellLabelProvider implements IColorProvider, IFontProvider {
@@ -66,7 +66,7 @@ public class ASTViewLabelProvider extends StyledCellLabelProvider implements ICo
 	//to dispose:
 	private final Font fAllocatedBoldItalic;
 	private final Color fLightBlue, fLightRed;
-	private CompilationUnitFeaturesManager compilationUnitFeaturesManager;
+	private ICompilationUnitFeaturesManager compilationUnitFeaturesManager;
 	
 	@Override
 	public void update(final ViewerCell cell) {
@@ -338,11 +338,11 @@ public class ASTViewLabelProvider extends StyledCellLabelProvider implements ICo
 		fAllocatedBoldItalic.dispose();
 	}
 
-	public CompilationUnitFeaturesManager getCompilationUnitFeaturesManager() {
+	public ICompilationUnitFeaturesManager getCompilationUnitFeaturesManager() {
 		return compilationUnitFeaturesManager;
 	}
 
-	public void setCompilationUnitFeaturesManager(CompilationUnitFeaturesManager compilationUnitFeaturesManager) {
+	public void setCompilationUnitFeaturesManager(ICompilationUnitFeaturesManager compilationUnitFeaturesManager) {
 		this.compilationUnitFeaturesManager = compilationUnitFeaturesManager;
 	}
 	

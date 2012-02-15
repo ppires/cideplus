@@ -9,11 +9,11 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import cideplus.model.Feature;
 import cideplus.model.exceptions.FeatureNotFoundException;
 
-public interface FeaturesManager {
+public interface IFeaturesManager {
 
 	Set<Feature> getFeatures() throws CoreException, IOException;
 	
 	void saveFeatures(Set<Feature> features) throws CoreException;
 	
-	CompilationUnitFeaturesManager getManagerForFile(ICompilationUnit file) throws IOException, FeatureNotFoundException, CoreException;
+	ICompilationUnitFeaturesManager getManagerForFile(ICompilationUnit file) throws IOException, FeatureNotFoundException, CoreException;
 }

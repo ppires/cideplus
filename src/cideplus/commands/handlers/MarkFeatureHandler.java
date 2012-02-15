@@ -13,6 +13,7 @@ import org.eclipse.jface.text.ITextSelection;
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
+import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 import cideplus.utils.PluginUtils;
 
 public class MarkFeatureHandler extends AbstractHandler implements IHandler {
@@ -51,6 +52,8 @@ public class MarkFeatureHandler extends AbstractHandler implements IHandler {
 			/* Refresh the editor */
 			FeaturesConfigurationUtil.updateEditors(PluginUtils.getActiveShell().getDisplay(), null);
 		}
+
+		FeaturesMarkerFactory.printAllMarkers();
 
 		return null;
 	}
