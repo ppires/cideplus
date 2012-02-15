@@ -21,6 +21,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.text.edits.RangeMarker;
 
 import cideplus.model.Feature;
 import cideplus.ui.astview.EditorUtility;
@@ -53,7 +54,8 @@ public class ColorPresentation implements ITextPresentationListener {
 		int offset = textPresentation.getExtent().getOffset();
 		int length = textPresentation.getExtent().getLength();
 
-		System.out.println("range markers size: " + manager.rangeMarkers.size());
+		List<RangeMarker> rangeMarkers = manager.getRangeMarkers();
+		System.out.println("range markers size: " + rangeMarkers.size());
 
 		// Apply presentation to AST
 		checkRange(root, offset, length, manager, textPresentation);
@@ -92,7 +94,7 @@ public class ColorPresentation implements ITextPresentationListener {
 		if (features.size() > 0) {
 			RGB combinedRGB = FeaturesConfigurationUtil.getCombinedRGB(features);
 
-			// Se o ASRNode estiver dentro do limite
+			// Se o ASTNode estiver dentro do limite
 			if (offset <= astNode.getStartPosition()
 					&& astNode.getStartPosition() + astNode.getLength() <= offset + length) {
 				//				System.out.println(offset+
@@ -136,8 +138,6 @@ public class ColorPresentation implements ITextPresentationListener {
 				}
 			}
 		}
-
-		System.out.println("Will iterate over astNode.structuralPropertiesForType()");
 
 		@SuppressWarnings("rawtypes")
 		List list = astNode.structuralPropertiesForType();

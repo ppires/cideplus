@@ -1,17 +1,19 @@
 package cideplus.ui.configuration;
 
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.text.edits.RangeMarker;
 
 import cideplus.model.ASTNodeReference;
 import cideplus.model.Feature;
 
 public interface CompilationUnitFeaturesManager {
 
-	//	public List<RangeMarker> rangeMarkers = null;
+	//List<RangeMarker> rangeMarkers;
 
 	boolean hasFeature(ASTNode astNode, Feature feature);
 
@@ -28,5 +30,7 @@ public interface CompilationUnitFeaturesManager {
 	ICompilationUnit getCompilationUnit();
 
 	Set<ASTNodeReference> getNodeReferences();
+
+	List<RangeMarker> getRangeMarkers();
 
 }

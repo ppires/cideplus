@@ -3,6 +3,7 @@ package cideplus.ui.configuration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.text.edits.RangeMarker;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -84,6 +86,8 @@ public class FeaturesConfigurationUtil {
 
 						compilationUnitFeaturesManager = new CompilationUnitFeaturesManager() {
 
+							List<RangeMarker> rangeMarkers = new ArrayList<RangeMarker>();
+
 							public Set<ASTNodeReference> getNodeReferences() {
 								return model.getNodeReferences();
 							}
@@ -109,11 +113,16 @@ public class FeaturesConfigurationUtil {
 									e.printStackTrace();
 								}
 
-								//								/* Cria um RangeMarker para trackear as modificações no texto */
-								//								if (rangeMarkers == null) {
+								/* Cria um RangeMarker para trackear as modificações no texto */
+								//								if (rangeMarkers == null)
 								//									rangeMarkers = new ArrayList<RangeMarker>();
-								//								}
-								//								rangeMarkers.add(new RangeMarker(astNode.getStartPosition(), astNode.getLength()));
+								RangeMarker rangeMarker = new RangeMarker(astNode.getStartPosition(), astNode.getLength());
+								rangeMarkers.add(rangeMarker);
+								System.out.println("Added new range marker to list! size(): " + rangeMarkers.size());
+							}
+
+							public List<RangeMarker> getRangeMarkers() {
+								return rangeMarkers;
 							}
 
 							public boolean hasFeature(ASTNode astNode, Feature feature) {
