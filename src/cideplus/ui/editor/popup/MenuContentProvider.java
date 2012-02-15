@@ -1,4 +1,4 @@
-package cideplus.ui.editor.popup.actions;
+package cideplus.ui.editor.popup;
 
 import java.io.IOException;
 import java.util.HashMap;

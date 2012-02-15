@@ -9,11 +9,11 @@ import java.util.TreeSet;
 public class CompilationUnitFeaturesModel {
 
 	Map<ASTNodeReference, Set<Feature>> configurationMap = new HashMap<ASTNodeReference, Set<Feature>>();
-	
+
 	public Set<Feature> getFeatures(ASTNodeReference reference){
 		return getFeatures(reference, false);
 	}
-	
+
 	public Set<Feature> getFeatures(ASTNodeReference reference, boolean updateAstReference){
 		Set<Feature> list = configurationMap.get(reference);
 		if(list == null) {
@@ -31,6 +31,6 @@ public class CompilationUnitFeaturesModel {
 		set.addAll(configurationMap.keySet());
 		return set;
 	}
-	
-	
+
+
 }

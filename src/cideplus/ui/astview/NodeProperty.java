@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2000, 2005 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials 
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
@@ -18,25 +18,27 @@ import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.swt.graphics.Image;
 
 public class NodeProperty extends ASTAttribute {
-	
+
 	private ASTNode fParent;
 	private StructuralPropertyDescriptor fProperty;
-	
+
 	public NodeProperty(ASTNode parent, StructuralPropertyDescriptor property) {
 		fParent= parent;
 		fProperty= property;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jdt.astview.views.ASTAttribute#getParent()
 	 */
+	@Override
 	public Object getParent() {
 		return fParent;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jdt.astview.views.ASTAttribute#getChildren()
 	 */
+	@Override
 	public Object[] getChildren() {
 		Object child= getNode();
 		if (child instanceof List) {
@@ -52,10 +54,11 @@ public class NodeProperty extends ASTAttribute {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jdt.astview.views.ASTAttribute#getLabel()
 	 */
+	@Override
 	public String getLabel() {
 		StringBuffer buf= new StringBuffer();
 		buf.append(getPropertyName());
-		
+
 		if (fProperty.isSimpleProperty()) {
 			buf.append(": "); //$NON-NLS-1$
 			Object node= getNode();
@@ -80,18 +83,19 @@ public class NodeProperty extends ASTAttribute {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jdt.astview.views.ASTAttribute#getImage()
 	 */
+	@Override
 	public Image getImage() {
 		return null;
 	}
-	
+
 	public Object getNode() {
 		return fParent.getStructuralProperty(fProperty);
 	}
-	
+
 	public String getPropertyName() {
 		return toConstantName(fProperty.getId());
 	}
-	
+
 	private static String toConstantName(String string) {
 		StringBuffer buf= new StringBuffer();
 		for (int i= 0; i < string.length(); i++) {
@@ -103,7 +107,8 @@ public class NodeProperty extends ASTAttribute {
 		}
 		return buf.toString();
 	}
-	
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
@@ -115,13 +120,15 @@ public class NodeProperty extends ASTAttribute {
 		return  fParent.equals(castedObj.fParent) && (fProperty == castedObj.fProperty);
 	}
 
+	@Override
 	public int hashCode() {
 		return fParent.hashCode() * 31 + fProperty.hashCode();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return getLabel();
 

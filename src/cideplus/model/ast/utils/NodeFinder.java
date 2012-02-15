@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package cideplus.model.ASTUtils;
+package cideplus.model.ast.utils;
 
 import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.ISourceRange;
@@ -102,6 +102,7 @@ public final class NodeFinder {
 	public static ASTNode perform(ASTNode root, int start, int length) {
 		NodeFinder finder = new NodeFinder(root, start, length);
 		ASTNode result= finder.getCoveredNode();
+		System.out.println("NodeFinder result: " + result);
 		if (result == null || result.getStartPosition() != start || result.getLength() != length) {
 			return finder.getCoveringNode();
 		}

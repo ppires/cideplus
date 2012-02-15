@@ -108,6 +108,12 @@ public class FeaturesConfigurationUtil {
 									System.out.println("Could not create marker for feature " + feature.getName());
 									e.printStackTrace();
 								}
+
+								//								/* Cria um RangeMarker para trackear as modificações no texto */
+								//								if (rangeMarkers == null) {
+								//									rangeMarkers = new ArrayList<RangeMarker>();
+								//								}
+								//								rangeMarkers.add(new RangeMarker(astNode.getStartPosition(), astNode.getLength()));
 							}
 
 							public boolean hasFeature(ASTNode astNode, Feature feature) {

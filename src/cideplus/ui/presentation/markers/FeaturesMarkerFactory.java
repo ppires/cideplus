@@ -10,10 +10,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import cideplus.model.ast.utils.ASTUtils;
 import cideplus.utils.PluginUtils;
 
 public class FeaturesMarkerFactory {
@@ -34,20 +34,10 @@ public class FeaturesMarkerFactory {
 	}
 
 	public static IMarker createMarker(ASTNode node, int featureId) throws CoreException {
-		//		CompilationUnit compUnit = node.getRoot()
-		//		IResource resource = ((CompilationUnit) node.getRoot()).getJavaElement();
-		ASTNode root = node.getRoot();
-		if (root.getNodeType() == ASTNode.COMPILATION_UNIT) {
-			Object resource = ((CompilationUnit) root).getJavaElement().getAdapter(IResource.class);
-			if (resource != null) {
-				System.out.println("found resource! " + resource);
-				IMarker marker = createMarker((IResource) resource, node.getStartPosition(), node.getLength(), featureId);
-				return marker;
-			}
-			else {
-				System.out.println("resource == null!!!");
-				return null;
-			}
+		IResource resource = ASTUtils.getCorrespondingResource(node);
+		if (resource != null) {
+			IMarker marker = createMarker(resource, node.getStartPosition(), node.getLength(), featureId);
+			return marker;
 		}
 		return null;
 	}

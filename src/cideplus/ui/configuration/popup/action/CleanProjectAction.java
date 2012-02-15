@@ -1,6 +1,7 @@
 package cideplus.ui.configuration.popup.action;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
@@ -20,6 +21,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import cideplus.FeaturerPlugin;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
+import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 
 public class CleanProjectAction  implements IObjectActionDelegate {
 
@@ -30,10 +32,10 @@ public class CleanProjectAction  implements IObjectActionDelegate {
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		shell = targetPart.getSite().getShell();
 	}
-	
+
 	public void run(IAction action) {
 		new Job("Clean project") {
-			
+
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 				monitor.beginTask("Cleaning project...", IProgressMonitor.UNKNOWN);
@@ -50,10 +52,16 @@ public class CleanProjectAction  implements IObjectActionDelegate {
 			}
 		}.schedule();
 	}
-	
+
 	private void doClean(final IProgressMonitor monitor) throws CoreException {
+
+		// Delete all markers associated with the project
+		for (IMarker marker : FeaturesMarkerFactory.findAllRelatedMarkers(project.getProject())) {
+			marker.delete();
+			monitor.worked(1);
+		}
+
 		project.getProject().accept(new IResourceVisitor() {
-			
 			public boolean visit(IResource resource) throws CoreException {
 				if(resource instanceof IFolder || resource instanceof IProject){
 					return true;
@@ -61,12 +69,13 @@ public class CleanProjectAction  implements IObjectActionDelegate {
 				if(resource.getName().endsWith("feat") && !resource.getName().equals(FeaturesConfigurationUtil.FEATURES_FILE)){
 					monitor.setTaskName("Cleaning project... deleting feature file "+resource.getName());
 					resource.delete(true, new NullProgressMonitor());
+					monitor.worked(5);
 				}
 				return false;
 			}
 		});
 	}
-	
+
 	public void selectionChanged(IAction action, ISelection selection) {
 		if(selection instanceof IJavaProject){
 			project = (IJavaProject) selection;

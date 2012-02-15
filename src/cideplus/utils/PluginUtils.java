@@ -115,17 +115,16 @@ public class PluginUtils {
 
 
 	public static ICompilationUnit getCurrentCompilationUnit() {
-		System.out.println("Getting current compilation unit!");
-		//IEditorInput inputElement = getCurrentEditor().getEditorInput();
+		//		IEditorInput inputElement = getCurrentEditor().getEditorInput();
 		IJavaElement editorCU = EditorUtility.getActiveEditorJavaInput();
 		if (editorCU instanceof ICompilationUnit) {
-			System.out.println("First if");
+			//			System.out.println("First if");
 			return (ICompilationUnit) editorCU;
 		}
 		else {
 			editorCU = editorCU.getAncestor(IJavaElement.COMPILATION_UNIT);
 			if (editorCU instanceof ICompilationUnit) {
-				System.out.println("Second if");
+				//				System.out.println("Second if");
 				return (ICompilationUnit) editorCU;
 			}
 		}

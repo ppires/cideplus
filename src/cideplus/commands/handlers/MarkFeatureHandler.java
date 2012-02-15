@@ -28,7 +28,6 @@ public class MarkFeatureHandler extends AbstractHandler implements IHandler {
 		int featureId = Integer.parseInt(event.getParameter(paramFeatureId));
 
 		ITextSelection selection = PluginUtils.getCurrentEditorTextSelection();
-		System.out.println("offset: " + selection.getOffset() + "     length: " + selection.getLength());
 		if (selection == null || selection.isEmpty()) {
 			MessageDialog.openError(PluginUtils.getActiveShell(), "CIDE+", "You must select some text in order to mark a feature.");
 		}

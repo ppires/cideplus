@@ -11,18 +11,20 @@ import cideplus.model.Feature;
 
 public interface CompilationUnitFeaturesManager {
 
+	//	public List<RangeMarker> rangeMarkers = null;
+
 	boolean hasFeature(ASTNode astNode, Feature feature);
-	
+
 	void setFeature(ASTNode astNode, Feature feature);
-	
+
 	Set<Feature> getFeatures(ASTNode astNode);
-	
+
 	Set<Feature> getFeatures(ASTNodeReference reference);
-	
+
 	void removeFeature(ASTNode node, Feature feature);
-	
+
 	void commitChanges() throws CoreException;
-	
+
 	ICompilationUnit getCompilationUnit();
 
 	Set<ASTNodeReference> getNodeReferences();

@@ -12,7 +12,7 @@
                id="cideplus.editor.features.menu"
                label="Features">
             <dynamic 
-                  class="cideplus.ui.editor.popup.actions.MenuContentProvider"
+                  class="cideplus.ui.editor.popup.MenuContentProvider"
                   id="cideplus.menus.dynamicContentProvider" >
             </dynamic>
          </menu>               

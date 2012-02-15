@@ -17,7 +17,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 import cideplus.automation.Util;
-import cideplus.model.ASTUtils.NodeFinder;
+import cideplus.model.ast.utils.NodeFinder;
 import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.configuration.CompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
