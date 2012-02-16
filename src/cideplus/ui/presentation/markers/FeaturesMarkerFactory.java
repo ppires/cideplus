@@ -25,6 +25,7 @@ public class FeaturesMarkerFactory {
 		HashMap<String, Object> attributes = createMarkerAttributes(offset, length, featureId);
 		IMarker marker = resource.createMarker(FEATURES_MARKER_ID);
 		marker.setAttributes(attributes);
+		printAllRelatedMarkers(PluginUtils.getCurrentProject());
 		return marker;
 	}
 
@@ -124,6 +125,13 @@ public class FeaturesMarkerFactory {
 
 	public static void printAllMarkers() {
 		for (IMarker marker : findAllMarkers()) {
+			printMarker(marker);
+			System.out.println(System.getProperty("line.separator"));
+		}
+	}
+
+	public static void printAllRelatedMarkers(IResource resource) {
+		for (IMarker marker : findAllRelatedMarkers(resource)) {
 			printMarker(marker);
 			System.out.println(System.getProperty("line.separator"));
 		}

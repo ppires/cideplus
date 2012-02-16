@@ -19,6 +19,7 @@ import cideplus.utils.PluginUtils;
 public class MarkFeatureHandler extends AbstractHandler implements IHandler {
 
 	private static final String paramFeatureId = "cideplus.commands.markFeature.featureIdParameter";
+	private static final String paramProjectName = "cideplus.commands.markFeature.projectNameParameter";
 
 	public MarkFeatureHandler() {
 		// TODO Auto-generated constructor stub
@@ -27,6 +28,7 @@ public class MarkFeatureHandler extends AbstractHandler implements IHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		int featureId = Integer.parseInt(event.getParameter(paramFeatureId));
+		String projectName = event.getParameter(paramProjectName);
 
 		ITextSelection selection = PluginUtils.getCurrentEditorTextSelection();
 		if (selection == null || selection.isEmpty()) {

@@ -60,6 +60,10 @@ public class FeaturesConfigurationUtil {
 					return FeaturesConfigurationUtil.getFeatures(project);
 				}
 
+				public IProject getProject() {
+					return project;
+				}
+
 				public ICompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeatureNotFoundException, CoreException {
 					ICompilationUnitFeaturesManager compilationUnitFeaturesManager;
 					if((compilationUnitFeaturesManager = compUnitCache.get(compilationUnit)) == null){

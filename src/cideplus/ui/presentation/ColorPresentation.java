@@ -31,11 +31,16 @@ import cideplus.ui.editor.FeaturerCompilationUnitEditor;
 
 public class ColorPresentation implements ITextPresentationListener {
 
+	private ASTParser astParser;
+	private FeaturerCompilationUnitEditor editor;
+
+
 	private CompilationUnit root;
 	private ICompilationUnitFeaturesManager manager;
 	private ITypeRoot input;
 
 	public ColorPresentation(ISourceViewer sourceViewer, FeaturerCompilationUnitEditor compilationUnitEditor) {
+
 		this.input = EditorUtility.getJavaInput(compilationUnitEditor);
 		ASTParser parser = ASTParser.newParser(AST.JLS3);
 		parser.setResolveBindings(false);
@@ -47,18 +52,34 @@ public class ColorPresentation implements ITextPresentationListener {
 		}
 		this.root = (CompilationUnit) parser.createAST(null);
 		refreshFeatures();
+
+		this.astParser = parser;
+		this.editor = compilationUnitEditor;
 	}
 
 	public void applyTextPresentation(TextPresentation textPresentation) {
 		int offset = textPresentation.getExtent().getOffset();
 		int length = textPresentation.getExtent().getLength();
 
+		// Apply presentation to AST
+		//checkRange(root, offset, length, manager, textPresentation);
+
+
+
+		astParser.setResolveBindings(false);
+		this.input = EditorUtility.getJavaInput(editor);
+		if (input instanceof ICompilationUnit) {
+			astParser.setSource((ICompilationUnit) input);
+		} else {
+			astParser.setSource((IClassFile) input);
+		}
+		checkRange(astParser.createAST(null), offset, length, manager, textPresentation);
+
+
+		//		/* Failed attempts */
 		//		List<RangeMarker> rangeMarkers = ((CompilationUnitFeaturesManager) manager).getRangeMarkers();
 		//		System.out.println("range markers size: " + rangeMarkers.size());
-
-		// Apply presentation to AST
-		checkRange(root, offset, length, manager, textPresentation);
-
+		//
 		//		IResource resource = ASTUtils.getCorrespondingResource(root);
 		//		List<IMarker> markers = FeaturesMarkerFactory.findAllRelatedMarkers(resource);
 		//		System.out.println("total markers: " + markers.size());

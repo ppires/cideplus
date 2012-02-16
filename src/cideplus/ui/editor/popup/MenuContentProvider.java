@@ -23,7 +23,7 @@ public class MenuContentProvider extends CompoundContributionItem {
 
 	private Set<Feature> features;
 
-	private static String paramFeatureId = "cideplus.commands.markFeature.featureIdParameter";
+	private static final String paramFeatureId = "cideplus.commands.markFeature.featureIdParameter";
 
 	public MenuContentProvider() {
 		setFeatures();
