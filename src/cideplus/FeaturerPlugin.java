@@ -2,6 +2,8 @@ package cideplus;
 
 import java.io.InputStream;
 
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.Device;
@@ -10,6 +12,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import cideplus.ui.astview.ASTViewPlugin;
+import cideplus.ui.presentation.ResourceChangeListener;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -22,6 +25,10 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static FeaturerPlugin plugin;
 	private final ASTViewPlugin astViewPlugin;
+
+	public static final boolean DEBUG_RESOURCE_LISTENER = true;
+	public static final boolean DEBUG_REFRESH = false;
+	public static final boolean DEBUG_CACHE = false;
 
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;
@@ -46,6 +53,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		astViewPlugin.start(context);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(new ResourceChangeListener(), IResourceChangeEvent.POST_CHANGE);
 	}
 
 	/*
@@ -67,7 +75,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 			return FileLocator.find(getDefault().getBundle(),
 					new Path("/icons" + path), null).openStream();
 		} catch (Exception e3) {
-			throw new RuntimeException("N�o foi possivel encontrar o arquivo "
+			throw new RuntimeException("Não foi possivel encontrar o arquivo "
 					+ path);
 		}
 	}

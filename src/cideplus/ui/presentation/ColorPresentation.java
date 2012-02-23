@@ -22,6 +22,7 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
+import cideplus.FeaturerPlugin;
 import cideplus.model.Feature;
 import cideplus.ui.astview.EditorUtility;
 import cideplus.ui.astview.NodeProperty;
@@ -124,8 +125,8 @@ public class ColorPresentation implements ITextPresentationListener {
 				range.background = new Color(null, combinedRGB);
 				range.start = astNode.getStartPosition();
 				range.length = astNode.getLength();
-				textPresentation.replaceStyleRange(range);
-				//				textPresentation.mergeStyleRange(range);
+				//				textPresentation.replaceStyleRange(range);
+				textPresentation.mergeStyleRange(range);
 
 				//
 			} else if (offset > astNode.getStartPosition()) {
@@ -249,9 +250,7 @@ public class ColorPresentation implements ITextPresentationListener {
 		};
 		ICompilationUnitFeaturesManager managerForFile;
 		try {
-			managerForFile = FeaturesConfigurationUtil.getFeaturesManager(
-					project).getManagerForFile(
-							input.getWorkingCopy(copyOwner, null));
+			managerForFile = FeaturesConfigurationUtil.getFeaturesManager(project).getManagerForFile(input.getWorkingCopy(copyOwner, null));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -262,7 +261,11 @@ public class ColorPresentation implements ITextPresentationListener {
 	 * Lê as informacoes atualizadas das features
 	 */
 	public void refreshFeatures() {
+		if (FeaturerPlugin.DEBUG_REFRESH) System.out.println("-=-=-=-=-=");
+		if (FeaturerPlugin.DEBUG_REFRESH) System.out.println("Refresing features...");
 		this.manager = getManager(input);
+		if (FeaturerPlugin.DEBUG_REFRESH) System.out.println("Refreshed!");
+		if (FeaturerPlugin.DEBUG_REFRESH) System.out.println("-=-=-=-=-=");
 	}
 
 }

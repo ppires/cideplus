@@ -26,13 +26,14 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+import cideplus.FeaturerPlugin;
 import cideplus.model.ASTNodeReference;
 import cideplus.model.CompilationUnitFeaturesModel;
 import cideplus.model.Feature;
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
-import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
+import cideplus.ui.presentation.FeaturesMarkerFactory;
 
 /**
  * Class utilit�ria para trabalhar com a configura��o das features junto a Interface Gr�fica
@@ -48,6 +49,7 @@ public class FeaturesConfigurationUtil {
 	public static IFeaturesManager getFeaturesManager(final IProject project){
 		IFeaturesManager featuresManager;
 		if((featuresManager = projectCache.get(project)) == null){
+			if (FeaturerPlugin.DEBUG_CACHE) System.out.println("projectCache MISS");
 			featuresManager = new IFeaturesManager() {
 
 				Map<ICompilationUnit, ICompilationUnitFeaturesManager> compUnitCache = new HashMap<ICompilationUnit, ICompilationUnitFeaturesManager>();
@@ -67,6 +69,7 @@ public class FeaturesConfigurationUtil {
 				public ICompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeatureNotFoundException, CoreException {
 					ICompilationUnitFeaturesManager compilationUnitFeaturesManager;
 					if((compilationUnitFeaturesManager = compUnitCache.get(compilationUnit)) == null){
+						if (FeaturerPlugin.DEBUG_CACHE) System.out.println("compUnitCache MISS");
 						//						PluginUtils.showPopup("(compilationUnitFeaturesManager = cache.get(compilationUnit)) == null");
 						IPath path = compilationUnit.getPath().removeFileExtension().addFileExtension("feat");
 						final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
@@ -146,11 +149,17 @@ public class FeaturesConfigurationUtil {
 						};
 						compUnitCache.put(compilationUnit, compilationUnitFeaturesManager);
 					}
+					else {
+						if (FeaturerPlugin.DEBUG_CACHE) System.out.println("compUnitCache HIT");
+					}
 					return compilationUnitFeaturesManager;
 				}
 			};
 			//o project feature manager nao possuirá cache... apenas o compilation unit
 			//cache.put(project, featuresManager);
+		}
+		else {
+			if (FeaturerPlugin.DEBUG_CACHE) System.out.println("projectCache HIT");
 		}
 		return featuresManager;
 	}

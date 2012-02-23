@@ -13,13 +13,11 @@ import org.eclipse.jface.text.ITextSelection;
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 import cideplus.utils.PluginUtils;
 
 public class MarkFeatureHandler extends AbstractHandler implements IHandler {
 
 	private static final String paramFeatureId = "cideplus.commands.markFeature.featureIdParameter";
-	private static final String paramProjectName = "cideplus.commands.markFeature.projectNameParameter";
 
 	public MarkFeatureHandler() {
 		// TODO Auto-generated constructor stub
@@ -28,7 +26,6 @@ public class MarkFeatureHandler extends AbstractHandler implements IHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		int featureId = Integer.parseInt(event.getParameter(paramFeatureId));
-		String projectName = event.getParameter(paramProjectName);
 
 		ITextSelection selection = PluginUtils.getCurrentEditorTextSelection();
 		if (selection == null || selection.isEmpty()) {
@@ -55,7 +52,7 @@ public class MarkFeatureHandler extends AbstractHandler implements IHandler {
 			FeaturesConfigurationUtil.updateEditors(PluginUtils.getActiveShell().getDisplay(), null);
 		}
 
-		FeaturesMarkerFactory.printAllMarkers();
+		//FeaturesMarkerFactory.printAllMarkers();
 
 		return null;
 	}

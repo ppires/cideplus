@@ -21,7 +21,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import cideplus.FeaturerPlugin;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
+import cideplus.ui.presentation.FeaturesMarkerFactory;
 
 public class CleanProjectAction  implements IObjectActionDelegate {
 

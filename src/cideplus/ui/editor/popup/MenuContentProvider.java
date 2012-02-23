@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CompoundContributionItem;
@@ -49,9 +50,10 @@ public class MenuContentProvider extends CompoundContributionItem {
 			return new IContributionItem[] { new CommandContributionItem(contributionParameter) };
 		}
 		else {
-			IContributionItem[] menuItems = new IContributionItem[features.size()];
+			IContributionItem[] menuItems = new IContributionItem[features.size() + 1];
 			Iterator<Feature> it = features.iterator();
-			for (int i = 0; it.hasNext(); i++) {
+			int i;
+			for (i = 0; it.hasNext(); i++) {
 				Feature feature = it.next();
 				final CommandContributionItemParameter contributionParameter = new CommandContributionItemParameter(serviceLocator, id, markFeatureCommandId, CommandContributionItem.STYLE_PULLDOWN);
 				contributionParameter.label = feature.getName();
@@ -59,6 +61,7 @@ public class MenuContentProvider extends CompoundContributionItem {
 				contributionParameter.parameters.put(paramFeatureId, feature.getId().toString());
 				menuItems[i] = new CommandContributionItem(contributionParameter);
 			}
+			menuItems[i++] = new Separator();
 			return menuItems;
 		}
 	}

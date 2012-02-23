@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -19,10 +18,9 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import cideplus.automation.Util;
 import cideplus.model.ast.utils.NodeFinder;
 import cideplus.model.exceptions.FeatureNotFoundException;
-import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.IFeaturesManager;
-import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
 import cideplus.utils.PluginUtils;
 
 /**
@@ -167,10 +165,6 @@ public class FeaturesUtil {
 			Feature feature = FeaturesConfigurationUtil.getFeature(feature_id, project);
 			managerForFile.setFeature(node, feature);
 			managerForFile.commitChanges();
-
-			/* Create marker for the newly created feature */
-			IResource resource = PluginUtils.getCurrentFile();
-			FeaturesMarkerFactory.createMarker(resource, node.getStartPosition(), node.getLength(), feature_id);
 		}
 	}
 }

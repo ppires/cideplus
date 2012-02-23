@@ -1,4 +1,4 @@
-package cideplus.ui.presentation.markers;
+package cideplus.ui.presentation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +18,8 @@ import cideplus.utils.PluginUtils;
 
 public class FeaturesMarkerFactory {
 
+	private static final boolean DEBUG_MARKERS = false;
+
 	public static final String FEATURES_MARKER_ID = "cideplus.markers.featuresMarker";
 
 
@@ -25,7 +27,7 @@ public class FeaturesMarkerFactory {
 		HashMap<String, Object> attributes = createMarkerAttributes(offset, length, featureId);
 		IMarker marker = resource.createMarker(FEATURES_MARKER_ID);
 		marker.setAttributes(attributes);
-		printAllRelatedMarkers(PluginUtils.getCurrentProject());
+		if (DEBUG_MARKERS) printAllRelatedMarkers(resource);
 		return marker;
 	}
 
@@ -131,10 +133,14 @@ public class FeaturesMarkerFactory {
 	}
 
 	public static void printAllRelatedMarkers(IResource resource) {
+		System.out.println("========================================");
+		System.out.println("Printing all markers related to " + resource.getName());
+		System.out.println("========================================");
 		for (IMarker marker : findAllRelatedMarkers(resource)) {
 			printMarker(marker);
 			System.out.println(System.getProperty("line.separator"));
 		}
+		System.out.println("========================================");
 	}
 }
 

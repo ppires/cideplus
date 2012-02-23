@@ -10,7 +10,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
+import cideplus.ui.presentation.FeaturesMarkerFactory;
 import cideplus.utils.PluginUtils;
 
 public class MarkFeatureInEditorAction implements IWorkbenchWindowActionDelegate {

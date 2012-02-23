@@ -19,7 +19,7 @@ import cideplus.model.ASTNodeReference;
 import cideplus.model.CompilationUnitFeaturesModel;
 import cideplus.model.Feature;
 import cideplus.model.FeaturesUtil;
-import cideplus.ui.presentation.markers.FeaturesMarkerFactory;
+import cideplus.ui.presentation.FeaturesMarkerFactory;
 
 public class CompilationUnitFeaturesManager implements ICompilationUnitFeaturesManager {
 

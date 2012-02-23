@@ -107,8 +107,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import cideplus.model.Feature;
 import cideplus.ui.astview.action.SetFeatureAction;
-import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.IFeaturesManager;
 
 
@@ -162,6 +162,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 			return fLevel;
 		}
 
+		@Override
 		public void run() {
 			setASTLevel(fLevel, true);
 		}
@@ -187,6 +188,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 			return fInputKind;
 		}
 
+		@Override
 		public void run() {
 			setASTInputType(fInputKind);
 		}
@@ -491,6 +493,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 	/*(non-Javadoc)
 	 * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite)
 	 */
+	@Override
 	public void init(IViewSite site) throws PartInitException {
 		super.setSite(site);
 		if (fSuperListener == null) {
@@ -560,6 +563,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 					public boolean isActive() {return true;}
 				};
 				WorkingCopyOwner copyOwner = new WorkingCopyOwner() {
+					@Override
 					public IProblemRequestor getProblemRequestor(ICompilationUnit workingCopy) {
 						return problemRequestor;
 					}
@@ -651,6 +655,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 				}
 			};
 			WorkingCopyOwner workingCopyOwner= new WorkingCopyOwner() {
+				@Override
 				public IProblemRequestor getProblemRequestor(ICompilationUnit workingCopy) {
 					return problemRequestor;
 				}
@@ -739,6 +744,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#dispose()
 	 */
+	@Override
 	public void dispose() {
 		if (fSuperListener != null) {
 			if (fEditor != null) {
@@ -767,6 +773,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		fSash= new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
 		fViewer = new TreeViewer(fSash, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -777,6 +784,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fViewer.addSelectionChangedListener(fSuperListener);
 		fViewer.addDoubleClickListener(fSuperListener);
 		fViewer.addFilter(new ViewerFilter() {
+			@Override
 			public boolean select(Viewer viewer, Object parentElement, Object element) {
 				if (!fCreateBindings && element instanceof Binding)
 					return false;
@@ -826,10 +834,12 @@ public class ASTView extends ViewPart implements IShowInSource {
 			}
 		});
 		fTray.getTree().addFocusListener(new FocusAdapter() {
+			@Override
 			public void focusGained(FocusEvent e) {
 				IStructuredSelection selection= (IStructuredSelection) fTray.getSelection();
 				fDeleteAction.setEnabled(selection.size() >= 1);
 			}
+			@Override
 			public void focusLost(FocusEvent e) {
 				fDeleteAction.setEnabled(false);
 			}
@@ -975,6 +985,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 
 	private void makeActions() {
 		fRefreshAction = new Action() {
+			@Override
 			public void run() {
 				performRefresh();
 			}
@@ -985,6 +996,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		ASTViewImages.setImageDescriptors(fRefreshAction, ASTViewImages.REFRESH);
 
 		fClearAction = new Action() {
+			@Override
 			public void run() {
 				performClear();
 			}
@@ -1002,6 +1014,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		};
 
 		fCreateBindingsAction = new Action("&Create Bindings", IAction.AS_CHECK_BOX) { //$NON-NLS-1$
+			@Override
 			public void run() {
 				performCreateBindings();
 			}
@@ -1011,6 +1024,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fCreateBindingsAction.setEnabled(true);
 
 		fStatementsRecoveryAction = new Action("&Statements Recovery", IAction.AS_CHECK_BOX) { //$NON-NLS-1$
+			@Override
 			public void run() {
 				performStatementsRecovery();
 			}
@@ -1019,6 +1033,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fStatementsRecoveryAction.setEnabled(true);
 
 		fBindingsRecoveryAction = new Action("&Bindings Recovery", IAction.AS_CHECK_BOX) { //$NON-NLS-1$
+			@Override
 			public void run() {
 				performBindingsRecovery();
 			}
@@ -1027,6 +1042,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fBindingsRecoveryAction.setEnabled(true);
 
 		fIgnoreMethodBodiesAction = new Action("&Ignore Method Bodies", IAction.AS_CHECK_BOX) { //$NON-NLS-1$
+			@Override
 			public void run() {
 				performIgnoreMethodBodies();
 			}
@@ -1035,6 +1051,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fIgnoreMethodBodiesAction.setEnabled(true);
 
 		fFilterNonRelevantAction = new Action("&Hide Non-Relevant Attributes", IAction.AS_CHECK_BOX) { //$NON-NLS-1$
+			@Override
 			public void run() {
 				performFilterNonRelevant();
 			}
@@ -1044,6 +1061,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fFilterNonRelevantAction.setEnabled(true);
 
 		fFindDeclaringNodeAction= new Action("Find &Declaring Node...", IAction.AS_PUSH_BUTTON) { //$NON-NLS-1$
+			@Override
 			public void run() {
 				performFindDeclaringNode();
 			}
@@ -1052,6 +1070,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fFindDeclaringNodeAction.setEnabled(false);
 
 		fParseBindingFromElementAction= new Action("&Parse Binding from &Element Handle...", IAction.AS_PUSH_BUTTON) { //$NON-NLS-1$
+			@Override
 			public void run() {
 				performParseBindingFromElement();
 			}
@@ -1060,6 +1079,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fParseBindingFromElementAction.setEnabled(true);
 
 		fParseBindingFromKeyAction= new Action("Parse Binding from &Key...", IAction.AS_PUSH_BUTTON) { //$NON-NLS-1$
+			@Override
 			public void run() {
 				performParseBindingFromKey();
 			}
@@ -1068,16 +1088,18 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fParseBindingFromKeyAction.setEnabled(true);
 
 		fFocusAction = new Action() {
+			@Override
 			public void run() {
 				performSetFocus();
 			}
 		};
 		fFocusAction.setText("&Show AST of active editor"); //$NON-NLS-1$
 		fFocusAction.setToolTipText("Show AST of active editor"); //$NON-NLS-1$
-		fFocusAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_REFRESH); //$NON-NLS-1$
+		fFocusAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_REFRESH);
 		ASTViewImages.setImageDescriptors(fFocusAction, ASTViewImages.SETFOCUS);
 
 		fCollapseAction = new Action() {
+			@Override
 			public void run() {
 				performCollapse();
 			}
@@ -1088,6 +1110,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		ASTViewImages.setImageDescriptors(fCollapseAction, ASTViewImages.COLLAPSE);
 
 		fExpandAction = new Action() {
+			@Override
 			public void run() {
 				performExpand();
 			}
@@ -1100,12 +1123,14 @@ public class ASTView extends ViewPart implements IShowInSource {
 		fCopyAction= new TreeCopyAction(new Tree[] {fViewer.getTree(), fTray.getTree()});
 
 		fDoubleClickAction = new Action() {
+			@Override
 			public void run() {
 				performDoubleClick();
 			}
 		};
 
 		fLinkWithEditor = new Action() {
+			@Override
 			public void run() {
 				performLinkWithEditor();
 			}
@@ -1122,6 +1147,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		};
 
 		fAddToTrayAction= new Action() {
+			@Override
 			public void run() {
 				performAddToTray();
 			}
@@ -1132,6 +1158,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		ASTViewImages.setImageDescriptors(fAddToTrayAction, ASTViewImages.ADD_TO_TRAY);
 
 		fDeleteAction= new Action() {
+			@Override
 			public void run() {
 				performDelete();
 			}
@@ -1440,6 +1467,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 		class MyASTRequestor extends ASTRequestor {
 			String fBindingKey;
 			IBinding fBinding;
+			@Override
 			public void acceptBinding(String bindingKey, IBinding binding) {
 				fBindingKey= bindingKey;
 				fBinding= binding;
@@ -1622,6 +1650,7 @@ public class ASTView extends ViewPart implements IShowInSource {
 			fTray.setInput(fTrayRoots);
 	}
 
+	@Override
 	public void setFocus() {
 		fViewer.getControl().setFocus();
 	}
