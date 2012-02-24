@@ -11,6 +11,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import cideplus.model.ast.utils.ASTUtils;
@@ -28,6 +30,11 @@ public class FeaturesMarkerFactory {
 		IMarker marker = resource.createMarker(FEATURES_MARKER_ID);
 		marker.setAttributes(attributes);
 		if (DEBUG_MARKERS) printAllRelatedMarkers(resource);
+
+		ITextEditor editor = PluginUtils.getCurrentTextEditor();
+		IAnnotationModel model = editor.getDocumentProvider().getAnnotationModel(editor.getEditorInput());
+		System.out.println("Annotation model class: " + model.getClass());
+
 		return marker;
 	}
 

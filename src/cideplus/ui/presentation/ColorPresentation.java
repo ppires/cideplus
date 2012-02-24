@@ -67,17 +67,17 @@ public class ColorPresentation implements ITextPresentationListener {
 
 
 
-		astParser.setResolveBindings(false);
-		this.input = EditorUtility.getJavaInput(editor);
-		if (input instanceof ICompilationUnit) {
-			astParser.setSource((ICompilationUnit) input);
-		} else {
-			astParser.setSource((IClassFile) input);
-		}
-		checkRange(astParser.createAST(null), offset, length, manager, textPresentation);
+		//		astParser.setResolveBindings(false);
+		//		this.input = EditorUtility.getJavaInput(editor);
+		//		if (input instanceof ICompilationUnit) {
+		//			astParser.setSource((ICompilationUnit) input);
+		//		} else {
+		//			astParser.setSource((IClassFile) input);
+		//		}
+		//		checkRange(astParser.createAST(null), offset, length, manager, textPresentation);
 
 
-		//		/* Failed attempts */
+		/* Failed attempts */
 		//		List<RangeMarker> rangeMarkers = ((CompilationUnitFeaturesManager) manager).getRangeMarkers();
 		//		System.out.println("range markers size: " + rangeMarkers.size());
 		//

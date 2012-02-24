@@ -136,7 +136,6 @@
 	      id="cideplus.markers.featuresMarker"
 	      name="Features Marker">
 	   <super type="org.eclipse.core.resources.textmarker"/>
-	   <!--super type="org.eclipse.core.resources.marker"/-->
 	   <persistent value="true"/>
 	   <attribute name="feature_id"/>
 	   <attribute name="length" />
@@ -158,27 +157,25 @@
 			id="cideplus.ui.featuresAnnotationSpecification" 
 			name="FeaturesAnnotation">
 	   <specification 
-	   			symbolicIcon="info"
-		        annotationType="cideplus.ui.editor.featureAnnotation"
-		        label="FeatureAnnotation"
-				icon="icons/view.gif"
-	            highlightPreferenceKey="featureHighlighting"
-	            highlightPreferenceValue="false"
-				overviewRulerPreferenceKey="clruler"
-				overviewRulerPreferenceValue="true"
-				verticalRulerPreferenceKey="clvertical"
-				verticalRulerPreferenceValue="true"
-				colorPreferenceKey="clcolor"
-				colorPreferenceValue="255,255,0"
-				textPreferenceKey="cltext"
-				textPreferenceValue="true"
-				textStylePreferenceKey="clstyle"
-				textStylePreferenceValue="IBEAM">
+			annotationType="cideplus.ui.editor.featureAnnotation"
+			colorPreferenceKey="cideplus.annotation.colorPreferenceKey"
+			colorPreferenceValue="255,255,0"
+			textPreferenceKey="cideplus.annotation.textPreferenceKey"
+			textPreferenceValue="true"
+			highlightPreferenceKey="cideplus.annotation.highlightPreferenceKey"
+			highlightPreferenceValue="true"
+			textStylePreferenceKey="cideplus.annotation.textStylePreferenceKey"
+			textStylePreferenceValue="BOX"
+			overviewRulerPreferenceKey="cideplus.annotation.overviewRulerPreferenceKey"
+			overviewRulerPreferenceValue="false"
+			verticalRulerPreferenceKey="cideplus.annotation.verticalRulerPreferenceKey"
+			verticalRulerPreferenceValue="true"
+			symbolicIcon="info"
+			label="Feature Marker"
+			icon="icons/view.gif"
+			includeOnPreferencePage="false">
 		</specification>
 	</extension>
-
-
-
 
 	
      <extension
