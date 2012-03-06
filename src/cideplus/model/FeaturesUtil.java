@@ -151,7 +151,7 @@ public class FeaturesUtil {
 		}
 	}
 
-	/* Marca uma feature. Cria um marker para a feature recem criada. */
+	/* Marca uma feature a partir de um offset e um length */
 	public static void markFeature(int feature_id, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
 		IProject project = PluginUtils.getCurrentProject();
 		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();

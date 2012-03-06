@@ -10,30 +10,32 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import cideplus.FeaturerPlugin;
 import cideplus.model.ast.utils.ASTUtils;
 import cideplus.utils.PluginUtils;
 
 public class FeaturesMarkerFactory {
 
-	private static final boolean DEBUG_MARKERS = false;
-
-	public static final String FEATURES_MARKER_ID = "cideplus.markers.featuresMarker";
+	public static final String FEATURES_MARKER_TYPE = "cideplus.markers.featuresMarker";
 
 
-	public static IMarker createMarker(IResource resource, int offset, int length, int featureId) throws CoreException {
+	public static IMarker createMarker(IResource resource, final int offset, final int length, int featureId) throws CoreException {
 		HashMap<String, Object> attributes = createMarkerAttributes(offset, length, featureId);
-		IMarker marker = resource.createMarker(FEATURES_MARKER_ID);
+		IMarker marker = resource.createMarker(FEATURES_MARKER_TYPE);
 		marker.setAttributes(attributes);
-		if (DEBUG_MARKERS) printAllRelatedMarkers(resource);
 
-		ITextEditor editor = PluginUtils.getCurrentTextEditor();
-		IAnnotationModel model = editor.getDocumentProvider().getAnnotationModel(editor.getEditorInput());
-		System.out.println("Annotation model class: " + model.getClass());
+		//		addAnnotation(marker, offset, length);
+
+		if (FeaturerPlugin.DEBUG_MARKERS)
+			printAllRelatedMarkers(resource);
 
 		return marker;
 	}
@@ -52,26 +54,30 @@ public class FeaturesMarkerFactory {
 		return null;
 	}
 
-	//	public static void addAnnotation(IMarker marker, ITextSelection selection) {
-	//		ITextEditor editor = PluginUtils.getCurrentTextEditor();
-	//
-	//		//The DocumentProvider enables to get the document currently loaded in the editor
-	//		IDocumentProvider idp = editor.getDocumentProvider();
-	//
-	//		//This is the document we want to connect to. This is taken from the current editor input.
-	//		IDocument document = idp.getDocument(editor.getEditorInput());
-	//
-	//		//The IannotationModel enables to add/remove/change annoatation to a Document loaded in an Editor
-	//		IAnnotationModel iamf = idp.getAnnotationModel(editor.getEditorInput());
-	//
-	//		//Note: The annotation type id specify that you want to create one of your annotations
-	//		SimpleMarkerAnnotation ma = new SimpleMarkerAnnotation(ANNOTATION_ID, marker);
-	//
-	//		//Finally add the new annotation to the model
-	//		iamf.connect(document);
-	//		iamf.addAnnotation(ma,new Position(selection.getOffset(),selection.getLength()));
-	//		iamf.disconnect(document);
-	//	}
+	public static void addAnnotation(IMarker marker, int offset, int length) {
+		ITextEditor editor = PluginUtils.getCurrentTextEditor();
+
+		//The DocumentProvider enables to get the document currently loaded in the editor
+		IDocumentProvider idp = editor.getDocumentProvider();
+
+		//This is the document we want to connect to. This is taken from the current editor input.
+		IDocument document = idp.getDocument(editor.getEditorInput());
+
+		//The IannotationModel enables to add/remove/change annoatation to a Document loaded in an Editor
+		IAnnotationModel iamf = idp.getAnnotationModel(editor.getEditorInput());
+
+		//Note: The annotation type id specify that you want to create one of your annotations
+		FeatureAnnotation annotation = new FeatureAnnotation(marker);
+
+		//Finally add the new annotation to the model
+		iamf.connect(document);
+		iamf.addAnnotation(annotation, new Position(offset, length));
+		iamf.disconnect(document);
+	}
+
+	public static void addAnnotation(IMarker marker, ITextSelection selection) {
+		addAnnotation(marker, selection.getOffset(), selection.getLength());
+	}
 
 
 
@@ -79,7 +85,7 @@ public class FeaturesMarkerFactory {
 	/* returns a list of a resource's markers */
 	public static List<IMarker> findMarkers(IResource resource) {
 		try {
-			return Arrays.asList(resource.findMarkers(FEATURES_MARKER_ID, true, IResource.DEPTH_ZERO));
+			return Arrays.asList(resource.findMarkers(FEATURES_MARKER_TYPE, true, IResource.DEPTH_ZERO));
 		} catch (CoreException e) {
 			return new ArrayList<IMarker>();
 		}
@@ -89,7 +95,7 @@ public class FeaturesMarkerFactory {
 	/* Returns a list of markers that are linked to the resource or any sub resource of the resource */
 	public static List<IMarker> findAllRelatedMarkers(IResource  resource) {
 		try {
-			return Arrays.asList(resource.findMarkers(FEATURES_MARKER_ID, true, IResource.DEPTH_INFINITE));
+			return Arrays.asList(resource.findMarkers(FEATURES_MARKER_TYPE, true, IResource.DEPTH_INFINITE));
 		} catch (CoreException e) {
 			return new ArrayList<IMarker>();
 		}
@@ -99,7 +105,7 @@ public class FeaturesMarkerFactory {
 	public static List<IMarker> findAllMarkers() {
 		IWorkspaceRoot root = PluginUtils.getWorkspaceRoot();
 		try {
-			return Arrays.asList(root.findMarkers(FEATURES_MARKER_ID, true, IResource.DEPTH_INFINITE));
+			return Arrays.asList(root.findMarkers(FEATURES_MARKER_TYPE, true, IResource.DEPTH_INFINITE));
 		} catch (CoreException e) {
 			return new ArrayList<IMarker>();
 		}

@@ -3,6 +3,7 @@ package cideplus.ui.presentation;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -17,10 +18,12 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jface.text.ITextPresentationListener;
 import org.eclipse.jface.text.TextPresentation;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import cideplus.FeaturerPlugin;
 import cideplus.model.Feature;
@@ -29,11 +32,14 @@ import cideplus.ui.astview.NodeProperty;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
 import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
+import cideplus.utils.PluginUtils;
 
 public class ColorPresentation implements ITextPresentationListener {
 
 	private ASTParser astParser;
 	private FeaturerCompilationUnitEditor editor;
+
+	private IAnnotationModel annotationModel = null;
 
 
 	private CompilationUnit root;
@@ -56,17 +62,21 @@ public class ColorPresentation implements ITextPresentationListener {
 
 		this.astParser = parser;
 		this.editor = compilationUnitEditor;
+
+		annotationModel = PluginUtils.getAnnotationsModel(compilationUnitEditor);
 	}
 
 	public void applyTextPresentation(TextPresentation textPresentation) {
 		int offset = textPresentation.getExtent().getOffset();
 		int length = textPresentation.getExtent().getLength();
 
-		// Apply presentation to AST
-		//checkRange(root, offset, length, manager, textPresentation);
+		if (FeaturerPlugin.DEBUG_PRESENTATION)
+			System.out.println("Applying text presentation from color presentation!");
 
+		//		// Apply presentation to AST
+		//		checkRange(root, offset, length, manager, textPresentation);
 
-
+		//		// Aplpy presentation rebuilding AST
 		//		astParser.setResolveBindings(false);
 		//		this.input = EditorUtility.getJavaInput(editor);
 		//		if (input instanceof ICompilationUnit) {
@@ -86,6 +96,14 @@ public class ColorPresentation implements ITextPresentationListener {
 		//		System.out.println("total markers: " + markers.size());
 		//		for (IMarker marker : markers) {
 		//			checkMarker(marker, offset, length, manager, textPresentation);
+		//		}
+
+		//		for (Iterator<?> it = annotationModel.getAnnotationIterator(); it.hasNext();) {
+		//			Annotation annotation = (Annotation) it.next();
+		//			if (annotation.getType() == FeatureAnnotation.TYPE) {
+		//				IMarker marker = ((FeatureAnnotation) annotation).getMarker();
+		//				checkMarker(marker, offset, length, manager, textPresentation);
+		//			}
 		//		}
 	}
 
@@ -170,51 +188,51 @@ public class ColorPresentation implements ITextPresentationListener {
 
 	}
 
-	//	private void checkMarker(IMarker marker, int offset, int length, CompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
-	//		System.out.println("checking marker");
-	//		Set<Feature> features = manager.getFeatures(root);
-	//		if (features.size() > 0) {
-	//			RGB combinedRGB = FeaturesConfigurationUtil.getCombinedRGB(features);
-	//
-	//			final int markerCharStart = MarkerUtilities.getCharStart(marker);
-	//			final int markerCharEnd = MarkerUtilities.getCharEnd(marker);
-	//			if (offset <= markerCharStart && markerCharEnd <= offset + length) {
-	//				//				System.out.println(offset+
-	//				//						":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
-	//				//								+ astNode.getLength())+":"+(offset+length));
-	//				StyleRange range = new StyleRange();
-	//				range.background = new Color(null, combinedRGB);
-	//				range.start = markerCharStart;
-	//				range.length = marker.getAttribute("length", -1);
-	//				textPresentation.mergeStyleRange(range);
-	//			} else if (offset > markerCharStart) {
-	//				//				System.out.println(offset+
-	//				//						":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
-	//				//								+ astNode.getLength())+":"+(offset+length));
-	//				StyleRange range = new StyleRange();
-	//				range.background = new Color(null, combinedRGB);
-	//				range.start = offset;
-	//				if (markerCharEnd > offset + length) {
-	//					range.length = length;
-	//				} else {
-	//					range.length = marker.getAttribute("length", -1) - (offset - markerCharStart);
-	//				}
-	//				textPresentation.mergeStyleRange(range);
-	//			} else if (offset <= markerCharStart && markerCharEnd > offset + length) {
-	//				// System.out.println(offset+
-	//				// ":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
-	//				// + astNode.getLength())+":"+(offset+length));
-	//				StyleRange range = new StyleRange();
-	//				range.background = new Color(null, combinedRGB);
-	//				range.start = markerCharStart;
-	//				range.length = length - (markerCharStart - offset);
-	//				if (range.length > 0) {
-	//					textPresentation.mergeStyleRange(range);
-	//				}
-	//			}
-	//		}
-	//		FeaturesConfigurationUtil.updateEditors(PluginUtils.getActiveShell().getDisplay(), null);
-	//	}
+	private void checkMarker(IMarker marker, int offset, int length, ICompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
+		System.out.println("checking marker");
+		Set<Feature> features = manager.getFeatures(root);
+		if (features.size() > 0) {
+			RGB combinedRGB = FeaturesConfigurationUtil.getCombinedRGB(features);
+
+			final int markerCharStart = MarkerUtilities.getCharStart(marker);
+			final int markerCharEnd = MarkerUtilities.getCharEnd(marker);
+			if (offset <= markerCharStart && markerCharEnd <= offset + length) {
+				//				System.out.println(offset+
+				//						":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
+				//								+ astNode.getLength())+":"+(offset+length));
+				StyleRange range = new StyleRange();
+				range.background = new Color(null, combinedRGB);
+				range.start = markerCharStart;
+				range.length = marker.getAttribute("length", -1);
+				textPresentation.mergeStyleRange(range);
+			} else if (offset > markerCharStart) {
+				//				System.out.println(offset+
+				//						":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
+				//								+ astNode.getLength())+":"+(offset+length));
+				StyleRange range = new StyleRange();
+				range.background = new Color(null, combinedRGB);
+				range.start = offset;
+				if (markerCharEnd > offset + length) {
+					range.length = length;
+				} else {
+					range.length = marker.getAttribute("length", -1) - (offset - markerCharStart);
+				}
+				textPresentation.mergeStyleRange(range);
+			} else if (offset <= markerCharStart && markerCharEnd > offset + length) {
+				// System.out.println(offset+
+				// ":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
+				// + astNode.getLength())+":"+(offset+length));
+				StyleRange range = new StyleRange();
+				range.background = new Color(null, combinedRGB);
+				range.start = markerCharStart;
+				range.length = length - (markerCharStart - offset);
+				if (range.length > 0) {
+					textPresentation.mergeStyleRange(range);
+				}
+			}
+		}
+		FeaturesConfigurationUtil.updateEditors(PluginUtils.getActiveShell().getDisplay(), null);
+	}
 
 
 	private ICompilationUnitFeaturesManager getManager(ITypeRoot input) {

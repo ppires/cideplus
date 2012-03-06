@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jface.text.source.AnnotationBarHoverManager;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -95,25 +96,19 @@ public class FeaturesConfigurationUtil {
 							}
 
 							public void setFeature(ASTNode astNode, Feature feature) {
-								if(astNode == null){
+								if(astNode == null)
 									throw new IllegalArgumentException("astNode cannot be null to set feature");
-								}
+
 								getASTFeatures(astNode).add(feature);
 
 								/* Um marker associado com cada feature. */
 								try {
 									FeaturesMarkerFactory.createMarker(astNode, feature.getId());
+									AnnotationBarHoverManager m;
 								} catch (CoreException e) {
 									System.out.println("Could not create marker for feature " + feature.getName());
 									e.printStackTrace();
 								}
-
-								//								/* Cria um RangeMarker para trackear as modificações no texto */
-								//								if (rangeMarkers == null)
-								//									rangeMarkers = new ArrayList<RangeMarker>();
-								//								RangeMarker rangeMarker = new RangeMarker(astNode.getStartPosition(), astNode.getLength());
-								//								rangeMarkers.add(rangeMarker);
-								//								System.out.println("Added new range marker to list! size(): " + rangeMarkers.size());
 							}
 
 							public boolean hasFeature(ASTNode astNode, Feature feature) {

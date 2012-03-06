@@ -10,7 +10,9 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
@@ -90,7 +92,7 @@ public class PluginUtils {
 		return null;
 	}
 
-	/* retorna a current selection */
+	/* retorna a current selection do editor */
 	public static ISelection getCurrentEditorSelection() {
 		ITextEditor editor = getCurrentTextEditor();
 		if (editor != null) {
@@ -142,21 +144,22 @@ public class PluginUtils {
 		showPopup("CIDE+", text);
 	}
 
-	//	public static IDocument getCurrentDocument() {
-	//		ITextEditor editor = getCurrentTextEditor();
-	//		if (editor != null) {
-	//			return editor.getDocumentProvider().getDocument(editor.getEditorInput());
-	//		}
-	//		return null;
-	//	}
+	public static IDocument getCurrentDocument() {
+		ITextEditor editor = getCurrentTextEditor();
+		if (editor != null)
+			return editor.getDocumentProvider().getDocument(editor.getEditorInput());
 
-	//	/* retorna a current selection se ela for uma TreeSelection */
-	//	public static TreeSelection getTreeSelection() {
-	//		ISelection selection = getCurrentSelection();
-	//		if(selection instanceof TreeSelection){
-	//			return (TreeSelection)selection;
-	//		}
-	//		return null;
-	//	}
+		return null;
+	}
+
+	public static IAnnotationModel getAnnotationsModel(ITextEditor editor) {
+		if (editor == null)
+			editor = getCurrentTextEditor();
+
+		if (editor != null)
+			return editor.getDocumentProvider().getAnnotationModel(editor.getEditorInput());
+
+		return null;
+	}
 
 }

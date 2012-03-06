@@ -6,11 +6,13 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.ITextPresentationListener;
+import org.eclipse.jface.text.TextPresentation;
 
 import cideplus.FeaturerPlugin;
 
 
-public class ResourceChangeListener implements IResourceChangeListener {
+public class ResourceChangeListener implements IResourceChangeListener, ITextPresentationListener {
 
 	public void resourceChanged(IResourceChangeEvent event) {
 		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
@@ -21,6 +23,11 @@ public class ResourceChangeListener implements IResourceChangeListener {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void applyTextPresentation(TextPresentation textPresentation) {
+		if (FeaturerPlugin.DEBUG_PRESENTATION)
+			System.out.println("Applying text presentation from resource change listener!");
 	}
 }
 
