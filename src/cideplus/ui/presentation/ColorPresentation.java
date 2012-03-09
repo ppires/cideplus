@@ -18,7 +18,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jface.text.ITextPresentationListener;
 import org.eclipse.jface.text.TextPresentation;
-import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
@@ -39,7 +38,6 @@ public class ColorPresentation implements ITextPresentationListener {
 	private ASTParser astParser;
 	private FeaturerCompilationUnitEditor editor;
 
-	private IAnnotationModel annotationModel = null;
 
 
 	private CompilationUnit root;
@@ -63,7 +61,6 @@ public class ColorPresentation implements ITextPresentationListener {
 		this.astParser = parser;
 		this.editor = compilationUnitEditor;
 
-		annotationModel = PluginUtils.getAnnotationsModel(compilationUnitEditor);
 	}
 
 	public void applyTextPresentation(TextPresentation textPresentation) {
@@ -73,10 +70,10 @@ public class ColorPresentation implements ITextPresentationListener {
 		if (FeaturerPlugin.DEBUG_PRESENTATION)
 			System.out.println("Applying text presentation from color presentation!");
 
-		//		// Apply presentation to AST
-		//		checkRange(root, offset, length, manager, textPresentation);
+		// Apply presentation to AST
+		checkRange(root, offset, length, manager, textPresentation);
 
-		//		// Aplpy presentation rebuilding AST
+		//		// Apply presentation rebuilding AST
 		//		astParser.setResolveBindings(false);
 		//		this.input = EditorUtility.getJavaInput(editor);
 		//		if (input instanceof ICompilationUnit) {
@@ -85,26 +82,6 @@ public class ColorPresentation implements ITextPresentationListener {
 		//			astParser.setSource((IClassFile) input);
 		//		}
 		//		checkRange(astParser.createAST(null), offset, length, manager, textPresentation);
-
-
-		/* Failed attempts */
-		//		List<RangeMarker> rangeMarkers = ((CompilationUnitFeaturesManager) manager).getRangeMarkers();
-		//		System.out.println("range markers size: " + rangeMarkers.size());
-		//
-		//		IResource resource = ASTUtils.getCorrespondingResource(root);
-		//		List<IMarker> markers = FeaturesMarkerFactory.findAllRelatedMarkers(resource);
-		//		System.out.println("total markers: " + markers.size());
-		//		for (IMarker marker : markers) {
-		//			checkMarker(marker, offset, length, manager, textPresentation);
-		//		}
-
-		//		for (Iterator<?> it = annotationModel.getAnnotationIterator(); it.hasNext();) {
-		//			Annotation annotation = (Annotation) it.next();
-		//			if (annotation.getType() == FeatureAnnotation.TYPE) {
-		//				IMarker marker = ((FeatureAnnotation) annotation).getMarker();
-		//				checkMarker(marker, offset, length, manager, textPresentation);
-		//			}
-		//		}
 	}
 
 	private void checkRange(Object node, int offset, int length, ICompilationUnitFeaturesManager manager, TextPresentation textPresentation) {

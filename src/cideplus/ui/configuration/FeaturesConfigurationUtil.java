@@ -16,6 +16,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.source.AnnotationBarHoverManager;
@@ -34,7 +35,7 @@ import cideplus.model.Feature;
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
-import cideplus.ui.presentation.FeaturesMarkerFactory;
+import cideplus.ui.presentation.FeaturesMarker;
 
 /**
  * Class utilit�ria para trabalhar com a configura��o das features junto a Interface Gr�fica
@@ -50,7 +51,8 @@ public class FeaturesConfigurationUtil {
 	public static IFeaturesManager getFeaturesManager(final IProject project){
 		IFeaturesManager featuresManager;
 		if((featuresManager = projectCache.get(project)) == null){
-			if (FeaturerPlugin.DEBUG_CACHE) System.out.println("projectCache MISS");
+			if (FeaturerPlugin.DEBUG_CACHE)
+				System.out.println("projectCache MISS");
 			featuresManager = new IFeaturesManager() {
 
 				Map<ICompilationUnit, ICompilationUnitFeaturesManager> compUnitCache = new HashMap<ICompilationUnit, ICompilationUnitFeaturesManager>();
@@ -67,10 +69,16 @@ public class FeaturesConfigurationUtil {
 					return project;
 				}
 
+				public ICompilationUnitFeaturesManager getManagerForFile(final IFile file) throws IOException, FeatureNotFoundException, CoreException {
+					ICompilationUnit compilationUnit = (ICompilationUnit) JavaCore.create(file);
+					return getManagerForFile(compilationUnit);
+				}
+
 				public ICompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeatureNotFoundException, CoreException {
 					ICompilationUnitFeaturesManager compilationUnitFeaturesManager;
 					if((compilationUnitFeaturesManager = compUnitCache.get(compilationUnit)) == null){
-						if (FeaturerPlugin.DEBUG_CACHE) System.out.println("compUnitCache MISS");
+						if (FeaturerPlugin.DEBUG_CACHE)
+							System.out.println("compUnitCache MISS");
 						//						PluginUtils.showPopup("(compilationUnitFeaturesManager = cache.get(compilationUnit)) == null");
 						IPath path = compilationUnit.getPath().removeFileExtension().addFileExtension("feat");
 						final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
@@ -103,7 +111,7 @@ public class FeaturesConfigurationUtil {
 
 								/* Um marker associado com cada feature. */
 								try {
-									FeaturesMarkerFactory.createMarker(astNode, feature.getId());
+									FeaturesMarker.createMarker(astNode, feature.getId());
 									AnnotationBarHoverManager m;
 								} catch (CoreException e) {
 									System.out.println("Could not create marker for feature " + feature.getName());
@@ -145,7 +153,8 @@ public class FeaturesConfigurationUtil {
 						compUnitCache.put(compilationUnit, compilationUnitFeaturesManager);
 					}
 					else {
-						if (FeaturerPlugin.DEBUG_CACHE) System.out.println("compUnitCache HIT");
+						if (FeaturerPlugin.DEBUG_CACHE)
+							System.out.println("compUnitCache HIT");
 					}
 					return compilationUnitFeaturesManager;
 				}
@@ -171,14 +180,16 @@ public class FeaturesConfigurationUtil {
 	}
 
 	//	TODO: Não iterar nas features para buscar o id.
-	public static Feature getFeature(int feature_id, IProject project) throws CoreException, IOException {
+	public static Feature getFeature(IProject project, int featureId) throws CoreException, IOException {
 		Set<Feature> features = getFeatures(project);
 		for (Feature feature : features) {
-			if (feature.getId() == feature_id) {
+			if (feature.getId() == featureId) {
 				return feature;
 			}
 		}
-		//		throw new FeatureNotFoundException(feature_id);
+		// TODO: Verificar o impacto de lançar uma exception aqui
+		//       ao invés de retornar null
+		//		throw new FeatureNotFoundException(featureId);
 		return null;
 	}
 

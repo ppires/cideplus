@@ -7,8 +7,8 @@ public class FeatureNotFoundException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public FeatureNotFoundException(int feature_id) {
-		super("The project does not contain the feature with ID " + feature_id + ".");
+	public FeatureNotFoundException(int featureId) {
+		super("The project does not contain the feature with ID " + featureId + ".");
 	}
 
 	public FeatureNotFoundException(String message, Throwable cause) {

@@ -64,7 +64,7 @@ public class FeaturesAnnotationPainter extends AnnotationPainter {
 				Feature feature;
 				try {
 					System.out.print("Drawing annotation for feature ");
-					feature = FeaturesConfigurationUtil.getFeature(((FeatureAnnotation) annotation).getFeatureId(), PluginUtils.getCurrentProject());
+					feature = FeaturesConfigurationUtil.getFeature(PluginUtils.getCurrentProject(), ((FeatureAnnotation) annotation).getFeatureId());
 					System.out.println(feature.getName());
 				} catch (CoreException e) {
 					// TODO Auto-generated catch block

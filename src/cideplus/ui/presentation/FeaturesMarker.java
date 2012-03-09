@@ -22,14 +22,14 @@ import cideplus.FeaturerPlugin;
 import cideplus.model.ast.utils.ASTUtils;
 import cideplus.utils.PluginUtils;
 
-public class FeaturesMarkerFactory {
+public class FeaturesMarker {
 
-	public static final String FEATURES_MARKER_TYPE = "cideplus.markers.featuresMarker";
+	public static final String TYPE = "cideplus.markers.featuresMarker";
 
 
 	public static IMarker createMarker(IResource resource, final int offset, final int length, int featureId) throws CoreException {
 		HashMap<String, Object> attributes = createMarkerAttributes(offset, length, featureId);
-		IMarker marker = resource.createMarker(FEATURES_MARKER_TYPE);
+		IMarker marker = resource.createMarker(TYPE);
 		marker.setAttributes(attributes);
 
 		//		addAnnotation(marker, offset, length);
@@ -85,7 +85,7 @@ public class FeaturesMarkerFactory {
 	/* returns a list of a resource's markers */
 	public static List<IMarker> findMarkers(IResource resource) {
 		try {
-			return Arrays.asList(resource.findMarkers(FEATURES_MARKER_TYPE, true, IResource.DEPTH_ZERO));
+			return Arrays.asList(resource.findMarkers(TYPE, true, IResource.DEPTH_ZERO));
 		} catch (CoreException e) {
 			return new ArrayList<IMarker>();
 		}
@@ -95,7 +95,7 @@ public class FeaturesMarkerFactory {
 	/* Returns a list of markers that are linked to the resource or any sub resource of the resource */
 	public static List<IMarker> findAllRelatedMarkers(IResource  resource) {
 		try {
-			return Arrays.asList(resource.findMarkers(FEATURES_MARKER_TYPE, true, IResource.DEPTH_INFINITE));
+			return Arrays.asList(resource.findMarkers(TYPE, true, IResource.DEPTH_INFINITE));
 		} catch (CoreException e) {
 			return new ArrayList<IMarker>();
 		}
@@ -105,18 +105,18 @@ public class FeaturesMarkerFactory {
 	public static List<IMarker> findAllMarkers() {
 		IWorkspaceRoot root = PluginUtils.getWorkspaceRoot();
 		try {
-			return Arrays.asList(root.findMarkers(FEATURES_MARKER_TYPE, true, IResource.DEPTH_INFINITE));
+			return Arrays.asList(root.findMarkers(TYPE, true, IResource.DEPTH_INFINITE));
 		} catch (CoreException e) {
 			return new ArrayList<IMarker>();
 		}
 	}
 
-	private static HashMap<String, Object> createMarkerAttributes(int offset, int length, int feature_id) {
+	private static HashMap<String, Object> createMarkerAttributes(int offset, int length, int featureId) {
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
 		//MarkerUtilities.setLineNumber(attributes, selection.getStartLine());
 		MarkerUtilities.setCharStart(attributes, offset);
 		MarkerUtilities.setCharEnd(attributes, offset + length);
-		attributes.put("feature_id", new Integer(feature_id));
+		attributes.put("featureId", new Integer(featureId));
 		attributes.put("length", new Integer(length));
 		return attributes;
 	}
@@ -130,7 +130,7 @@ public class FeaturesMarkerFactory {
 			System.out.println("resource: " + marker.getResource().getName());
 			System.out.println("char start: " + start);
 			System.out.println("length: " + (end - start));
-			System.out.println("feature id: " + marker.getAttribute("feature_id"));
+			System.out.println("feature id: " + marker.getAttribute("featureId"));
 			System.out.println("message: " + marker.getAttribute("message"));
 		} catch (CoreException e) {
 			System.out.println("Caught Exception getting marker att...");

@@ -10,12 +10,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 
 import cideplus.ui.presentation.ColorPresentation;
-import cideplus.ui.presentation.ResourceChangeListener;
+import cideplus.ui.presentation.ResourceTracker;
 
 @SuppressWarnings("restriction")
 public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 
 	private ColorPresentation colorPresentation;
+	private ResourceTracker resourceTracker = null;
 
 	public ColorPresentation getColorPresentation() {
 		return colorPresentation;
@@ -23,6 +24,9 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 
 	@Override
 	protected ISourceViewer createJavaSourceViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler, boolean isOverviewRulerVisible, int styles, IPreferenceStore store) {
+
+		System.out.println("Creating java source viewer in editor inicilization.");
+
 		ISourceViewer javaSourceViewer = super.createJavaSourceViewer(parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
 		//		initAnnotationPainter((SourceViewer) javaSourceViewer);
@@ -33,8 +37,11 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 
 		if(javaSourceViewer instanceof ITextViewerExtension4){
 			this.colorPresentation = new ColorPresentation(javaSourceViewer, this);
-			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(colorPresentation);
-			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(new ResourceChangeListener());
+			//			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(colorPresentation);
+
+			if (resourceTracker == null)
+				resourceTracker = new ResourceTracker();
+			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(resourceTracker);
 		}
 
 		return javaSourceViewer;
@@ -44,27 +51,4 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 	protected void configureSourceViewerDecorationSupport(SourceViewerDecorationSupport support) {
 		super.configureSourceViewerDecorationSupport(support);
 	}
-
-	//	private void initAnnotationPainter(SourceViewer sourceViewer) {
-	//		IAnnotationAccess annotationAccess = new IAnnotationAccess() {
-	//
-	//			public Object getType(Annotation annotation) {
-	//				return annotation.getType();
-	//			}
-	//
-	//			public boolean isMultiLine(Annotation annotation) {
-	//				return true;
-	//			}
-	//
-	//			public boolean isTemporary(Annotation annotation) {
-	//				return true;
-	//			}
-	//
-	//		};
-	//
-	//		annotationPainter = new FeaturesAnnotationPainter(sourceViewer, annotationAccess);
-	//		annotationPainter.addAnnotationType(FeatureAnnotation.TYPE, FeatureAnnotation.TYPE);
-	//		annotationPainter.addTextStyleStrategy(FeatureAnnotation.TYPE, new AnnotationPainter.HighlightingStrategy());
-	//		//		annotationPainter.setAnnotationTypeColor(FeatureAnnotation.TYPE, getTextWidget().getForeground());
-	//	}
 }

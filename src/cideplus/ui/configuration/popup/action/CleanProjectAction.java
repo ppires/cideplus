@@ -21,7 +21,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import cideplus.FeaturerPlugin;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
-import cideplus.ui.presentation.FeaturesMarkerFactory;
+import cideplus.ui.presentation.FeaturesMarker;
 
 public class CleanProjectAction  implements IObjectActionDelegate {
 
@@ -56,7 +56,7 @@ public class CleanProjectAction  implements IObjectActionDelegate {
 	private void doClean(final IProgressMonitor monitor) throws CoreException {
 
 		// Delete all markers associated with the project
-		for (IMarker marker : FeaturesMarkerFactory.findAllRelatedMarkers(project.getProject())) {
+		for (IMarker marker : FeaturesMarker.findAllRelatedMarkers(project.getProject())) {
 			marker.delete();
 			monitor.worked(1);
 		}

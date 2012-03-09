@@ -106,7 +106,7 @@
                menubarPath="cideplus.menuFeatures/group2">
          </action>
          <action
-               class="cideplus.ui.configuration.popup.action.StatiticsAction"
+               class="cideplus.ui.configuration.popup.action.StatisticsAction"
                enablesFor="1"
                id="cideplus.actionStatitics"
                label="Statitics..."
@@ -137,7 +137,7 @@
 	      name="Features Marker">
 	   <super type="org.eclipse.core.resources.textmarker"/>
 	   <persistent value="true"/>
-	   <attribute name="feature_id"/>
+	   <attribute name="featureId"/>
 	</extension> 
  
 	<!-- Declaração da annotation p/ mostrar no editor os markers das features -->

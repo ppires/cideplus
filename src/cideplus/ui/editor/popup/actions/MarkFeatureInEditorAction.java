@@ -10,7 +10,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import cideplus.ui.presentation.FeaturesMarkerFactory;
+import cideplus.ui.presentation.FeaturesMarker;
 import cideplus.utils.PluginUtils;
 
 public class MarkFeatureInEditorAction implements IWorkbenchWindowActionDelegate {
@@ -32,7 +32,7 @@ public class MarkFeatureInEditorAction implements IWorkbenchWindowActionDelegate
 		ITextSelection selection = PluginUtils.getCurrentEditorTextSelection();
 		try {
 			IResource resource = PluginUtils.getCurrentFile();
-			FeaturesMarkerFactory.createMarker(resource, selection, 1);
+			FeaturesMarker.createMarker(resource, selection, 1);
 		} catch (CoreException e) {
 			System.out.println("Caught Exception creating marker!!!");
 			e.printStackTrace();

@@ -107,10 +107,10 @@ public class FeaturesUtil {
 			if(features != null){
 				astWriter.flush();
 				String astString = new String(astOut.toByteArray());
-				for (int feature_id : features) {
-					Feature featureObj = new Feature(feature_id);
+				for (int featureId : features) {
+					Feature featureObj = new Feature(featureId);
 					if(!projectFeatures.contains(featureObj)){
-						throw new FeatureNotFoundException(feature_id);
+						throw new FeatureNotFoundException(featureId);
 					}
 					//pegar o feature completo do projeto, não apenas com o ID
 					for (Feature feature : projectFeatures) {
@@ -152,7 +152,7 @@ public class FeaturesUtil {
 	}
 
 	/* Marca uma feature a partir de um offset e um length */
-	public static void markFeature(int feature_id, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
+	public static void markFeature(int featureId, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
 		IProject project = PluginUtils.getCurrentProject();
 		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
 		IFeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
@@ -162,7 +162,7 @@ public class FeaturesUtil {
 			System.out.println("No node found...");
 		}
 		else {
-			Feature feature = FeaturesConfigurationUtil.getFeature(feature_id, project);
+			Feature feature = FeaturesConfigurationUtil.getFeature(project, featureId);
 			managerForFile.setFeature(node, feature);
 			managerForFile.commitChanges();
 		}

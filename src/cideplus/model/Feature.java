@@ -3,7 +3,7 @@ package cideplus.model;
 public class Feature implements Comparable<Feature>{
 
 	static final String FEATURE_PROPERTY_DELIMITER = "::";
-	
+
 	final Integer id;
 	String name;
 	RGB rgb;
@@ -18,7 +18,7 @@ public class Feature implements Comparable<Feature>{
 		this.name = name;
 		this.rgb = rgb;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -26,7 +26,7 @@ public class Feature implements Comparable<Feature>{
 	public void setRgb(RGB rgb) {
 		this.rgb = rgb;
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -38,7 +38,7 @@ public class Feature implements Comparable<Feature>{
 	public RGB getRgb() {
 		return rgb;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

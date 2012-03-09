@@ -34,7 +34,7 @@ import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
 import cideplus.ui.configuration.IFeaturesManager;
 
-public class StatiticsAction implements IObjectActionDelegate {
+public class StatisticsAction implements IObjectActionDelegate {
 
 	private IJavaProject project;
 	private Shell shell;
@@ -94,7 +94,7 @@ public class StatiticsAction implements IObjectActionDelegate {
 	}
 	
 	private List<Statitics> doStatitics(final IProgressMonitor monitor) throws CoreException {
-		final List<Statitics> statiticsList = new ArrayList<StatiticsAction.Statitics>();
+		final List<Statitics> statiticsList = new ArrayList<StatisticsAction.Statitics>();
 		statiticsList.add(new Statitics());//adicionar uma estatistica para o conjunto geral
 		final IFeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project.getProject());
 		Set<Feature> features;

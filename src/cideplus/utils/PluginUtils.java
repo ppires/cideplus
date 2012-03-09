@@ -8,7 +8,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
@@ -117,20 +116,26 @@ public class PluginUtils {
 
 
 	public static ICompilationUnit getCurrentCompilationUnit() {
-		//		IEditorInput inputElement = getCurrentEditor().getEditorInput();
-		IJavaElement editorCU = EditorUtility.getActiveEditorJavaInput();
-		if (editorCU instanceof ICompilationUnit) {
-			//			System.out.println("First if");
-			return (ICompilationUnit) editorCU;
-		}
-		else {
-			editorCU = editorCU.getAncestor(IJavaElement.COMPILATION_UNIT);
-			if (editorCU instanceof ICompilationUnit) {
-				//				System.out.println("Second if");
-				return (ICompilationUnit) editorCU;
-			}
+		IFile file = getCurrentFile();
+		if (file != null) {
+			IJavaElement element = JavaCore.create(file);
+			if (element instanceof ICompilationUnit)
+				return (ICompilationUnit) element;
 		}
 		return null;
+		//		//		IEditorInput inputElement = getCurrentEditor().getEditorInput();
+		//		IJavaElement editorCU = EditorUtility.getActiveEditorJavaInput();
+		//		if (editorCU instanceof ICompilationUnit) {
+		//			//			System.out.println("First if");
+		//			return (ICompilationUnit) editorCU;
+		//		}
+		//		else {
+		//			editorCU = editorCU.getAncestor(IJavaElement.COMPILATION_UNIT);
+		//			if (editorCU instanceof ICompilationUnit) {
+		//				//				System.out.println("Second if");
+		//				return (ICompilationUnit) editorCU;
+		//			}
+		//		}
 	}
 
 

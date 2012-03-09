@@ -16,7 +16,7 @@ public class FeatureAnnotation extends Annotation {
 	public FeatureAnnotation(IMarker marker) {
 		super();
 		this.marker = marker;
-		this.featureId = Integer.parseInt(marker.getAttribute("feature_id", "0"));
+		this.featureId = Integer.parseInt(marker.getAttribute("featureId", "0"));
 
 		if (FeaturerPlugin.DEBUG_PRESENTATION)
 			System.out.println("Constructor from FeatureAnnotation");

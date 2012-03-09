@@ -2,6 +2,8 @@ package cideplus;
 
 import java.io.InputStream;
 
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.Device;
@@ -10,6 +12,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import cideplus.ui.astview.ASTViewPlugin;
+import cideplus.ui.presentation.FeaturesStyleCache;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -24,8 +27,9 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	private final ASTViewPlugin astViewPlugin;
 
 	public static final boolean DEBUG_RESOURCE_LISTENER = true;
-	public static final boolean DEBUG_PRESENTATION = false;
-	public static final boolean DEBUG_MARKERS = true;
+	public static final boolean DEBUG_PRESENTATION = true;
+	public static final boolean DEBUG_STYLE_CACHE = true;
+	public static final boolean DEBUG_MARKERS = false;
 	public static final boolean DEBUG_REFRESH = false;
 	public static final boolean DEBUG_CACHE = false;
 
@@ -52,7 +56,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		astViewPlugin.start(context);
-		//ResourcesPlugin.getWorkspace().addResourceChangeListener(new ResourceChangeListener(), IResourceChangeEvent.POST_CHANGE);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(FeaturesStyleCache.getInstance(), IResourceChangeEvent.POST_CHANGE);
 	}
 
 	/*

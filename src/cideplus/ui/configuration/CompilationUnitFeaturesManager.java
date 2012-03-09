@@ -19,7 +19,7 @@ import cideplus.model.ASTNodeReference;
 import cideplus.model.CompilationUnitFeaturesModel;
 import cideplus.model.Feature;
 import cideplus.model.FeaturesUtil;
-import cideplus.ui.presentation.FeaturesMarkerFactory;
+import cideplus.ui.presentation.FeaturesMarker;
 
 public class CompilationUnitFeaturesManager implements ICompilationUnitFeaturesManager {
 
@@ -49,7 +49,7 @@ public class CompilationUnitFeaturesManager implements ICompilationUnitFeaturesM
 
 		/* Um marker associado com cada feature. */
 		try {
-			FeaturesMarkerFactory.createMarker(astNode, feature.getId());
+			FeaturesMarker.createMarker(astNode, feature.getId());
 		} catch (CoreException e) {
 			System.out.println("Could not create marker for feature " + feature.getName());
 			e.printStackTrace();
