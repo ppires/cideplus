@@ -8,11 +8,11 @@ import org.eclipse.swt.custom.StyleRange;
 import cideplus.FeaturerPlugin;
 import cideplus.utils.PluginUtils;
 
-public class ResourceTracker implements ITextPresentationListener {
+public class FeaturesPainter implements ITextPresentationListener {
 
 	private FeaturesStyleCache styleCache;
 
-	public ResourceTracker() {
+	public FeaturesPainter() {
 		styleCache = FeaturesStyleCache.getInstance();
 	}
 

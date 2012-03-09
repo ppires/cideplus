@@ -1,10 +1,14 @@
 package cideplus.ui.presentation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -14,6 +18,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.source.AnnotationPainter;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -27,11 +32,12 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 	private static FeaturesStyleCache instance = null;
 
 	/*
-	 * { :project => { :file => { :marker => :style } } }
+	 * { :project => { :file => [:marker1, :marker2] } }
 	 */
-	private Map<IProject, Map<IFile, Map<IMarker, StyleRange>>> markerStyleCache = null;
+	private Map<IProject, Map<IFile, SortedSet<IMarker>>> markerStyleCache = null;
 
 	private FeaturesStyleCache() {
+		AnnotationPainter ap;
 		updateStyleCache(false);
 	}
 
@@ -76,16 +82,19 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 	}
 
 	public void addMarkerToCache(IMarker marker) {
-		Map<IMarker, StyleRange> markerToStyleCache = getStyleCache(marker);
-		StyleRange style = getMarkerStyle(marker);
-		markerToStyleCache.put(marker, style);
+		if (FeaturerPlugin.DEBUG_CACHE)
+			System.out.println("Adding marker to cache...");
+
+		SortedSet<IMarker> markers = getStyleCache(marker);
+		markers.add(marker);
 	}
 
 	public void removeMarkerFromCache(IMarker marker) {
 		if (FeaturerPlugin.DEBUG_CACHE)
-			System.out.println("Removing marker form cache...");
-		Map<IMarker, StyleRange> markerToStyleCache = getStyleCache(marker);
-		markerToStyleCache.remove(marker);
+			System.out.println("Removing marker from cache...");
+
+		SortedSet<IMarker> markers = getStyleCache(marker);
+		markers.remove(marker);
 	}
 
 	/*
@@ -95,6 +104,7 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 	 * é retirado, e depois o cache é atualizado.
 	 */
 	public void updateMarkerInCache(IMarker marker) {
+		removeMarkerFromCache(marker);
 		addMarkerToCache(marker);
 		//		removeMarkerFromCache(marker);
 		//		updateStyleCache(false);
@@ -102,34 +112,54 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 
 
 	public Collection<StyleRange> getStyles(IFile file) {
-		return getStyleCache(file).values();
+		SortedSet<IMarker> markers = getStyleCache(file);
+		Collection<StyleRange> styles = new ArrayList<StyleRange>();
+		for (IMarker marker : markers) {
+			styles.add(getMarkerStyle(marker));
+		}
+		return styles;
 	}
 
-	private Map<IMarker, StyleRange> getStyleCache(IMarker marker) {
+	private SortedSet<IMarker> getStyleCache(IMarker marker) {
 		IFile file = (IFile) marker.getResource().getAdapter(IFile.class);
 		return getStyleCache(file);
 	}
 
-	private Map<IMarker, StyleRange> getStyleCache(IFile file) {
+	private SortedSet<IMarker> getStyleCache(IFile file) {
 		IProject project = file.getProject();
-		Map<IFile, Map<IMarker, StyleRange>> fileToMarkerMap;
+		Map<IFile, SortedSet<IMarker>> fileToMarkerMap;
 		if (markerStyleCache.containsKey(project)) {
 			fileToMarkerMap = markerStyleCache.get(project);
 		}
 		else {
-			fileToMarkerMap = new HashMap<IFile, Map<IMarker, StyleRange>>();
+			fileToMarkerMap = new HashMap<IFile, SortedSet<IMarker>>();
 			markerStyleCache.put(project, fileToMarkerMap);
 		}
 
-		Map<IMarker, StyleRange> markerToStyleMap;
+		SortedSet<IMarker> markerSet;
 		if (fileToMarkerMap.containsKey(file)) {
-			markerToStyleMap = fileToMarkerMap.get(file);
+			markerSet = fileToMarkerMap.get(file);
 		}
 		else {
-			markerToStyleMap = new HashMap<IMarker, StyleRange>();
-			fileToMarkerMap.put(file, markerToStyleMap);
+			//			markerSet = new HashMap<IMarker, StyleRange>();
+			markerSet = new ConcurrentSkipListSet<IMarker>(new Comparator<IMarker>() {
+				public int compare(IMarker marker1, IMarker marker2) {
+					if (marker1.equals(marker2)){
+						return 0;
+					}
+					else {
+						int offset1 = marker1.getAttribute("charStart", -1);
+						int offset2 = marker2.getAttribute("charStart", -1);
+						if (offset1 > offset2)
+							return 1;
+						else
+							return -1;
+					}
+				}
+			});
+			fileToMarkerMap.put(file, markerSet);
 		}
-		return markerToStyleMap;
+		return markerSet;
 	}
 
 
@@ -137,16 +167,16 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 		if (FeaturerPlugin.DEBUG_STYLE_CACHE)
 			System.out.println("Updating Style Cache...");
 
+		if (markerStyleCache == null) {
+			if (FeaturerPlugin.DEBUG_STYLE_CACHE)
+				System.out.println("  -> Initializing style cache...");
+			markerStyleCache = new HashMap<IProject, Map<IFile, SortedSet<IMarker>>>();
+		}
+
 		if (resetCache) {
 			if (FeaturerPlugin.DEBUG_STYLE_CACHE)
 				System.out.println("  -> Reseting style cache...");
 			markerStyleCache.clear();
-		}
-
-		if (markerStyleCache == null) {
-			if (FeaturerPlugin.DEBUG_STYLE_CACHE)
-				System.out.println("  -> Initializing style cache...");
-			markerStyleCache = new HashMap<IProject, Map<IFile, Map<IMarker, StyleRange>>>();
 		}
 
 		List<IMarker> markers = FeaturesMarker.findAllMarkers();
@@ -163,7 +193,7 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 
 	private StyleRange getMarkerStyle(IMarker marker) {
 		try {
-			int featureId = marker.getAttribute("featureId", 0);
+			int featureId = marker.getAttribute("featureId", -2);
 			IProject project = ((IFile) marker.getResource().getAdapter(IFile.class)).getProject();
 			Feature feature = FeaturesConfigurationUtil.getFeature(project, featureId);
 			if (feature == null) {
@@ -174,10 +204,7 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 				Color rangeColor = new Color(null, rgb);
 				int rangeStart = marker.getAttribute("charStart", 0);
 				int rangeLength = marker.getAttribute("charEnd", 0) - rangeStart;
-				StyleRange range = new StyleRange();
-				range.background = rangeColor;
-				range.start = rangeStart;
-				range.length = rangeLength;
+				StyleRange range = new StyleRange(rangeStart, rangeLength, null, rangeColor);
 				return range;
 			}
 		} catch (CoreException e) {
@@ -193,15 +220,16 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 		System.out.println("========================================");
 		System.out.println("Style Cache");
 		System.out.println("========================================");
-		for (Map.Entry<IProject, Map<IFile, Map<IMarker, StyleRange>>> project : markerStyleCache.entrySet()) {
+		for (Map.Entry<IProject, Map<IFile, SortedSet<IMarker>>> project : markerStyleCache.entrySet()) {
 			System.out.println(project.getKey().getName());
-			for (Map.Entry<IFile, Map<IMarker, StyleRange>> file : project.getValue().entrySet()) {
+			for (Map.Entry<IFile, SortedSet<IMarker>> file : project.getValue().entrySet()) {
 				System.out.println("  " + file.getKey().getName());
-				for (Map.Entry<IMarker, StyleRange> marker : file.getValue().entrySet()) {
-					System.out.print("   - start: " + marker.getValue().start);
-					System.out.print(" / length: " + marker.getValue().length);
-					System.out.print(" / " + marker.getValue().background);
-					System.out.println(" / markerId: " + marker.getKey().getId());
+				for (IMarker marker : file.getValue()) {
+					int charStart = marker.getAttribute("charStart", -1);
+					int length = marker.getAttribute("charEnd", -1) - charStart;
+					System.out.print("   - start: " + charStart);
+					System.out.print(" / length: " + length);
+					System.out.println(" / markerId: " + marker.getId());
 				}
 			}
 		}

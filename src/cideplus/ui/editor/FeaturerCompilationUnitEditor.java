@@ -10,13 +10,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 
 import cideplus.ui.presentation.ColorPresentation;
-import cideplus.ui.presentation.ResourceTracker;
+import cideplus.ui.presentation.FeaturesPainter;
 
 @SuppressWarnings("restriction")
 public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 
 	private ColorPresentation colorPresentation;
-	private ResourceTracker resourceTracker = null;
+	private FeaturesPainter resourceTracker = null;
 
 	public ColorPresentation getColorPresentation() {
 		return colorPresentation;
@@ -40,7 +40,7 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 			//			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(colorPresentation);
 
 			if (resourceTracker == null)
-				resourceTracker = new ResourceTracker();
+				resourceTracker = new FeaturesPainter();
 			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(resourceTracker);
 		}
 
