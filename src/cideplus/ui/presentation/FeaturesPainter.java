@@ -25,9 +25,6 @@ public class FeaturesPainter implements ITextPresentationListener {
 		if (FeaturerPlugin.DEBUG_PRESENTATION)
 			System.out.println("  -> Current file: " + file);
 
-		if (FeaturerPlugin.DEBUG_STYLE_CACHE)
-			styleCache.printStyleCache();
-
 		if (file != null) {
 			for (StyleRange style : styleCache.getStyles(file))
 				textPresentation.mergeStyleRange(style);

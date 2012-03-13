@@ -25,8 +25,6 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 	@Override
 	protected ISourceViewer createJavaSourceViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler, boolean isOverviewRulerVisible, int styles, IPreferenceStore store) {
 
-		System.out.println("Creating java source viewer in editor inicilization.");
-
 		ISourceViewer javaSourceViewer = super.createJavaSourceViewer(parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
 		//		initAnnotationPainter((SourceViewer) javaSourceViewer);
