@@ -10,37 +10,39 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 
 import cideplus.ui.presentation.ColorPresentation;
+import cideplus.ui.presentation.FeaturesAnnotationHover;
 import cideplus.ui.presentation.FeaturesPainter;
 
 @SuppressWarnings("restriction")
 public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 
 	private ColorPresentation colorPresentation;
-	private FeaturesPainter resourceTracker = null;
-
 	public ColorPresentation getColorPresentation() {
 		return colorPresentation;
 	}
+
+
+
+	private FeaturesPainter featuresPainter = null;
+	private FeaturesAnnotationHover annotationHover = null;
 
 	@Override
 	protected ISourceViewer createJavaSourceViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler, boolean isOverviewRulerVisible, int styles, IPreferenceStore store) {
 
 		ISourceViewer javaSourceViewer = super.createJavaSourceViewer(parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
-		//		initAnnotationPainter((SourceViewer) javaSourceViewer);
-		//
-		//		if (javaSourceViewer instanceof ITextViewerExtension2) {
-		//			((ITextViewerExtension2)javaSourceViewer).addPainter(annotationPainter);
-		//		}
-
 		if(javaSourceViewer instanceof ITextViewerExtension4){
-			this.colorPresentation = new ColorPresentation(javaSourceViewer, this);
+			//			this.colorPresentation = new ColorPresentation(javaSourceViewer, this);
 			//			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(colorPresentation);
 
-			if (resourceTracker == null)
-				resourceTracker = new FeaturesPainter();
-			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(resourceTracker);
+			if (featuresPainter == null)
+				featuresPainter = new FeaturesPainter();
+			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(featuresPainter);
 		}
+
+		if (annotationHover == null)
+			annotationHover = new FeaturesAnnotationHover();
+		javaSourceViewer.setAnnotationHover(annotationHover);
 
 		return javaSourceViewer;
 	}

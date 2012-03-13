@@ -26,12 +26,13 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	private static FeaturerPlugin plugin;
 	private final ASTViewPlugin astViewPlugin;
 
-	public static final boolean DEBUG_RESOURCE_LISTENER = true;
+	public static final boolean DEBUG_RESOURCE_LISTENER = false;
 	public static final boolean DEBUG_PRESENTATION = false;
-	public static final boolean DEBUG_STYLE_CACHE = true;
+	public static final boolean DEBUG_STYLE_CACHE = false;
 	public static final boolean DEBUG_MARKERS = false;
 	public static final boolean DEBUG_REFRESH = false;
-	public static final boolean DEBUG_CACHE = false;
+	public static final boolean DEBUG_MANAGER_CACHE = false;
+	public static final boolean DEBUG_HOVER = true;
 
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;

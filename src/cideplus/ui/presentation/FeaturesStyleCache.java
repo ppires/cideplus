@@ -35,7 +35,7 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 	 * { :project => { :file => [:marker1, :marker2] } }
 	 */
 	private Map<IProject, Map<IFile, SortedSet<IMarker>>> markerStyleCache = null;
-	private Object styleCacheLock = new Object();
+	//	private Object styleCacheLock = new Object();
 
 	private FeaturesStyleCache() {
 		updateStyleCache(false);
