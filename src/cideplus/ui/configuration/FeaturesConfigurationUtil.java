@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.source.AnnotationBarHoverManager;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
@@ -309,7 +308,7 @@ public class FeaturesConfigurationUtil {
 						refresh(iEditorReference);
 					}
 				} else {
-					//se o compilation unit � null, atualizar todos os editores
+					//se o compilation unit é null, atualizar todos os editores
 					refresh(iEditorReference);
 				}
 			}
@@ -319,10 +318,11 @@ public class FeaturesConfigurationUtil {
 	private static void refresh(IEditorReference iEditorReference) {
 		IEditorPart editor = iEditorReference.getEditor(false);
 		if(editor instanceof FeaturerCompilationUnitEditor){
-			FeaturerCompilationUnitEditor fcue = (FeaturerCompilationUnitEditor) editor;
-			fcue.getColorPresentation().refreshFeatures();
-			ISourceViewer viewer = fcue.getViewer();
-			viewer.invalidateTextPresentation();
+			((FeaturerCompilationUnitEditor) editor).getViewer().invalidateTextPresentation();
+			//			FeaturerCompilationUnitEditor fcue = (FeaturerCompilationUnitEditor) editor;
+			//			fcue.getColorPresentation().refreshFeatures();
+			//			ISourceViewer viewer = fcue.getViewer();
+			//			viewer.invalidateTextPresentation();
 		}
 	}
 }

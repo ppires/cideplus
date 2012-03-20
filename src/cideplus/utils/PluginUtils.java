@@ -51,17 +51,25 @@ public class PluginUtils {
 		return null;
 	}
 
-	/* se o editor sendo usado for do tipo TextEditor, retorna ele. retorna null caso contrário */
+	/**
+	 *  Get the editor that is currently being used, if it
+	 *  is a text editor.
+	 * 
+	 * @returns The current text editor. <code>null</code> otherwise.
+	 */
 	public static ITextEditor getCurrentTextEditor() {
 		IEditorPart editor = getCurrentEditor();
 		if (editor instanceof ITextEditor) {
 			return (ITextEditor) editor;
 		}
-		else {
-			return null;
-		}
+		return null;
 	}
 
+	/**
+	 * Get the project to which the currently opened file belongs to.
+	 * 
+	 * @return The current project, or <code>null</code> if there isn't any opened file.
+	 */
 	public static IProject getCurrentProject() {
 		IFile file = getCurrentFile();
 		if (file != null) {

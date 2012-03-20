@@ -22,14 +22,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.texteditor.AbstractMarkerAnnotationModel;
 
 import cideplus.FeaturerPlugin;
 import cideplus.model.Feature;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
 
-public class FeaturesStyleCache implements IResourceChangeListener {
+public class StyleCache implements IResourceChangeListener {
 
-	private static FeaturesStyleCache instance = null;
+	private static StyleCache instance = null;
 
 	/*
 	 * { :project => { :file => [:marker1, :marker2] } }
@@ -37,13 +38,13 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 	private Map<IProject, Map<IFile, SortedSet<IMarker>>> markerStyleCache = null;
 	//	private Object styleCacheLock = new Object();
 
-	private FeaturesStyleCache() {
+	private StyleCache() {
 		updateStyleCache(false);
 	}
 
-	public static synchronized FeaturesStyleCache getInstance() {
+	public static synchronized StyleCache getInstance() {
 		if (instance == null)
-			instance = new FeaturesStyleCache();
+			instance = new StyleCache();
 
 		return instance;
 	}
@@ -77,7 +78,7 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 			getInstance().printStyleCache();
 	}
 
-	public void addMarkerToCache(IMarker marker) {
+	private void addMarkerToCache(IMarker marker) {
 		if (FeaturerPlugin.DEBUG_STYLE_CACHE)
 			System.out.println("Adding marker to cache...");
 
@@ -86,7 +87,7 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 		System.out.println(resp ? "ADDED!" : "UNCHANGED...");
 	}
 
-	public void removeMarkerFromCache(IMarker oldMarker) {
+	private void removeMarkerFromCache(IMarker oldMarker) {
 		SortedSet<IMarker> markers = getStyleCache(oldMarker);
 
 		Iterator<IMarker> it = markers.iterator();
@@ -107,12 +108,13 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 	 *  Por isso não é necessário fazer nada quando um marker
 	 *  é modificado.
 	 */
-	public void updateMarkerInCache(IMarker marker) {
+	private void updateMarkerInCache(IMarker marker) {
 		//...
 	}
 
 
 	public Collection<StyleRange> getStyles(IFile file) {
+		AbstractMarkerAnnotationModel am;
 		SortedSet<IMarker> markers = getStyleCache(file);
 		Collection<StyleRange> styles = new ArrayList<StyleRange>();
 		for (IMarker marker : markers) {
@@ -220,7 +222,7 @@ public class FeaturesStyleCache implements IResourceChangeListener {
 	}
 
 
-	public void printStyleCache() {
+	private void printStyleCache() {
 		System.out.println("========================================");
 		System.out.println("Style Cache");
 		System.out.println("========================================");

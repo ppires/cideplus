@@ -1,21 +1,19 @@
 package cideplus.ui.presentation;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import cideplus.FeaturerPlugin;
 
-public class FeatureAnnotation extends Annotation {
+public class FeatureAnnotation extends MarkerAnnotation {
 
 	public static final String TYPE = "cideplus.ui.editor.featureAnnotation";
-	private IMarker marker;
 	private int featureId;
 
 	public FeatureAnnotation(IMarker marker) {
-		super();
-		this.marker = marker;
+		super(marker);
 		this.featureId = Integer.parseInt(marker.getAttribute("featureId", "0"));
 
 		if (FeaturerPlugin.DEBUG_PRESENTATION)
@@ -24,10 +22,6 @@ public class FeatureAnnotation extends Annotation {
 
 	public int getFeatureId() {
 		return featureId;
-	}
-
-	public IMarker getMarker() {
-		return marker;
 	}
 
 	@Override

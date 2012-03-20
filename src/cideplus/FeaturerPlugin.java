@@ -12,7 +12,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import cideplus.ui.astview.ASTViewPlugin;
-import cideplus.ui.presentation.FeaturesStyleCache;
+import cideplus.ui.presentation.StyleCache;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -27,12 +27,12 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	private final ASTViewPlugin astViewPlugin;
 
 	public static final boolean DEBUG_RESOURCE_LISTENER = false;
-	public static final boolean DEBUG_PRESENTATION = false;
+	public static final boolean DEBUG_PRESENTATION = true;
 	public static final boolean DEBUG_STYLE_CACHE = false;
 	public static final boolean DEBUG_MARKERS = false;
 	public static final boolean DEBUG_REFRESH = false;
 	public static final boolean DEBUG_MANAGER_CACHE = false;
-	public static final boolean DEBUG_HOVER = true;
+	public static final boolean DEBUG_HOVER = false;
 
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;
@@ -57,7 +57,14 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		astViewPlugin.start(context);
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(FeaturesStyleCache.getInstance(), IResourceChangeEvent.POST_CHANGE);
+
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(StyleCache.getInstance(), IResourceChangeEvent.POST_CHANGE);
+
+		//		IEditorPart editor = PluginUtils.getCurrentTextEditor();
+		//		System.out.println("editor: " + editor);
+		//		if (editor instanceof FeaturerCompilationUnitEditor) {
+		//			((FeaturerCompilationUnitEditor) editor).setAnnotationModel();
+		//		}
 	}
 
 	/*
