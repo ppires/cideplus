@@ -67,7 +67,7 @@ public class CleanProjectAction  implements IObjectActionDelegate {
 					return true;
 				}
 				if(resource.getName().endsWith("feat") && !resource.getName().equals(FeaturesConfigurationUtil.FEATURES_FILE)){
-					monitor.setTaskName("Cleaning project... deleting feature file "+resource.getName());
+					monitor.setTaskName("Cleaning project... deleting feature file " + resource.getName());
 					resource.delete(true, new NullProgressMonitor());
 					monitor.worked(5);
 				}
@@ -83,8 +83,4 @@ public class CleanProjectAction  implements IObjectActionDelegate {
 			project = (IJavaProject) ((IStructuredSelection)selection).getFirstElement();
 		}
 	}
-
-
-
-
 }

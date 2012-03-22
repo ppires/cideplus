@@ -41,7 +41,7 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 		ISourceViewer javaSourceViewer = super.createJavaSourceViewer(parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
 		/* No longer used. Based on AST parsing to color the code. Too inefficient. */
-		//this.colorPresentation = new ColorPresentation(javaSourceViewer, this);
+		this.colorPresentation = new ColorPresentation(javaSourceViewer, this);
 
 		/* No longer used too. Efficient, but only updates text presentation when the file is saved. */
 		//		if (featuresPainter == null)
@@ -75,14 +75,8 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 				System.out.println("Registered painter!");
 		}
 
-
 		return javaSourceViewer;
 	}
-
-	//	@Override
-	//	protected void configureSourceViewerDecorationSupport(SourceViewerDecorationSupport support) {
-	//		super.configureSourceViewerDecorationSupport(support);
-	//	}
 
 	@Override
 	public void dispose() {
@@ -96,25 +90,4 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 		}
 		super.dispose();
 	}
-
-	//	public void setAnnotationModel() {
-	//		if (FeaturerPlugin.DEBUG_PRESENTATION)
-	//			System.out.println("Setting editor annotation model.");
-	//
-	//		ISourceViewer sourceViewer = getSourceViewer();
-	//		if (sourceViewer != null) {
-	//			IAnnotationModel model = sourceViewer.getAnnotationModel();
-	//			if (model != null) {
-	//				model.addAnnotationModelListener(customAnnotationPainter);
-	//				if (FeaturerPlugin.DEBUG_PRESENTATION)
-	//					System.out.println("Registered annotation model listener!");
-	//			}
-	//			else
-	//				if (FeaturerPlugin.DEBUG_PRESENTATION)
-	//					System.out.println("Failed to register annotation model listener: model == null");
-	//		}
-	//		else
-	//			if (FeaturerPlugin.DEBUG_PRESENTATION)
-	//				System.out.println("Failed to register annotation model listener: sourceViewer == null");
-	//	}
 }

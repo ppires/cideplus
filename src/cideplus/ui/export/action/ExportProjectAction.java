@@ -18,11 +18,14 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import cideplus.FeaturerPlugin;
 import cideplus.model.Feature;
+import cideplus.ui.editor.FeaturerCompilationUnitEditor;
 import cideplus.ui.export.dialog.ExportFileDialog;
 import cideplus.ui.export.dialog.SelectFeaturesDialog;
+import cideplus.utils.PluginUtils;
 
 public class ExportProjectAction implements IObjectActionDelegate {
 
@@ -30,6 +33,10 @@ public class ExportProjectAction implements IObjectActionDelegate {
 	private IJavaProject project;
 
 	public void run(IAction action) {
+		ITextEditor editor = PluginUtils.getCurrentTextEditor();
+		if (editor instanceof FeaturerCompilationUnitEditor) {
+			((FeaturerCompilationUnitEditor) editor).getColorPresentation().refreshFeatures();
+		}
 		try {
 			ExportFileDialog dialog = new ExportFileDialog(shell);
 			File exportFile = dialog.getExportFile();
@@ -38,7 +45,7 @@ public class ExportProjectAction implements IObjectActionDelegate {
 					SelectFeaturesDialog selectFeatures = new SelectFeaturesDialog(shell, project);
 					Set<Feature> features = selectFeatures.selectFeatures();
 					System.out.println(features);
-					if(features != null){			
+					if(features != null){
 						//exportando para um diretorio
 						doExport(exportFile, features);
 					}
@@ -60,9 +67,9 @@ public class ExportProjectAction implements IObjectActionDelegate {
 				try {
 					Exporter exporter = new Exporter(shell, project, features);
 					int fileCount = exporter.getFileCount(monitor);
-					//o fileCount é multiplicado por 4 para passar ao monitor pois
-					//o método getExportedFiles tem peso 3
-					//e o método writeFilesToDir tem peso 1
+					//o fileCount ï¿½ multiplicado por 4 para passar ao monitor pois
+					//o mï¿½todo getExportedFiles tem peso 3
+					//e o mï¿½todo writeFilesToDir tem peso 1
 					monitor.beginTask("Exporting "+fileCount+" files", fileCount * 4);
 					Map<String, byte[]> exportedFiles = exporter.getExportedFiles(monitor);
 					ExporterWriter writer = new ExporterWriter();

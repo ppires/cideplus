@@ -675,13 +675,8 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 		if (paintingStrategy == null || paintingStrategy instanceof NullStrategy)
 			return null;
 
-
-		/* Getting annotation color from marker */
-		Color color = getFeatureColor(annotation);
-
-		/* Eclipse way to get annotation color */
 		//		Color color= getColor(type);
-
+		Color color = getFeatureColor(annotation);
 		if (color == null)
 			return null;
 
@@ -749,35 +744,33 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 * @return the color
 	 * @since 3.0
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	private Color getColor(final Object annotationType) {
-		return new Color(Display.getDefault(), 255, 255, 0);
+		Color color= (Color)fCachedAnnotationType2Color.get(annotationType);
+		if (color != null)
+			return color;
 
-		//		Color color= (Color)fCachedAnnotationType2Color.get(annotationType);
-		//		if (color != null)
-		//			return color;
-		//
-		//		color= (Color)fAnnotationType2Color.get(annotationType);
-		//		if (color != null) {
-		//			fCachedAnnotationType2Color.put(annotationType, color);
-		//			return color;
-		//		}
-		//
-		//		if (fAnnotationAccess instanceof IAnnotationAccessExtension) {
-		//			IAnnotationAccessExtension extension= (IAnnotationAccessExtension) fAnnotationAccess;
-		//			Object[] superTypes= extension.getSupertypes(annotationType);
-		//			if (superTypes != null) {
-		//				for (int i= 0; i < superTypes.length; i++) {
-		//					color= (Color)fAnnotationType2Color.get(superTypes[i]);
-		//					if (color != null) {
-		//						fCachedAnnotationType2Color.put(annotationType, color);
-		//						return color;
-		//					}
-		//				}
-		//			}
-		//		}
-		//
-		//		return null;
+		color= (Color)fAnnotationType2Color.get(annotationType);
+		if (color != null) {
+			fCachedAnnotationType2Color.put(annotationType, color);
+			return color;
+		}
+
+		if (fAnnotationAccess instanceof IAnnotationAccessExtension) {
+			IAnnotationAccessExtension extension= (IAnnotationAccessExtension) fAnnotationAccess;
+			Object[] superTypes= extension.getSupertypes(annotationType);
+			if (superTypes != null) {
+				for (int i= 0; i < superTypes.length; i++) {
+					color= (Color)fAnnotationType2Color.get(superTypes[i]);
+					if (color != null) {
+						fCachedAnnotationType2Color.put(annotationType, color);
+						return color;
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -787,6 +780,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 *
 	 * @param annotation the annotation
 	 * @return the color
+	 * @author ppires
 	 */
 	private Color getFeatureColor(Annotation annotation) {
 		if (annotation instanceof SimpleMarkerAnnotation) {

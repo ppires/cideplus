@@ -67,18 +67,18 @@ public class ColorPresentation implements ITextPresentationListener {
 		if (FeaturerPlugin.DEBUG_PRESENTATION)
 			System.out.println("Applying text presentation from color presentation!");
 
-		// Apply presentation to AST
-		checkRange(root, offset, length, manager, textPresentation);
+		//		/* Apply presentation to AST */
+		//		checkRange(root, offset, length, manager, textPresentation);
 
-		//		// Apply presentation rebuilding AST
-		//		astParser.setResolveBindings(false);
-		//		this.input = EditorUtility.getJavaInput(editor);
-		//		if (input instanceof ICompilationUnit) {
-		//			astParser.setSource((ICompilationUnit) input);
-		//		} else {
-		//			astParser.setSource((IClassFile) input);
-		//		}
-		//		checkRange(astParser.createAST(null), offset, length, manager, textPresentation);
+		/* Apply presentation rebuilding AST */
+		astParser.setResolveBindings(false);
+		this.input = EditorUtility.getJavaInput(editor);
+		if (input instanceof ICompilationUnit) {
+			astParser.setSource((ICompilationUnit) input);
+		} else {
+			astParser.setSource((IClassFile) input);
+		}
+		checkRange(astParser.createAST(null), offset, length, manager, textPresentation);
 	}
 
 	private void checkRange(Object node, int offset, int length, ICompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
@@ -161,64 +161,10 @@ public class ColorPresentation implements ITextPresentationListener {
 
 	}
 
-	//	private void checkMarker(IMarker marker, int offset, int length, ICompilationUnitFeaturesManager manager, TextPresentation textPresentation) {
-	//		System.out.println("checking marker");
-	//		Set<Feature> features = manager.getFeatures(root);
-	//		if (features.size() > 0) {
-	//			RGB combinedRGB = FeaturesConfigurationUtil.getCombinedRGB(features);
-	//
-	//			final int markerCharStart = MarkerUtilities.getCharStart(marker);
-	//			final int markerCharEnd = MarkerUtilities.getCharEnd(marker);
-	//			if (offset <= markerCharStart && markerCharEnd <= offset + length) {
-	//				//				System.out.println(offset+
-	//				//						":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
-	//				//								+ astNode.getLength())+":"+(offset+length));
-	//				StyleRange range = new StyleRange();
-	//				range.background = new Color(null, combinedRGB);
-	//				range.start = markerCharStart;
-	//				range.length = marker.getAttribute("length", -1);
-	//				textPresentation.mergeStyleRange(range);
-	//			} else if (offset > markerCharStart) {
-	//				//				System.out.println(offset+
-	//				//						":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
-	//				//								+ astNode.getLength())+":"+(offset+length));
-	//				StyleRange range = new StyleRange();
-	//				range.background = new Color(null, combinedRGB);
-	//				range.start = offset;
-	//				if (markerCharEnd > offset + length) {
-	//					range.length = length;
-	//				} else {
-	//					range.length = marker.getAttribute("length", -1) - (offset - markerCharStart);
-	//				}
-	//				textPresentation.mergeStyleRange(range);
-	//			} else if (offset <= markerCharStart && markerCharEnd > offset + length) {
-	//				// System.out.println(offset+
-	//				// ":"+astNode.getStartPosition()+"  ::  "+(astNode.getStartPosition()
-	//				// + astNode.getLength())+":"+(offset+length));
-	//				StyleRange range = new StyleRange();
-	//				range.background = new Color(null, combinedRGB);
-	//				range.start = markerCharStart;
-	//				range.length = length - (markerCharStart - offset);
-	//				if (range.length > 0) {
-	//					textPresentation.mergeStyleRange(range);
-	//				}
-	//			}
-	//		}
-	//		FeaturesConfigurationUtil.updateEditors(PluginUtils.getActiveShell().getDisplay(), null);
-	//	}
-
 
 	private ICompilationUnitFeaturesManager getManager(ITypeRoot input) {
 		IProject project = input.getJavaProject().getProject();
-		final IProblemRequestor problemRequestor = new IProblemRequestor() { // strange:
-			// don't
-			// get
-			// bindings
-			// when
-			// supplying
-			// null
-			// as
-			// problemRequestor
+		final IProblemRequestor problemRequestor = new IProblemRequestor() { // strange: don't get bindings when supplying null as problemRequestor
 			public void acceptProblem(IProblem problem) {/* not interested */
 			}
 

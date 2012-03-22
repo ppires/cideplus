@@ -78,7 +78,6 @@ public class FeaturesConfigurationUtil {
 					if((compilationUnitFeaturesManager = compUnitCache.get(compilationUnit)) == null){
 						if (FeaturerPlugin.DEBUG_MANAGER_CACHE)
 							System.out.println("compUnitCache MISS\n");
-						//						PluginUtils.showPopup("(compilationUnitFeaturesManager = cache.get(compilationUnit)) == null");
 						IPath path = compilationUnit.getPath().removeFileExtension().addFileExtension("feat");
 						final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 						final CompilationUnitFeaturesModel model;
@@ -205,43 +204,6 @@ public class FeaturesConfigurationUtil {
 
 	private static ASTNodeReference getNodeReferenceFromAST(ASTNode astNode) {
 		return new ASTNodeReference(astNode);
-		//		if(astNode == null){
-		//			throw new IllegalArgumentException("Parameter astNode cannot be null");
-		//		}
-		//		int bytes = astNode.getLength();
-		//		int offset = astNode.getStartPosition();
-		//		String node = "";
-		//		do {
-		//			node += "$$";
-		//			if(astNode instanceof CompilationUnit){
-		//				node += "COMPILATION UNIT;;";
-		//			} else if (astNode instanceof TypeDeclaration) {
-		//				node += astNode.getClass().getSimpleName()+": "+((TypeDeclaration)astNode).getName()+" <<==\n";
-		//			} else if (astNode instanceof MethodDeclaration) {
-		//				Type returnType = ((MethodDeclaration)astNode).getReturnType2();
-		//				SimpleName methodName = ((MethodDeclaration)astNode).getName();
-		//				@SuppressWarnings("rawtypes")
-		//				List parameters = ((MethodDeclaration)astNode).parameters();
-		//				node += astNode.getClass().getSimpleName()+": "+returnType+" "+methodName+parameters+" <<==\n";
-		//			} else if (astNode instanceof Block) {
-		//				Block block = (Block) astNode;
-		//				node += astNode.getClass().getSimpleName()+": "+block.properties()+"  <<==\n";
-		//			} else if (astNode instanceof IfStatement) {
-		//				IfStatement statement = (IfStatement) astNode;
-		//				node += astNode.getClass().getSimpleName()+": "+statement.getExpression()+"  <<==\n";
-		//			} else if (astNode instanceof DoStatement) {
-		//				DoStatement statement = (DoStatement) astNode;
-		//				node += astNode.getClass().getSimpleName()+": "+statement.getExpression()+"  <<==\n";
-		//			} else if(astNode instanceof ForStatement) {
-		//				ForStatement statement = (ForStatement) astNode;
-		//				node += astNode.getClass().getSimpleName()+": "+statement.initializers()+" "+statement.getExpression()+" "+statement.updaters()+"  <<==\n";
-		//			} else {
-		//				node += astNode.getClass().getSimpleName()+": "+astNode+" <<==\n";
-		//			}
-		//			astNode = astNode.getParent();
-		//		} while(astNode != null);
-		//		node = node.replace('\n', ' ').replace('\r', ' ');
-		//		return new ASTNodeReference(node, bytes, offset);
 	}
 
 	public static RGB getRGB(Feature feature){
