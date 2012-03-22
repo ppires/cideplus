@@ -18,11 +18,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.ui.texteditor.AbstractMarkerAnnotationModel;
 
 import cideplus.FeaturerPlugin;
 import cideplus.model.Feature;
@@ -40,6 +40,7 @@ public class StyleCache implements IResourceChangeListener {
 
 	private StyleCache() {
 		updateStyleCache(false);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	public static synchronized StyleCache getInstance() {
@@ -75,7 +76,7 @@ public class StyleCache implements IResourceChangeListener {
 			}
 		}
 		if (FeaturerPlugin.DEBUG_STYLE_CACHE)
-			getInstance().printStyleCache();
+			getInstance().printStyleCache(true);
 	}
 
 	private void addMarkerToCache(IMarker marker) {
@@ -84,7 +85,6 @@ public class StyleCache implements IResourceChangeListener {
 
 		SortedSet<IMarker> markers = getStyleCache(marker);
 		boolean resp = markers.add(marker);
-		System.out.println(resp ? "ADDED!" : "UNCHANGED...");
 	}
 
 	private void removeMarkerFromCache(IMarker oldMarker) {
@@ -114,7 +114,6 @@ public class StyleCache implements IResourceChangeListener {
 
 
 	public Collection<StyleRange> getStyles(IFile file) {
-		AbstractMarkerAnnotationModel am;
 		SortedSet<IMarker> markers = getStyleCache(file);
 		Collection<StyleRange> styles = new ArrayList<StyleRange>();
 		for (IMarker marker : markers) {
@@ -153,7 +152,9 @@ public class StyleCache implements IResourceChangeListener {
 					else {
 						int offset1 = marker1.getAttribute("charStart", -1);
 						int offset2 = marker2.getAttribute("charStart", -1);
-						if (offset1 > offset2)
+						if (offset1 == offset2)
+							return 0;
+						else if (offset1 > offset2)
 							return 1;
 						else
 							return -1;
@@ -222,7 +223,7 @@ public class StyleCache implements IResourceChangeListener {
 	}
 
 
-	private void printStyleCache() {
+	private void printStyleCache(boolean printRealMarkers) {
 		System.out.println("========================================");
 		System.out.println("Style Cache");
 		System.out.println("========================================");
@@ -231,16 +232,18 @@ public class StyleCache implements IResourceChangeListener {
 			for (Map.Entry<IFile, SortedSet<IMarker>> file : project.getValue().entrySet()) {
 				System.out.println("  " + file.getKey().getName());
 				for (IMarker marker : file.getValue()) {
-					int charStart = marker.getAttribute("charStart", -1);
-					int charEnd = marker.getAttribute("charEnd", -1);
-					int featureId = marker.getAttribute("featureId", -1);
-					System.out.print("   - start: " + charStart);
-					System.out.print(" / length: " + charEnd);
-					System.out.print(" / featureId: " + featureId);
-					System.out.println(" / markerId: " + marker.getId());
+					FeaturesMarker.printMarkerInline(marker);
+				}
+				if (printRealMarkers) {
+					System.out.println("--- Real Markers ---");
+					List<IMarker> markers = FeaturesMarker.findAllRelatedMarkers(file.getKey());
+					for (IMarker marker : markers) {
+						FeaturesMarker.printMarkerInline(marker);
+					}
 				}
 			}
 		}
-		System.out.println("========================================\n\n");
+		System.out.println("========================================");
 	}
+
 }

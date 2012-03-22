@@ -3,7 +3,9 @@ package cideplus.ui.presentation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -28,14 +30,12 @@ public class FeaturesMarker {
 
 
 	public static IMarker createMarker(IResource resource, final int offset, final int length, int featureId) throws CoreException {
-		HashMap<String, Object> attributes = createMarkerAttributes(offset, length, featureId);
+		Map<String, Object> attributes = createMarkerAttributes(offset, length, featureId);
 		IMarker marker = resource.createMarker(TYPE);
 		marker.setAttributes(attributes);
 
-		//		addAnnotation(marker, offset, length);
-
 		if (FeaturerPlugin.DEBUG_MARKERS)
-			printAllRelatedMarkers(resource);
+			printAllRelatedMarkers(resource, false);
 
 		return marker;
 	}
@@ -91,6 +91,40 @@ public class FeaturesMarker {
 		}
 	}
 
+	/* Returns the marker associated with the given feature in the AST node */
+	public static IMarker getCorrespondingMarker(ASTNode node, int featureId) {
+		int nodeStart = node.getStartPosition();
+		int nodeLength = node.getLength();
+		IResource resource = ASTUtils.getCorrespondingResource(node);
+		List<IMarker> markers = findAllRelatedMarkers(resource);
+
+		if (FeaturerPlugin.DEBUG_AST_MARKER) {
+			System.out.println("Getting corresponding marker...");
+			for (IMarker marker : markers)
+				printMarkerInline(marker);
+			System.out.println("---");
+			System.out.println("nodeStart: " + nodeStart);
+			System.out.println("nodeLength: " + nodeLength);
+		}
+
+		Iterator<IMarker> it = markers.iterator();
+		while (it.hasNext()) {
+			IMarker marker = it.next();
+			//		for (IMarker marker : markers) {
+			int markerStart = marker.getAttribute("charStart", -1);
+			int markerLength = marker.getAttribute("charEnd", -1) - markerStart;
+			if (marker.getAttribute("featureId", -1) == featureId) {
+				if (FeaturerPlugin.DEBUG_AST_MARKER) {
+					System.out.println("  markerStart: " + markerStart);
+					System.out.println("  markerLength: " + markerLength);
+				}
+				if (markerStart == nodeStart && markerLength == nodeLength)
+					return marker;
+			}
+		}
+		return null;
+	}
+
 
 	/* Returns a list of markers that are linked to the resource or any sub resource of the resource */
 	public static List<IMarker> findAllRelatedMarkers(IResource  resource) {
@@ -111,8 +145,8 @@ public class FeaturesMarker {
 		}
 	}
 
-	private static HashMap<String, Object> createMarkerAttributes(int offset, int length, int featureId) {
-		HashMap<String, Object> attributes = new HashMap<String, Object>();
+	private static Map<String, Object> createMarkerAttributes(int offset, int length, int featureId) {
+		Map<String, Object> attributes = new HashMap<String, Object>();
 		//MarkerUtilities.setLineNumber(attributes, selection.getStartLine());
 		MarkerUtilities.setCharStart(attributes, offset);
 		MarkerUtilities.setCharEnd(attributes, offset + length);
@@ -121,6 +155,42 @@ public class FeaturesMarker {
 		return attributes;
 	}
 
+
+	public static void printAllRelatedMarkers(IResource resource, boolean inline) {
+		System.out.println("========================================");
+		System.out.println("Printing all markers related to " + resource.getName());
+		System.out.println("========================================");
+		for (IMarker marker : findAllRelatedMarkers(resource)) {
+			if (inline)
+				printMarkerInline(marker);
+			else {
+				printMarker(marker);
+				System.out.println(System.getProperty("line.separator"));
+			}
+		}
+		System.out.println("========================================");
+	}
+
+	public static void printAllMarkers(boolean inline) {
+		for (IMarker marker : findAllMarkers()) {
+			if (inline)
+				printMarkerInline(marker);
+			else {
+				printMarker(marker);
+				System.out.println(System.getProperty("line.separator"));
+			}
+		}
+	}
+
+	public static void printMarkerInline(IMarker marker) {
+		int charStart = marker.getAttribute("charStart", -1);
+		int charEnd = marker.getAttribute("charEnd", -1);
+		int featureId = marker.getAttribute("featureId", -1);
+		System.out.print("   - start: " + charStart);
+		System.out.print(" / length: " + (charEnd - charStart));
+		System.out.print(" / featureId: " + featureId);
+		System.out.println(" / markerId: " + marker.getId());
+	}
 
 	public static void printMarker(IMarker marker) {
 		try {
@@ -136,24 +206,6 @@ public class FeaturesMarker {
 			System.out.println("Caught Exception getting marker att...");
 			e.printStackTrace();
 		}
-	}
-
-	public static void printAllMarkers() {
-		for (IMarker marker : findAllMarkers()) {
-			printMarker(marker);
-			System.out.println(System.getProperty("line.separator"));
-		}
-	}
-
-	public static void printAllRelatedMarkers(IResource resource) {
-		System.out.println("========================================");
-		System.out.println("Printing all markers related to " + resource.getName());
-		System.out.println("========================================");
-		for (IMarker marker : findAllRelatedMarkers(resource)) {
-			printMarker(marker);
-			System.out.println(System.getProperty("line.separator"));
-		}
-		System.out.println("========================================");
 	}
 }
 

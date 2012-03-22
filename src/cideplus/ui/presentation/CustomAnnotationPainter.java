@@ -289,7 +289,6 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 */
 	@SuppressWarnings("unchecked")
 	public CustomAnnotationPainter(ISourceViewer sourceViewer, IAnnotationAccess access) {
-		System.out.println("Instantiating annotation painter!");
 		fSourceViewer= sourceViewer;
 		fAnnotationAccess= access;
 		fTextWidget= sourceViewer.getTextWidget();
@@ -298,6 +297,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 		fPaintingStrategyId2PaintingStrategy.put(SQUIGGLES, SQUIGGLES_STRATEGY);
 		fPaintingStrategyId2PaintingStrategy.put(HIGHLIGHTING, HIGHLIGHTING_STRATEGY);
 
+		addAnnotationType(FeatureAnnotation.TYPE, null);
 		//		addHighlightAnnotationType(FeatureAnnotation.TYPE);
 	}
 

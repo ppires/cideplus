@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -19,7 +20,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jface.text.source.AnnotationBarHoverManager;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
@@ -33,6 +33,7 @@ import cideplus.model.CompilationUnitFeaturesModel;
 import cideplus.model.Feature;
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
+import cideplus.ui.astview.ASTView;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
 import cideplus.ui.presentation.FeaturesMarker;
 
@@ -103,14 +104,14 @@ public class FeaturesConfigurationUtil {
 
 							public void setFeature(ASTNode astNode, Feature feature) {
 								if(astNode == null)
-									throw new IllegalArgumentException("astNode cannot be null to set feature");
+									throw new IllegalArgumentException("AST node cannot be null to set feature");
 
 								getASTFeatures(astNode).add(feature);
 
 								/* Um marker associado com cada feature. */
 								try {
 									FeaturesMarker.createMarker(astNode, feature.getId());
-									AnnotationBarHoverManager m;
+									ASTView.getView().refreshAST();
 								} catch (CoreException e) {
 									System.out.println("Could not create marker for feature " + feature.getName());
 									e.printStackTrace();
@@ -130,7 +131,13 @@ public class FeaturesConfigurationUtil {
 							}
 
 							public void removeFeature(ASTNode node, Feature feature) {
+								IMarker marker = FeaturesMarker.getCorrespondingMarker(node, feature.getId());
 								getASTFeatures(node).remove(feature);
+								try {
+									marker.delete();
+								} catch (CoreException e) {
+									e.printStackTrace();
+								}
 							}
 
 							public synchronized void commitChanges() throws CoreException {

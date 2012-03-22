@@ -18,14 +18,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 import cideplus.FeaturerPlugin;
 import cideplus.model.Feature;
-import cideplus.ui.editor.FeaturerCompilationUnitEditor;
 import cideplus.ui.export.dialog.ExportFileDialog;
 import cideplus.ui.export.dialog.SelectFeaturesDialog;
-import cideplus.utils.PluginUtils;
 
 public class ExportProjectAction implements IObjectActionDelegate {
 
@@ -33,10 +30,10 @@ public class ExportProjectAction implements IObjectActionDelegate {
 	private IJavaProject project;
 
 	public void run(IAction action) {
-		ITextEditor editor = PluginUtils.getCurrentTextEditor();
-		if (editor instanceof FeaturerCompilationUnitEditor) {
-			((FeaturerCompilationUnitEditor) editor).getColorPresentation().refreshFeatures();
-		}
+		//		ITextEditor editor = PluginUtils.getCurrentTextEditor();
+		//		if (editor instanceof FeaturerCompilationUnitEditor) {
+		//			((FeaturerCompilationUnitEditor) editor).getColorPresentation().refreshFeatures();
+		//		}
 		try {
 			ExportFileDialog dialog = new ExportFileDialog(shell);
 			File exportFile = dialog.getExportFile();

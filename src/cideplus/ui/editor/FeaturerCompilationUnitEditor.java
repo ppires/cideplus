@@ -10,18 +10,18 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 
-import cideplus.FeaturerPlugin;
 import cideplus.ui.presentation.ColorPresentation;
 import cideplus.ui.presentation.CustomAnnotationPainter;
-import cideplus.ui.presentation.FeatureAnnotation;
+import cideplus.ui.presentation.FeaturesPainter;
 
 @SuppressWarnings("restriction")
 public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 
-	private ColorPresentation colorPresentation;
+	/* Ainda é usado para dar o refresh() nas features... */
+	private ColorPresentation colorPresentation = null;
 
 	private CustomAnnotationPainter customAnnotationPainter = null;
-	//	private FeaturesPainter featuresPainter = null;
+	private FeaturesPainter featuresPainter = null;
 	//	private FeaturesAnnotationHover annotationHover = null;
 
 
@@ -41,16 +41,16 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 		ISourceViewer javaSourceViewer = super.createJavaSourceViewer(parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
 		/* No longer used. Based on AST parsing to color the code. Too inefficient. */
-		this.colorPresentation = new ColorPresentation(javaSourceViewer, this);
+		if (colorPresentation == null)
+			colorPresentation = new ColorPresentation(javaSourceViewer, this);
 
 		/* No longer used too. Efficient, but only updates text presentation when the file is saved. */
-		//		if (featuresPainter == null)
-		//			featuresPainter = new FeaturesPainter(javaSourceViewer);
+		if (featuresPainter == null)
+			featuresPainter = new FeaturesPainter(javaSourceViewer);
 
 		/* Completely copied from org.eclipse.jface.text.source.AnnotationPainter */
 		if (customAnnotationPainter == null) {
 			customAnnotationPainter = new CustomAnnotationPainter(javaSourceViewer, fAnnotationAccess);
-			customAnnotationPainter.addAnnotationType(FeatureAnnotation.TYPE, null);// null because highlighting strategy is hardcoded!
 		}
 
 
@@ -64,15 +64,12 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 			//			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(colorPresentation);
 			//			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(featuresPainter);
 			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(customAnnotationPainter);
-			if (FeaturerPlugin.DEBUG_PRESENTATION)
-				System.out.println("Registered text presentation listener!!");
 		}
 
 		/* Registering IPainter */
 		if(javaSourceViewer instanceof ITextViewerExtension2) {
 			((ITextViewerExtension2) javaSourceViewer).addPainter(customAnnotationPainter);
-			if (FeaturerPlugin.DEBUG_PRESENTATION)
-				System.out.println("Registered painter!");
+			//			((ITextViewerExtension2) javaSourceViewer).addPainter(featuresPainter);
 		}
 
 		return javaSourceViewer;

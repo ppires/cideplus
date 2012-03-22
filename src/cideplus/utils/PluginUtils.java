@@ -16,9 +16,12 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import cideplus.ui.astview.ASTView;
 
 
 public class PluginUtils {
@@ -46,6 +49,19 @@ public class PluginUtils {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {
 				return page.getActiveEditor();
+			}
+		}
+		return null;
+	}
+
+	public static ASTView getASTView() {
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window != null) {
+			IWorkbenchPage page = window.getActivePage();
+			if (page != null) {
+				IWorkbenchPart part = page.getActivePart();
+				if (part instanceof ASTView)
+					return (ASTView)part;
 			}
 		}
 		return null;
