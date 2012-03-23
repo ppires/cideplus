@@ -49,9 +49,8 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 			featuresPainter = new FeaturesPainter(javaSourceViewer);
 
 		/* Completely copied from org.eclipse.jface.text.source.AnnotationPainter */
-		if (customAnnotationPainter == null) {
+		if (customAnnotationPainter == null)
 			customAnnotationPainter = new CustomAnnotationPainter(javaSourceViewer, fAnnotationAccess);
-		}
 
 
 		//		if (annotationHover == null)

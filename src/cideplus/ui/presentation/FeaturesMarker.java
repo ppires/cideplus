@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
@@ -146,8 +147,15 @@ public class FeaturesMarker {
 	}
 
 	private static Map<String, Object> createMarkerAttributes(int offset, int length, int featureId) {
+		IDocument document = PluginUtils.getCurrentDocument();
+		int lineNumber = 0;
+		try {
+			lineNumber = document.getLineOfOffset(offset) + 1;
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 		Map<String, Object> attributes = new HashMap<String, Object>();
-		//MarkerUtilities.setLineNumber(attributes, selection.getStartLine());
+		MarkerUtilities.setLineNumber(attributes, lineNumber);
 		MarkerUtilities.setCharStart(attributes, offset);
 		MarkerUtilities.setCharEnd(attributes, offset + length);
 		attributes.put("featureId", new Integer(featureId));
@@ -185,9 +193,11 @@ public class FeaturesMarker {
 	public static void printMarkerInline(IMarker marker) {
 		int charStart = marker.getAttribute("charStart", -1);
 		int charEnd = marker.getAttribute("charEnd", -1);
+		int lineNumber = marker.getAttribute("lineNumber", -1);
 		int featureId = marker.getAttribute("featureId", -1);
 		System.out.print("   - start: " + charStart);
 		System.out.print(" / length: " + (charEnd - charStart));
+		System.out.print(" / line: " + lineNumber);
 		System.out.print(" / featureId: " + featureId);
 		System.out.println(" / markerId: " + marker.getId());
 	}

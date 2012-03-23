@@ -19,6 +19,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import cideplus.ui.astview.ASTView;
@@ -175,9 +176,12 @@ public class PluginUtils {
 
 	public static IDocument getCurrentDocument() {
 		ITextEditor editor = getCurrentTextEditor();
-		if (editor != null)
-			return editor.getDocumentProvider().getDocument(editor.getEditorInput());
-
+		if (editor != null) {
+			IDocumentProvider provider = editor.getDocumentProvider();
+			if (provider != null) {
+				return provider.getDocument(editor.getEditorInput());
+			}
+		}
 		return null;
 	}
 

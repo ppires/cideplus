@@ -30,7 +30,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	public static final boolean DEBUG_REFRESH = false;
 	public static final boolean DEBUG_MANAGER_CACHE = false;
 	public static final boolean DEBUG_HOVER = false;
-	public static final boolean DEBUG_AST_MARKER = true;
+	public static final boolean DEBUG_AST_MARKER = false;
 
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;

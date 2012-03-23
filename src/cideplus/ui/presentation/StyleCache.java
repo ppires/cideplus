@@ -76,7 +76,7 @@ public class StyleCache implements IResourceChangeListener {
 			}
 		}
 		if (FeaturerPlugin.DEBUG_STYLE_CACHE)
-			getInstance().printStyleCache(true);
+			getInstance().printStyleCache(false);
 	}
 
 	private void addMarkerToCache(IMarker marker) {
