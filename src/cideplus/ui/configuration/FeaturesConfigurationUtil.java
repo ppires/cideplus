@@ -129,10 +129,11 @@ public class FeaturesConfigurationUtil {
 							}
 
 							public void removeFeature(ASTNode node, Feature feature) {
-								IMarker marker = FeaturesMarker.getCorrespondingMarker(node, feature.getId());
 								getASTFeatures(node).remove(feature);
 								try {
-									marker.delete();
+									IMarker marker = FeaturesMarker.getCorrespondingMarker(node, feature.getId());
+									if (marker != null)
+										marker.delete();
 								} catch (CoreException e) {
 									e.printStackTrace();
 								}

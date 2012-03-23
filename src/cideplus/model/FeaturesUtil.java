@@ -151,6 +151,7 @@ public class FeaturesUtil {
 		}
 	}
 
+	// TODO: Dar um merge nesses métodos!
 	/* Marca uma feature a partir de um offset e um length */
 	public static void markFeature(int featureId, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
 		IProject project = PluginUtils.getCurrentProject();
@@ -164,6 +165,23 @@ public class FeaturesUtil {
 		else {
 			Feature feature = FeaturesConfigurationUtil.getFeature(project, featureId);
 			managerForFile.setFeature(node, feature);
+			managerForFile.commitChanges();
+		}
+	}
+
+	/* Desmarca uma feature a partir de um offset e um length */
+	public static void unmarkFeature(int featureId, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
+		IProject project = PluginUtils.getCurrentProject();
+		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
+		IFeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
+		ICompilationUnitFeaturesManager managerForFile = manager.getManagerForFile(compUnit);
+		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), offset, length);
+		if (node == null) {
+			System.out.println("No node found...");
+		}
+		else {
+			Feature feature = FeaturesConfigurationUtil.getFeature(project, featureId);
+			managerForFile.removeFeature(node, feature);
 			managerForFile.commitChanges();
 		}
 	}
