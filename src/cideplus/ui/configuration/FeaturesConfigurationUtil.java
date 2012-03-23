@@ -33,7 +33,6 @@ import cideplus.model.CompilationUnitFeaturesModel;
 import cideplus.model.Feature;
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
-import cideplus.ui.astview.ASTView;
 import cideplus.ui.editor.FeaturerCompilationUnitEditor;
 import cideplus.ui.presentation.FeaturesMarker;
 
@@ -111,7 +110,6 @@ public class FeaturesConfigurationUtil {
 								/* Um marker associado com cada feature. */
 								try {
 									FeaturesMarker.createMarker(astNode, feature.getId());
-									ASTView.getView().refreshAST();
 								} catch (CoreException e) {
 									System.out.println("Could not create marker for feature " + feature.getName());
 									e.printStackTrace();
