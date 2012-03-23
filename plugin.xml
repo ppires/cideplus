@@ -19,16 +19,28 @@
       </menuContribution>
    </extension>
    
-   <!-- Command p/ criar feature -->
+   <!-- Commands -->
    <extension
          point="org.eclipse.ui.commands">
       <category
-            id="cideplus.commands.category.markFeature"
+            id="cideplus.commands.featuresCategory"
             name="Features Category"/>
+	  <!-- Command p/ marcar feature -->            
       <command
             id="cideplus.commands.markFeature"
             name="Mark Feature in Editor"
-            categoryId= "cideplus.commands.category.markFeature">
+            categoryId= "cideplus.commands.featuresCategory">
+         <commandParameter
+               id="cideplus.commands.markFeature.featureIdParameter"
+               name="Feature ID"
+               optional="false">
+         </commandParameter>
+      </command>
+	  <!-- Command p/ marcar feature -->            
+      <command
+            id="cideplus.commands.markFeature"
+            name="Unmark Feature in Editor"
+            categoryId= "cideplus.commands.featuresCategory">
          <commandParameter
                id="cideplus.commands.markFeature.featureIdParameter"
                name="Feature ID"
@@ -41,6 +53,10 @@
       <handler
             class="cideplus.commands.handlers.MarkFeatureHandler"
             commandId="cideplus.commands.markFeature">
+      </handler>
+      <handler
+            class="cideplus.commands.handlers.UnmarkFeatureHandler"
+            commandId="cideplus.commands.unmarkFeature">
       </handler>
    </extension>
    

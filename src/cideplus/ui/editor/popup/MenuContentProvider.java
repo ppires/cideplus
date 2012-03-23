@@ -25,6 +25,9 @@ public class MenuContentProvider extends CompoundContributionItem {
 	private Set<Feature> features;
 
 	private static final String paramFeatureId = "cideplus.commands.markFeature.featureIdParameter";
+	private static final String markFeatureCommandId = "cideplus.commands.markFeature";
+	private static final String unmarkFeatureCommandId = "cideplus.commands.unmarkFeature";
+	private static final String configureFeaturesCommandId = "cideplus.commands.configureFeatures";
 
 	public MenuContentProvider() {
 		setFeatures();
@@ -40,8 +43,6 @@ public class MenuContentProvider extends CompoundContributionItem {
 	protected IContributionItem[] getContributionItems() {
 		IServiceLocator serviceLocator = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		String id = "cideplus.commands.markFeature.commandParameterId";
-		String markFeatureCommandId = "cideplus.commands.markFeature";
-		String configureFeaturesCommandId = "cideplus.commands.configureFeatures";
 
 		if (features.isEmpty()) {
 			final CommandContributionItemParameter contributionParameter = new CommandContributionItemParameter(serviceLocator, id, configureFeaturesCommandId, SWT.NONE);
@@ -55,11 +56,11 @@ public class MenuContentProvider extends CompoundContributionItem {
 			int i;
 			for (i = 0; it.hasNext(); i++) {
 				Feature feature = it.next();
-				final CommandContributionItemParameter contributionParameter = new CommandContributionItemParameter(serviceLocator, id, markFeatureCommandId, CommandContributionItem.STYLE_PULLDOWN);
-				contributionParameter.label = feature.getName();
-				contributionParameter.parameters = new HashMap();
-				contributionParameter.parameters.put(paramFeatureId, feature.getId().toString());
-				menuItems[i] = new CommandContributionItem(contributionParameter);
+				final CommandContributionItemParameter item = new CommandContributionItemParameter(serviceLocator, id, markFeatureCommandId, CommandContributionItem.STYLE_PULLDOWN);
+				item.label = feature.getName();
+				item.parameters = new HashMap();
+				item.parameters.put(paramFeatureId, feature.getId().toString());
+				menuItems[i] = new CommandContributionItem(item);
 			}
 			menuItems[i++] = new Separator();
 			return menuItems;
