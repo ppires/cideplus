@@ -27,7 +27,6 @@
             description="Category for commands related to features."
             id="cideplus.commands.featuresCategory"
             name="Features Category"/>
-	  <!-- Command p/ marcar feature -->            
       <command
             id="cideplus.commands.markFeature"
             name="Mark Feature in Editor"
@@ -37,14 +36,8 @@
                name="Feature ID"
                optional="false">
          </commandParameter>
-      </command>
-	  <!-- Command p/ desmarcar feature -->            
-      <command
-            id="cideplus.commands.unmarkFeature"
-            name="Unmark Feature in Editor"
-            categoryId= "cideplus.commands.featuresCategory">
          <commandParameter
-               id="cideplus.commands.markFeature.featureIdParameter"
+               id="cideplus.commands.markFeature.checkedParameter"
                name="Feature ID"
                optional="false">
          </commandParameter>         
@@ -53,12 +46,8 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="cideplus.commands.handlers.MarkFeatureHandler"
+            class="cideplus.commands.handlers.ToggleFeatureHandler"
             commandId="cideplus.commands.markFeature">
-      </handler>
-      <handler
-            class="cideplus.commands.handlers.UnmarkFeatureHandler"
-            commandId="cideplus.commands.unmarkFeature">
       </handler>
    </extension>
    
