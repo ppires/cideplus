@@ -56,7 +56,7 @@ public class MenuContentProvider extends CompoundContributionItem {
 			int i;
 			for (i = 0; it.hasNext(); i++) {
 				Feature feature = it.next();
-				final CommandContributionItemParameter item = new CommandContributionItemParameter(serviceLocator, id, markFeatureCommandId, CommandContributionItem.STYLE_PULLDOWN);
+				final CommandContributionItemParameter item = new CommandContributionItemParameter(serviceLocator, id, markFeatureCommandId, CommandContributionItem.STYLE_CHECK);
 				item.label = feature.getName();
 				item.parameters = new HashMap();
 				item.parameters.put(paramFeatureId, feature.getId().toString());

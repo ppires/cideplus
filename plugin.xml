@@ -19,10 +19,12 @@
       </menuContribution>
    </extension>
    
+   
    <!-- Commands -->
    <extension
          point="org.eclipse.ui.commands">
       <category
+            description="Category for commands related to features."
             id="cideplus.commands.featuresCategory"
             name="Features Category"/>
 	  <!-- Command p/ marcar feature -->            
@@ -35,17 +37,21 @@
                name="Feature ID"
                optional="false">
          </commandParameter>
+         <state
+               class="org.eclipse.jface.commands.ToggleState:false"
+               id="cideplus.commands.markFeature.toggleState">
+         </state>
       </command>
-	  <!-- Command p/ marcar feature -->            
+	  <!-- Command p/ desmarcar feature -->            
       <command
-            id="cideplus.commands.markFeature"
+            id="cideplus.commands.unmarkFeature"
             name="Unmark Feature in Editor"
             categoryId= "cideplus.commands.featuresCategory">
          <commandParameter
                id="cideplus.commands.markFeature.featureIdParameter"
                name="Feature ID"
                optional="false">
-         </commandParameter>
+         </commandParameter>         
       </command>
    </extension>
    <extension
@@ -59,6 +65,7 @@
             commandId="cideplus.commands.unmarkFeature">
       </handler>
    </extension>
+   
    
    
    <!-- Command para configurar features. -->
