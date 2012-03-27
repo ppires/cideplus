@@ -37,10 +37,6 @@
                name="Feature ID"
                optional="false">
          </commandParameter>
-         <state
-               class="org.eclipse.jface.commands.ToggleState:false"
-               id="cideplus.commands.markFeature.toggleState">
-         </state>
       </command>
 	  <!-- Command p/ desmarcar feature -->            
       <command

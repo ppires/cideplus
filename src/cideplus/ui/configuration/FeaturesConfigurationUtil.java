@@ -73,7 +73,7 @@ public class FeaturesConfigurationUtil {
 					return getManagerForFile(compilationUnit);
 				}
 
-				public ICompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, FeatureNotFoundException, CoreException {
+				public ICompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, CoreException, FeatureNotFoundException {
 					ICompilationUnitFeaturesManager compilationUnitFeaturesManager;
 					if((compilationUnitFeaturesManager = compUnitCache.get(compilationUnit)) == null){
 						if (FeaturerPlugin.DEBUG_MANAGER_CACHE)
