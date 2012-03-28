@@ -39,7 +39,6 @@ public class MenuContentProvider extends CompoundContributionItem {
 
 	public MenuContentProvider() {
 		setFeatures();
-		System.out.println("Instantiated MenuContentProvider!");
 	}
 
 	public MenuContentProvider(String id) {

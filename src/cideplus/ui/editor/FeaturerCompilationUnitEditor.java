@@ -1,6 +1,7 @@
 package cideplus.ui.editor;
 
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
+import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension4;
@@ -10,18 +11,16 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 
-import cideplus.ui.presentation.ColorPresentation;
 import cideplus.ui.presentation.CustomAnnotationPainter;
-import cideplus.ui.presentation.FeaturesPainter;
 
 @SuppressWarnings("restriction")
 public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 
 	/* Ainda é usado para dar o refresh() nas features... */
-	private ColorPresentation colorPresentation = null;
+	//	private ColorPresentation colorPresentation = null;
 
 	private CustomAnnotationPainter customAnnotationPainter = null;
-	private FeaturesPainter featuresPainter = null;
+	//	private FeaturesPainter featuresPainter = null;
 	//	private FeaturesAnnotationHover annotationHover = null;
 
 
@@ -31,9 +30,9 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 	 * 
 	 * @return The color presentation used by this editor.
 	 */
-	public ColorPresentation getColorPresentation() {
-		return colorPresentation;
-	}
+	//	public ColorPresentation getColorPresentation() {
+	//		return colorPresentation;
+	//	}
 
 
 	@Override
@@ -41,16 +40,18 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 		ISourceViewer javaSourceViewer = super.createJavaSourceViewer(parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
 		/* No longer used. Based on AST parsing to color the code. Too inefficient. */
-		if (colorPresentation == null)
-			colorPresentation = new ColorPresentation(javaSourceViewer, this);
+		//		if (colorPresentation == null)
+		//			colorPresentation = new ColorPresentation(javaSourceViewer, this);
 
 		/* No longer used too. Efficient, but only updates text presentation when the file is saved. */
-		if (featuresPainter == null)
-			featuresPainter = new FeaturesPainter(javaSourceViewer);
+		//		if (featuresPainter == null)
+		//			featuresPainter = new FeaturesPainter(javaSourceViewer);
 
 		/* Completely copied from org.eclipse.jface.text.source.AnnotationPainter */
 		if (customAnnotationPainter == null)
 			customAnnotationPainter = new CustomAnnotationPainter(javaSourceViewer, fAnnotationAccess);
+
+
 
 
 		//		if (annotationHover == null)
@@ -64,6 +65,8 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 			//			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(featuresPainter);
 			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(customAnnotationPainter);
 		}
+
+		JavaSourceViewerConfiguration conf;
 
 		/* Registering IPainter */
 		if(javaSourceViewer instanceof ITextViewerExtension2) {
@@ -80,8 +83,8 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 		if (sourceViewer != null) {
 			StyledText textWidget = sourceViewer.getTextWidget();
 			if (textWidget != null) {
-				customAnnotationPainter.deactivate(false);
 				textWidget.removePaintListener(customAnnotationPainter);
+				customAnnotationPainter.deactivate(false);
 			}
 		}
 		super.dispose();
