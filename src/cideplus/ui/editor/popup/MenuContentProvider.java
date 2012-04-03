@@ -34,7 +34,6 @@ public class MenuContentProvider extends CompoundContributionItem {
 	public static final String paramChecked = "cideplus.commands.markFeature.checkedParameter";
 
 	private static final String markFeatureCommandId = "cideplus.commands.markFeature";
-	private static final String unmarkFeatureCommandId = "cideplus.commands.unmarkFeature";
 	private static final String configureFeaturesCommandId = "cideplus.commands.configureFeatures";
 
 	public MenuContentProvider() {
@@ -44,7 +43,6 @@ public class MenuContentProvider extends CompoundContributionItem {
 	public MenuContentProvider(String id) {
 		super(id);
 		setFeatures();
-		System.out.println("Instantiated MenuContentProvider!");
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

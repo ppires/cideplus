@@ -19,13 +19,12 @@ import cideplus.utils.PluginUtils;
 
 public class ToggleFeatureHandler extends AbstractHandler implements IElementUpdater {
 
-	private ITextSelection selection = null;
-
 	public ToggleFeatureHandler() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+
 		int featureId = Integer.parseInt(event.getParameter(MenuContentProvider.paramFeatureId));
 		Boolean checked = new Boolean(event.getParameter(MenuContentProvider.paramChecked));
 		ITextSelection selection = PluginUtils.getCurrentEditorTextSelection();
