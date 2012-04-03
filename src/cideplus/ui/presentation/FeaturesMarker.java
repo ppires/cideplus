@@ -146,16 +146,32 @@ public class FeaturesMarker {
 		}
 	}
 
+	/**
+	 * Creates an attributes map for a text marker that references a range in text. In order to the marker
+	 * appear automatically in the vertical ruler, the <code>lineNumber</code> or the <code>charStart</code>/<code>charEnd</code>
+	 * attributes must be set.
+	 * 
+	 * @param offset		The offset of the range being referenced
+	 * @param length		The length of the range being referenced
+	 * @param featureId		The ID of the feature this marker is tracking
+	 * @return The attribute map.
+	 * @author ppires
+	 */
 	private static Map<String, Object> createMarkerAttributes(int offset, int length, int featureId) {
-		IDocument document = PluginUtils.getCurrentDocument();
-		int lineNumber = 0;
-		try {
-			lineNumber = document.getLineOfOffset(offset) + 1;
-		} catch (BadLocationException e) {
-			e.printStackTrace();
-		}
 		Map<String, Object> attributes = new HashMap<String, Object>();
-		MarkerUtilities.setLineNumber(attributes, lineNumber);
+
+		// Setting the line number attribute
+		IDocument document = PluginUtils.getCurrentDocument();
+		if (document != null) {
+			try {
+				int lineNumber = document.getLineOfOffset(offset) + 1;
+				MarkerUtilities.setLineNumber(attributes, lineNumber);
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// Setting the charStart and charEnd attributes.
 		MarkerUtilities.setCharStart(attributes, offset);
 		MarkerUtilities.setCharEnd(attributes, offset + length);
 		attributes.put("featureId", new Integer(featureId));

@@ -55,19 +55,6 @@ public class PluginUtils {
 		return null;
 	}
 
-	public static ASTView getASTView() {
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window != null) {
-			IWorkbenchPage page = window.getActivePage();
-			if (page != null) {
-				IWorkbenchPart part = page.getActivePart();
-				if (part instanceof ASTView)
-					return (ASTView)part;
-			}
-		}
-		return null;
-	}
-
 	/**
 	 *  Get the editor that is currently being used, if it
 	 *  is a text editor.
@@ -78,6 +65,19 @@ public class PluginUtils {
 		IEditorPart editor = getCurrentEditor();
 		if (editor instanceof ITextEditor) {
 			return (ITextEditor) editor;
+		}
+		return null;
+	}
+
+	public static ASTView getASTView() {
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window != null) {
+			IWorkbenchPage page = window.getActivePage();
+			if (page != null) {
+				IWorkbenchPart part = page.getActivePart();
+				if (part instanceof ASTView)
+					return (ASTView)part;
+			}
 		}
 		return null;
 	}

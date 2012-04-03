@@ -1,47 +1,43 @@
 package cideplus.ui.editor;
 
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
-import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension4;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.jface.text.source.IVerticalRulerInfoExtension;
+import org.eclipse.jface.text.source.IVerticalRulerListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 
 import cideplus.ui.presentation.CustomAnnotationPainter;
+import cideplus.ui.presentation.VerticalRulerListener;
 
 @SuppressWarnings("restriction")
 public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
-
-	/* Ainda é usado para dar o refresh() nas features... */
-	//	private ColorPresentation colorPresentation = null;
 
 	private CustomAnnotationPainter customAnnotationPainter = null;
 	//	private FeaturesPainter featuresPainter = null;
 	//	private FeaturesAnnotationHover annotationHover = null;
 
+	public IVerticalRulerListener verticalRulerListener = null;
 
-
-	/**
-	 * Returns the color presentation object used by this editor.
-	 * 
-	 * @return The color presentation used by this editor.
-	 */
-	//	public ColorPresentation getColorPresentation() {
-	//		return colorPresentation;
-	//	}
 
 
 	@Override
 	protected ISourceViewer createJavaSourceViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler, boolean isOverviewRulerVisible, int styles, IPreferenceStore store) {
 		ISourceViewer javaSourceViewer = super.createJavaSourceViewer(parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
-		/* No longer used. Based on AST parsing to color the code. Too inefficient. */
-		//		if (colorPresentation == null)
-		//			colorPresentation = new ColorPresentation(javaSourceViewer, this);
+		//		CompositeRuler ruler;
+
+		System.out.println("Vertical ruler class: " + verticalRuler.getClass());
+		if (verticalRuler instanceof IVerticalRulerInfoExtension) {
+			if (verticalRulerListener == null)
+				verticalRulerListener = new VerticalRulerListener();
+			((IVerticalRulerInfoExtension) verticalRuler).addVerticalRulerListener(verticalRulerListener);
+		}
 
 		/* No longer used too. Efficient, but only updates text presentation when the file is saved. */
 		//		if (featuresPainter == null)
@@ -65,8 +61,6 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 			//			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(featuresPainter);
 			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(customAnnotationPainter);
 		}
-
-		JavaSourceViewerConfiguration conf;
 
 		/* Registering IPainter */
 		if(javaSourceViewer instanceof ITextViewerExtension2) {
