@@ -1,9 +1,13 @@
 package cideplus.ui.editor;
 
+import java.util.Iterator;
+
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension4;
+import org.eclipse.jface.text.source.AnnotationRulerColumn;
+import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
@@ -25,18 +29,26 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 	public IVerticalRulerListener verticalRulerListener = null;
 
 
-
 	@Override
 	protected ISourceViewer createJavaSourceViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler, boolean isOverviewRulerVisible, int styles, IPreferenceStore store) {
 		ISourceViewer javaSourceViewer = super.createJavaSourceViewer(parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
 		//		CompositeRuler ruler;
+		AnnotationRulerColumn col;
+
 
 		System.out.println("Vertical ruler class: " + verticalRuler.getClass());
 		if (verticalRuler instanceof IVerticalRulerInfoExtension) {
 			if (verticalRulerListener == null)
 				verticalRulerListener = new VerticalRulerListener();
 			((IVerticalRulerInfoExtension) verticalRuler).addVerticalRulerListener(verticalRulerListener);
+			//			verticalRuler.getControl();
+			//			IVerticalRulerColumn col;
+			Iterator it = ((CompositeRuler) verticalRuler).getDecoratorIterator();
+			while (it.hasNext()) {
+				Object obj = it.next();
+				System.out.println("object class: " + obj.getClass());
+			}
 		}
 
 		/* No longer used too. Efficient, but only updates text presentation when the file is saved. */
@@ -75,6 +87,8 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 	public void dispose() {
 		ISourceViewer sourceViewer = getSourceViewer();
 		if (sourceViewer != null) {
+			if (sourceViewer instanceof ITextViewerExtension4)
+				((ITextViewerExtension4) sourceViewer).removeTextPresentationListener(customAnnotationPainter);
 			StyledText textWidget = sourceViewer.getTextWidget();
 			if (textWidget != null) {
 				textWidget.removePaintListener(customAnnotationPainter);
@@ -83,4 +97,5 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 		}
 		super.dispose();
 	}
+
 }

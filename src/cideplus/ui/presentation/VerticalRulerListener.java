@@ -2,9 +2,11 @@ package cideplus.ui.presentation;
 
 import org.eclipse.jface.text.source.IVerticalRulerListener;
 import org.eclipse.jface.text.source.VerticalRulerEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Menu;
 
-public class VerticalRulerListener implements IVerticalRulerListener {
+public class VerticalRulerListener implements IVerticalRulerListener, MouseListener {
 
 	public VerticalRulerListener() {
 		super();
@@ -21,6 +23,18 @@ public class VerticalRulerListener implements IVerticalRulerListener {
 
 	public void annotationContextMenuAboutToShow(VerticalRulerEvent event, Menu menu) {
 		System.out.println("annotationContextMenuAboutToShow()");
+	}
+
+	public void mouseDoubleClick(MouseEvent e) {
+		System.out.println("mouseDoubleClick()");
+	}
+
+	public void mouseDown(MouseEvent e) {
+		System.out.println("mouseDown()");
+	}
+
+	public void mouseUp(MouseEvent e) {
+		System.out.println("mouseUp()");
 	}
 
 }

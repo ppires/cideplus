@@ -259,4 +259,21 @@
             /--> 
       </editor>  
    </extension>
+  <extension
+        point="org.eclipse.ui.workbench.texteditor.rulerColumns">
+     <column
+           class="cideplus.ui.editor.FeaturesVerticalRuler"
+           enabled="true"
+           global="true"
+           id="cideplus.editor.rulerColumn"
+           includeInMenu="true"
+           name="Features Vertical Ruler">
+        <placement
+              gravity="1.0">
+        </placement>
+        <targetEditor
+              id="cideplus.FeaturerCompilationUnitEditor">
+        </targetEditor>
+     </column>
+  </extension>
 </plugin>
