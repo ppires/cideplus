@@ -59,7 +59,7 @@ public class WizardPagina2 extends WizardPage {
 		try {
 			return FeaturesConfigurationUtil.getFeaturesManager(project).getManagerForFile(cu);
 		} catch (Exception e) {
-			MessageDialog.openError(getShell(), "Erro", "N�o foi poss�vel criar o compilarion unit para o arquivo. "+e.getMessage());
+			MessageDialog.openError(getShell(), "Erro", "Não foi possível criar o compilation unit para o arquivo. "+e.getMessage());
 			throw new RuntimeException(e);
 		}
 	}
