@@ -41,7 +41,7 @@ import cideplus.ui.configuration.FeaturesConfigurationUtil;
 
 public class WizardPagina2 extends WizardPage {
 	private IProject project;
-	private IJavaProject jproject;
+	private IJavaProject javaProject;
 	public Tree tree, lstSeeds;
 
 	public WizardPagina2(String pageName, IProject p) {
@@ -82,10 +82,10 @@ public class WizardPagina2 extends WizardPage {
 		final Image img_field_pub = new Image(getShell().getDisplay(), FeaturerPlugin.getFile("/images/field_public_obj.gif"));
 		final Image img_field_pri = new Image(getShell().getDisplay(), FeaturerPlugin.getFile("/images/field_private_obj.gif"));
 		final Composite composite = new Composite(parent, SWT.NONE);
-		jproject = null;
+		javaProject = null;
 
 		try {
-			jproject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
+			javaProject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
 		} catch (CoreException e2) {
 			e2.printStackTrace();
 			return;
@@ -310,7 +310,7 @@ public class WizardPagina2 extends WizardPage {
 		parent.getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				try {
-					for(IPackageFragmentRoot r: jproject.getAllPackageFragmentRoots()) {
+					for(IPackageFragmentRoot r: javaProject.getAllPackageFragmentRoots()) {
 						TreeItem nivel0 = new TreeItem(root, SWT.NULL);
 						if(r.getElementName().trim().equals(""))
 							nivel0.setText("(src)");
@@ -324,7 +324,7 @@ public class WizardPagina2 extends WizardPage {
 						}
 						new TreeItem(nivel0, SWT.NULL);
 					}
-					//					for(IPackageFragment pkg : jproject.getPackageFragments()) {
+					//					for(IPackageFragment pkg : javaProject.getPackageFragments()) {
 					//						if(pkg.getCompilationUnits().length == 0)
 					//							continue;
 					//						TreeItem nivel1 = new TreeItem(root, SWT.NULL);
