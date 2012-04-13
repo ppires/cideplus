@@ -27,7 +27,7 @@ import cideplus.ui.configuration.IFeaturesManager;
 
 public class WizardPagina1 extends WizardPage {
 	private IProject project;
-	public Combo combo;
+	public Combo featuresCombo;
 	public Label colorArea;
 
 	public WizardPagina1(String pageName, IProject p) {
@@ -37,53 +37,60 @@ public class WizardPagina1 extends WizardPage {
 	}
 	
 	public boolean canFlipToNextPage() {
-		return (combo.getSelectionIndex() > -1);		
+		return (featuresCombo.getSelectionIndex() > -1);		
 	}
     
 	public void createControl(Composite parent) {
 		IJavaProject jproject = null;
 		final Composite composite = new Composite(parent, SWT.NONE);		
 
-		try {
+		try { 
 			jproject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
 		} catch (CoreException e2) {
 			e2.printStackTrace();
 			return;
 		}		
-
 		composite.setLayout(null);
-		final Button rename = new Button(composite, SWT.NONE);
-		Label label = new Label(composite, SWT.NONE);
-		label.setText("Select a feature to extract:");
-		combo = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
+		
+		featuresCombo = new Combo(composite, SWT.READ_ONLY);
+		
+		final Button renameButton = new Button(composite, SWT.NONE);
+		renameButton.setText("Rename");
+		renameButton.setEnabled(false);
+		
+		Label comboLabel = new Label(composite, SWT.NONE);
+		comboLabel.setText("Select a feature to extract:");
+		
+		
+		comboLabel.setBounds   (60,  53, 180, 20);
+		featuresCombo.setBounds(240, 50, 180, 20);
+		renameButton.setBounds (425, 50, 70, 27);
+		
 		final IFeaturesManager featuresManager = FeaturesConfigurationUtil.getFeaturesManager(project);
-		combo.addModifyListener(new ModifyListener() {
+		featuresCombo.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				getContainer().updateButtons();				
 				int i = 0;
 				for (cideplus.model.Feature feat : getSafeFeatures(featuresManager)) {
-					if(i == combo.getSelectionIndex()){
+					if(i == featuresCombo.getSelectionIndex()){
 						colorArea.setBackground(new Color(getShell().getDisplay(), FeaturesConfigurationUtil.getRGB(feat)));
 					}
 					i++;
 				}
 				//colorArea.setBackground(new Color(null, FeatureManager.getFeatures().get(combo.getSelectionIndex()).getRGB()));
-				rename.setEnabled(combo.getSelectionIndex() > -1);
+				renameButton.setEnabled(featuresCombo.getSelectionIndex() > -1);
 			}});
 		for (cideplus.model.Feature feature : getSafeFeatures(featuresManager)) {
-			combo.add(feature.getName());			
+			featuresCombo.add(feature.getName());			
 		}
-		label.setBounds(30, 50, 150, 50);
-		combo.setBounds(180, 47, 180, 50);
+		
 		colorArea = new Label(composite, SWT.BORDER);
-		colorArea.setBounds(30, 150, 330, 200);
 		Label label2 = new Label(composite, SWT.NONE);
 		label2.setText("Associated Color:");
-		label2.setBounds(30, 120, 100, 50);
-		rename.setText("Rename");
-		rename.setEnabled(false);
-		rename.setBounds(365, 46, 60, 25);
-		rename.addMouseListener(new MouseListener() {
+		label2.setBounds   (60, 120, 120, 30);
+		colorArea.setBounds(180, 120, 315, 200);
+		
+		renameButton.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick(MouseEvent e) {}
 			public void mouseDown(MouseEvent e) {}
 			public void mouseUp(MouseEvent e) {

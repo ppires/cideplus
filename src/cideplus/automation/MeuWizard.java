@@ -29,8 +29,8 @@ public class MeuWizard extends Wizard {
 	}
 
 	public boolean performFinish() {
-		if(this.page1.combo.getSelectionIndex() > -1 && this.page2.tree.getSelectionCount() > 0) {
-			this.feature = this.page1.combo.getSelectionIndex();
+		if(this.page1.featuresCombo.getSelectionIndex() > -1 && this.page2.tree.getSelectionCount() > 0) {
+			this.feature = this.page1.featuresCombo.getSelectionIndex();
 			this.seeds.clear();
 			for(TreeItem i : this.page2.tree.getSelection()) {
 				if(i.getData() instanceof String)
