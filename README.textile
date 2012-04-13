@@ -1,8 +1,8 @@
 h1. CIDE+
 
-						INSTRUCTIONS
+h2. INSTRUCTIONS
 
-# About CIDE+
+1. About CIDE+
 
 	The extraction of non-trivial software product lines (SPL) from 
 	a legacy application is a time-consuming task. First, developers 
@@ -19,7 +19,7 @@ h1. CIDE+
 	a feature.
 
 
-# Installing CIDE+
+2. Installing CIDE+
 
 	CIDE+ is available at http://homepages.dcc.ufmg.br/~mtov/cideplus/.
 	Download the zip archive, unzip it, and copy the jar archive to the
@@ -29,7 +29,7 @@ h1. CIDE+
 	at http://code.google.com/p/cideplus/.
 
 
-# Configuring a project to use CIDE+
+3. Configuring a project to use CIDE+
 
 	After installing CIDE+, you need to configure a project to use it.
 	Open eclipse, and right click in a java project in the package 
@@ -40,7 +40,7 @@ h1. CIDE+
 	features, you're ready to annotate the code.
 	
 
-# Execute the semi-automatic feature extraction process
+4. Execute the semi-automatic feature extraction process
 
 	Right click in a java project in the package explorer, go to 'Features',
 	and click in 'Automatic Feature Detection'. In the opened dialog,
@@ -55,7 +55,7 @@ h1. CIDE+
 	to view the colored code.
 
 	
-# Complete the process manually
+5. Complete the process manually
 
 	The semi-automatic extraction isn't 100% accurate. It misses some 
 	of the feature code. To solve this, you have to review the code, 
@@ -81,7 +81,7 @@ h1. CIDE+
 	mapped to a different node than the marked.
 	
 
-# Export your project
+6. Export your project
 
 	After marking the features, you can export your project, selecting
 	which features you want to be in the exported code. To do this,
@@ -91,6 +91,6 @@ h1. CIDE+
 	and click 'OK'.
 	
 	
-# More info
+7. More info
 
 	More info about CIDE+ can be found at http://homepages.dcc.ufmg.br/~mtov/cideplus/
