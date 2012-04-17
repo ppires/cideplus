@@ -11,11 +11,11 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.TreeItem;
 
 public class MeuWizard extends Wizard {
-	private IProject project;
-	private WizardPagina1 page1;
-	private WizardPagina2 page2;
-	private TreeSet<String> seeds;
-	private ArrayList<IPackageFragment> pacotes;
+	private final IProject project;
+	private final WizardPagina1 page1;
+	private final WizardPagina2 page2;
+	private final TreeSet<String> seeds;
+	private final ArrayList<IPackageFragment> pacotes;
 	public int feature = -1;
 
 	public MeuWizard(IProject project, ArrayList<IPackageFragment> pacotes, TreeSet<String> seeds) {
@@ -28,21 +28,33 @@ public class MeuWizard extends Wizard {
 		addPage(this.page2);
 	}
 
+	@Override
 	public boolean performFinish() {
 		if(this.page1.featuresCombo.getSelectionIndex() > -1 && this.page2.tree.getSelectionCount() > 0) {
 			this.feature = this.page1.featuresCombo.getSelectionIndex();
 			this.seeds.clear();
 			for(TreeItem i : this.page2.tree.getSelection()) {
-				if(i.getData() instanceof String)
+				if(i.getData() instanceof String) {
 					this.seeds.add((String)i.getData());
+					return true;
+				}
+				else if(i.getData() instanceof IPackageFragment) {
+					pacotes.add((IPackageFragment)i.getData());
+					return true;
+				}
 				else if(i.getData() instanceof IPackageFragmentRoot) {
 					MessageDialog.openInformation(this.getShell(), "Semi-automatic Feature Extraction", "PackageRoot not supported yet!");
 					return false;
 				}
-				else if(i.getData() instanceof IPackageFragment) {
-					pacotes.add((IPackageFragment)i.getData());
+				else if(i.getData() instanceof IProject) {
+					MessageDialog.openInformation(this.getShell(), "Semi-automatic Feature Extraction", "Project not supported.\n\nYou can select packages, classes, methods, and fields.");
+					return false;
 				}
 			}
+		}
+		else {
+			MessageDialog.openInformation(this.getShell(), "Semi-automatic Feature Extraction", "Please, select one seed at least!");
+			return false;
 		}
 		return true;
 	}
