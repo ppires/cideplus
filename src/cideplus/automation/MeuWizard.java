@@ -47,7 +47,7 @@ public class MeuWizard extends Wizard {
 					return false;
 				}
 				else if(i.getData() instanceof IProject) {
-					MessageDialog.openInformation(this.getShell(), "Semi-automatic Feature Extraction", "Project not supported.\n\nYou can select packages, classes, methods, and fields.");
+					MessageDialog.openInformation(this.getShell(), "Semi-automatic Feature Extraction", "Project not supported.\n\nYou can only select packages, classes, methods, or fields.");
 					return false;
 				}
 			}
