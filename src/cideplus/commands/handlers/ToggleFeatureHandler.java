@@ -21,9 +21,28 @@ public class ToggleFeatureHandler extends AbstractHandler implements IElementUpd
 
 	public ToggleFeatureHandler() {
 
+		/* Testing code... This constructor should be empty! */
+		//		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		//		if (window != null) {
+		//			IWorkbenchPage page = window.getActivePage();
+		//			if (page != null) {
+		//				IEditorPart editor = page.getActiveEditor();
+		//				if (editor instanceof ITextEditor) {
+		//					Object adapted = editor.getAdapter(IVerticalRuler.class);
+		//					if (adapted instanceof IVerticalRulerInfoExtension) {
+		//						((IVerticalRulerInfoExtension)adapted).addVerticalRulerListener(new VerticalRulerListener());
+		//					}
+		//				}
+		//			}
+		//		}
+
 	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+
+		// Testando
+		//		ITextEditor editor = PluginUtils.getCurrentTextEditor();
+		//		System.out.println();
 
 		int featureId = Integer.parseInt(event.getParameter(MenuContentProvider.paramFeatureId));
 		Boolean checked = new Boolean(event.getParameter(MenuContentProvider.paramChecked));

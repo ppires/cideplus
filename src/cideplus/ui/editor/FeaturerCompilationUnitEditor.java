@@ -1,84 +1,115 @@
 package cideplus.ui.editor;
 
+import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
+import org.eclipse.jdt.ui.text.IJavaPartitions;
+import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
+import org.eclipse.jdt.ui.text.JavaTextTools;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension4;
-import org.eclipse.jface.text.source.IAnnotationAccess;
-import org.eclipse.jface.text.source.IAnnotationHover;
+import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.jface.text.source.IVerticalRulerInfoExtension;
 import org.eclipse.jface.text.source.IVerticalRulerListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 
 import cideplus.ui.presentation.CustomAnnotationPainter;
+import cideplus.ui.presentation.VerticalRulerListener;
 
 @SuppressWarnings("restriction")
 public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 
 	private CustomAnnotationPainter customAnnotationPainter = null;
-	//	private FeaturesPainter featuresPainter = null;
-	//	private FeaturesAnnotationHover annotationHover = null;
 
 	public IVerticalRulerListener verticalRulerListener = null;
 
-	public IAnnotationHover hover = null;
+	//	public SelectAnnotationRulerAction rulerAction = null;
+	//
+	//	IAnnotationHover hover = null;
+	//
+	//	private SourceViewerConfig sourceViewerConfig = null;
+
+	@Override
+	protected JavaSourceViewerConfiguration createJavaSourceViewerConfiguration() {
+		System.out.println("FeaturerCompilationUnitEditor.createJavaSourceViewerConfiguration()");
+		JavaTextTools textTools= JavaPlugin.getDefault().getJavaTextTools();
+		return new SourceViewerConfig(textTools.getColorManager(), getPreferenceStore(), this, IJavaPartitions.JAVA_PARTITIONING);
+	}
 
 
 	@Override
 	protected ISourceViewer createJavaSourceViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler, boolean isOverviewRulerVisible, int styles, IPreferenceStore store) {
 		ISourceViewer javaSourceViewer = super.createJavaSourceViewer(parent, verticalRuler, overviewRuler, isOverviewRulerVisible, styles, store);
 
-		//		CompositeRuler ruler;
-		//		AnnotationRulerColumn col;
-
-
-		//		System.out.println("Vertical ruler class: " + verticalRuler.getClass());
-		//		if (verticalRuler instanceof IVerticalRulerInfoExtension) {
-		//			if (verticalRulerListener == null)
-		//				verticalRulerListener = new VerticalRulerListener();
-		//			((IVerticalRulerInfoExtension) verticalRuler).addVerticalRulerListener(verticalRulerListener);
-		//			//			verticalRuler.getControl();
-		//			//			IVerticalRulerColumn col;
-		//			Iterator it = ((CompositeRuler) verticalRuler).getDecoratorIterator();
-		//			while (it.hasNext()) {
-		//				Object obj = it.next();
-		//				System.out.println("object class: " + obj.getClass());
-		//			}
-		//		}
-
-		/* No longer used too. Efficient, but only updates text presentation when the file is saved. */
-		//		if (featuresPainter == null)
-		//			featuresPainter = new FeaturesPainter(javaSourceViewer);
-
-		/* Completely copied from org.eclipse.jface.text.source.AnnotationPainter */
+		/* This is here only to ensure that customAnnotationPainter is instantiated only once. */
 		if (customAnnotationPainter == null) {
-			IAnnotationAccess annotationAccess = getAnnotationAccess();
-			customAnnotationPainter = new CustomAnnotationPainter(javaSourceViewer, annotationAccess);
+			customAnnotationPainter = new CustomAnnotationPainter(javaSourceViewer, getAnnotationAccess());
 		}
-
-
-		//
-		//
-		//		if (hover == null)
-		//			hover = new FeaturesAnnotationHover();
-		//		javaSourceViewer.setVerticalRulerAnnotationHover();
-		//		javaSourceViewer.setAnnotationHover(hover);
 
 		/* Extension4 introduced the presentation listener concept. */
 		if(javaSourceViewer instanceof ITextViewerExtension4) {
-			//			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(colorPresentation);
-			//			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(featuresPainter);
 			((ITextViewerExtension4)javaSourceViewer).addTextPresentationListener(customAnnotationPainter);
 		}
 
 		/* Registering IPainter */
 		if(javaSourceViewer instanceof ITextViewerExtension2) {
 			((ITextViewerExtension2) javaSourceViewer).addPainter(customAnnotationPainter);
-			//			((ITextViewerExtension2) javaSourceViewer).addPainter(featuresPainter);
 		}
+
+		if (verticalRuler instanceof IVerticalRulerInfoExtension) {
+			if (verticalRulerListener == null)
+				verticalRulerListener = new VerticalRulerListener();
+			((IVerticalRulerInfoExtension) verticalRuler).addVerticalRulerListener(verticalRulerListener);
+			//			verticalRuler.getControl();
+			//			IVerticalRulerColumn col;
+			//			Iterator it = ((CompositeRuler) verticalRuler).getDecoratorIterator();
+			//			while (it.hasNext()) {
+			//				Object obj = it.next();
+			//				System.out.println("object class: " + obj.getClass());
+			//			}
+		}
+
+		((CompositeRuler) verticalRuler).fireAnnotationSelected(null);
+
+
+		//		CompositeRuler ruler;
+		//		AnnotationRulerColumn col;
+		//		System.out.println("Vertical ruler class: " + verticalRuler.getClass());
+
+
+
+
+
+
+		//		if (hover == null)
+		//			hover = new FeaturesAnnotationHover();
+		//		((Object) javaSourceViewer).setVerticalRulerAnnotationHover();
+		//		javaSourceViewer.setAnnotationHover(hover);
+
+		//		if (verticalRulerListener == null) {
+		//			verticalRulerListener = new VerticalRulerListener();
+		//			((CompositeRuler) verticalRuler).
+		//		}
+
+		//		if (rulerAction == null) {
+		//			rulerAction = new SelectAnnotationRulerAction(null, "cideplus", this);
+		//		}
+		//		else  {
+		//			System.out.println("rulerAction already exists!");
+		//		}
+
+		//		javaSourceViewer.
+
+		//		System.out.println("javaSourceViewer class: " + javaSourceViewer.getClass());
+
+		//		javaSourceViewer.setAnnotationHover(hover);
+		//		((SourceViewer) javaSourceViewer).showAnnotations(true);
+
+
 
 		return javaSourceViewer;
 	}

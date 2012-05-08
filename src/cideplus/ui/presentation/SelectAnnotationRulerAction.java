@@ -1,4 +1,17 @@
+/*******************************************************************************
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
+
 package cideplus.ui.presentation;
+
 
 import java.util.ResourceBundle;
 
@@ -15,6 +28,12 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ResourceAction;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
+/**
+ * A ruler action which can select the textual range of an annotation that has a
+ * visual representation in a vertical ruler.
+ *
+ * @since 3.0
+ */
 public class SelectAnnotationRulerAction extends TextEditorAction implements IVerticalRulerListener {
 
 	/**
@@ -23,7 +42,7 @@ public class SelectAnnotationRulerAction extends TextEditorAction implements IVe
 	 *
 	 * @param bundle the resource bundle
 	 * @param prefix a prefix to be prepended to the various resource keys
-	 *   (described in <code>ResourceAction constructor), or  null if none
+	 *   (described in <code>ResourceAction</code> constructor), or  <code>null</code> if none
 	 * @param editor the editor
 	 *
 	 * @see ResourceAction#ResourceAction(ResourceBundle, String)
@@ -51,9 +70,9 @@ public class SelectAnnotationRulerAction extends TextEditorAction implements IVe
 	}
 
 	/**
-	 * Returns the <code>AbstractMarkerAnnotationModel of the editor's input.
+	 * Returns the <code>AbstractMarkerAnnotationModel</code> of the editor's input.
 	 *
-	 * @return the marker annotation model or <code>null if there's none
+	 * @return the marker annotation model or <code>null</code> if there's none
 	 */
 	protected IAnnotationModel getAnnotationModel() {
 		IDocumentProvider provider= getTextEditor().getDocumentProvider();
@@ -64,12 +83,14 @@ public class SelectAnnotationRulerAction extends TextEditorAction implements IVe
 	 * @see org.eclipse.ui.texteditor.IVerticalRulerListener#annotationSelected(org.eclipse.ui.texteditor.VerticalRulerEvent)
 	 */
 	public void annotationSelected(VerticalRulerEvent event) {
+		System.out.println("annotationSelected(VerticalRulerEvent event)");
 	}
 
 	/*
 	 * @see org.eclipse.ui.texteditor.IVerticalRulerListener#annotationDefaultSelected(org.eclipse.ui.texteditor.VerticalRulerEvent)
 	 */
 	public void annotationDefaultSelected(VerticalRulerEvent event) {
+		System.out.println("annotationDefaultSelected(VerticalRulerEvent event)");
 		Annotation a= event.getSelectedAnnotation();
 		IAnnotationModel model= getAnnotationModel();
 		Position position= model.getPosition(a);
@@ -83,33 +104,6 @@ public class SelectAnnotationRulerAction extends TextEditorAction implements IVe
 	 * @see org.eclipse.ui.texteditor.IVerticalRulerListener#annotationContextMenuAboutToShow(org.eclipse.ui.texteditor.VerticalRulerEvent, org.eclipse.swt.widgets.Menu)
 	 */
 	public void annotationContextMenuAboutToShow(VerticalRulerEvent event, Menu menu) {
+		System.out.println("annotationContextMenuAboutToShow(VerticalRulerEvent event, Menu menu)");
 	}
-
-
-
-
-
-
-
-
-	//	public SelectAnnotationRulerAction(ResourceBundle bundle, String prefix, ITextEditor editor) {
-	//		super(bundle, prefix, editor);
-	//	}
-	//
-	//	public SelectAnnotationRulerAction(ResourceBundle bundle, String prefix, ITextEditor editor, int style) {
-	//		super(bundle, prefix, editor, style);
-	//	}
-	//
-	//	public void annotationSelected(VerticalRulerEvent event) {
-	//
-	//	}
-	//
-	//	public void annotationDefaultSelected(VerticalRulerEvent event) {
-	//
-	//	}
-	//
-	//	public void annotationContextMenuAboutToShow(VerticalRulerEvent event, Menu menu) {
-	//
-	//	}
-
 }

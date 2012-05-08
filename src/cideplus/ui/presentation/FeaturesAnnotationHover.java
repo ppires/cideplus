@@ -1,12 +1,13 @@
 package cideplus.ui.presentation;
 
-import org.eclipse.jface.text.source.DefaultAnnotationHover;
+import org.eclipse.jdt.internal.ui.text.HTMLAnnotationHover;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.LineRange;
 
 import cideplus.FeaturerPlugin;
 
-public class FeaturesAnnotationHover extends DefaultAnnotationHover {// implements IAnnotationHoverExtension, IAnnotationHoverExtension2 {
+public class FeaturesAnnotationHover extends HTMLAnnotationHover {// implements IAnnotationHoverExtension, IAnnotationHoverExtension2 {
 
 	public FeaturesAnnotationHover() {
 		super(false);
@@ -23,8 +24,7 @@ public class FeaturesAnnotationHover extends DefaultAnnotationHover {// implemen
 	}
 
 	public ILineRange getHoverLineRange(ISourceViewer viewer, int lineNumber) {
-		// TODO Auto-generated method stub
-		return null;
+		return new LineRange(lineNumber, 1);
 	}
 
 	@Override
@@ -34,9 +34,9 @@ public class FeaturesAnnotationHover extends DefaultAnnotationHover {// implemen
 			System.out.println("Info returned by super(): " + super.getHoverInfo(sourceViewer, lineNumber));
 		}
 
-		//		String hoverInfo = super.getHoverInfo(sourceViewer, lineNumber);
-		String hoverInfo = "This is the hover info!!!";
-		return hoverInfo;
+		String hoverInfo = super.getHoverInfo(sourceViewer, lineNumber);
+		//		String hoverInfo = "This is the hover info!!!";
+		return hoverInfo == null ? "This is the hover info!" : hoverInfo;
 	}
 
 }

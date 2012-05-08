@@ -1,5 +1,6 @@
 package cideplus.ui.presentation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,7 +23,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import cideplus.FeaturerPlugin;
+import cideplus.model.Feature;
 import cideplus.model.ast.utils.ASTUtils;
+import cideplus.ui.configuration.FeaturesConfigurationUtil;
 import cideplus.utils.PluginUtils;
 
 public class FeaturesMarker {
@@ -160,6 +163,20 @@ public class FeaturesMarker {
 	private static Map<String, Object> createMarkerAttributes(int offset, int length, int featureId) {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		// Getting the feature name to show when
+		// hovering an annotation in vertical ruler
+		String featureName = null;
+		try {
+			Feature feature = FeaturesConfigurationUtil.getFeature(PluginUtils.getCurrentProject(), featureId);
+			featureName = feature.getName();
+		} catch (CoreException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 		// Setting the line number attribute
 		IDocument document = PluginUtils.getCurrentDocument();
 		if (document != null) {
@@ -174,8 +191,10 @@ public class FeaturesMarker {
 		// Setting the charStart and charEnd attributes.
 		MarkerUtilities.setCharStart(attributes, offset);
 		MarkerUtilities.setCharEnd(attributes, offset + length);
+		MarkerUtilities.setMessage(attributes, "Feature: " + featureName);
 		attributes.put("featureId", new Integer(featureId));
 		attributes.put("length", new Integer(length));
+		//		attributes.put(IMarker.MESSAGE, "A sample marker message!");
 		return attributes;
 	}
 
