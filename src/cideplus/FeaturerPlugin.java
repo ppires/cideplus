@@ -22,17 +22,20 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static FeaturerPlugin plugin;
 	private final ASTViewPlugin astViewPlugin;
+	//	private static EditorListener editorListener;
+
 
 	public static final boolean DEBUG_AST_MARKER = false;
-	public static final boolean DEBUG_HOVER = true;
+	public static final boolean DEBUG_HOVER = false;
 	public static final boolean DEBUG_MANAGER_CACHE = false;
 	public static final boolean DEBUG_MARKERS = false;
 	public static final boolean DEBUG_PRESENTATION = false;
 	public static final boolean DEBUG_REFRESH = false;
 	public static final boolean DEBUG_RESOURCE_LISTENER = false;
-	public static final boolean DEBUG_RULER_LISTENER = true;
-	public static final boolean DEBUG_SELECTION = true;
+	public static final boolean DEBUG_RULER_LISTENER = false;
+	public static final boolean DEBUG_SELECTION = false;
 	public static final boolean DEBUG_STYLE_CACHE = false;
+	public static final boolean DEBUG_PART_LISTENER = true;
 
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;
@@ -57,6 +60,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		astViewPlugin.start(context);
+		//		installEditorListener();
 	}
 
 	/*
@@ -69,6 +73,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		//		uninstallEditorListener();
 		astViewPlugin.stop(context);
 		super.stop(context);
 	}
@@ -98,4 +103,29 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	//	private void installEditorListener() {
+	//		IWorkbench workbench = PlatformUI.getWorkbench();
+	//		if (workbench != null) {
+	//			editorListener = new EditorListener();
+	//			IPartService service = (IPartService) workbench.getService(IPartService.class);
+	//			service.addPartListener(editorListener);
+	//		}
+	//		else {
+	//			if (FeaturerPlugin.DEBUG_PART_LISTENER)
+	//				System.out.println("workbench == null (install)");
+	//		}
+	//	}
+	//
+	//	private void uninstallEditorListener() {
+	//		IWorkbench workbench = PlatformUI.getWorkbench();
+	//		if (workbench != null) {
+	//			IPartService service = (IPartService) workbench.getService(IPartService.class);
+	//			service.removePartListener(editorListener);
+	//			editorListener = null;
+	//		}
+	//		else {
+	//			if (FeaturerPlugin.DEBUG_PART_LISTENER)
+	//				System.out.println("workbench == null (uninstall)");
+	//		}
+	//	}
 }

@@ -259,6 +259,12 @@
             /--> 
       </editor>  
    </extension>
+  <extension
+        point="org.eclipse.ui.startup">
+     <startup
+           class="cideplus.PluginStartup">
+     </startup>
+  </extension>
    
   <!-- extension para criar uma nova ruler -->
   <!--

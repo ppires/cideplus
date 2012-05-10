@@ -8,6 +8,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
@@ -167,6 +168,7 @@ public class PluginUtils {
 	/* mostra um popup com title e text */
 	public static void showPopup(String title, String text) {
 		MessageDialog.openInformation(getActiveShell(), title, text);
+		JavaPlugin p;
 	}
 
 	/* Overloaded para colocar título default do popup */

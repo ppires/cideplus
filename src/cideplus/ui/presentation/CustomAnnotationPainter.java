@@ -42,6 +42,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.AnnotationModelEvent;
+import org.eclipse.jface.text.source.AnnotationPainter;
 import org.eclipse.jface.text.source.AnnotationPainter.HighlightingStrategy;
 import org.eclipse.jface.text.source.AnnotationPainter.IDrawingStrategy;
 import org.eclipse.jface.text.source.AnnotationPainter.ITextStyleStrategy;
@@ -153,6 +154,8 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 		 * @since 3.0
 		 */
 		private Object fPaintingStrategy;
+
+		AnnotationPainter ap;
 	}
 
 
@@ -989,6 +992,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 *             {@link #addTextStyleStrategy(Object, CustomAnnotationPainter.ITextStyleStrategy)} and
 	 *             {@link UnderlineStrategy}
 	 */
+	@Deprecated
 	public void addAnnotationType(Object annotationType) {
 		addAnnotationType(annotationType, SQUIGGLES);
 	}
