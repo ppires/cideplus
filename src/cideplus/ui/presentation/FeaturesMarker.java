@@ -162,13 +162,25 @@ public class FeaturesMarker {
 	 */
 	private static Map<String, Object> createMarkerAttributes(int offset, int length, int featureId) {
 		Map<String, Object> attributes = new HashMap<String, Object>();
+		IDocument document = PluginUtils.getCurrentDocument();
 
 		// Getting the feature name to show when
 		// hovering an annotation in vertical ruler
-		String featureName = null;
+		String infoMessage = null;
 		try {
+
 			Feature feature = FeaturesConfigurationUtil.getFeature(PluginUtils.getCurrentProject(), featureId);
-			featureName = feature.getName();
+			String featureName = feature.getName();
+			//			String code = document.get(offset, length);
+			//			infoMessage = "(" + featureName + ") " + code;
+			infoMessage = "Feature: " + featureName;
+
+			String lineSeparator = System.getProperty("line.separator");
+			infoMessage.replaceAll(lineSeparator, "<br />");
+			System.out.println("info: " + infoMessage.replaceAll(lineSeparator, "<br />").replaceAll("\r", ""));
+
+			System.out.println("'\\n' matches \n ? " + "\n".matches("\n"));
+
 		} catch (CoreException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -178,7 +190,6 @@ public class FeaturesMarker {
 		}
 
 		// Setting the line number attribute
-		IDocument document = PluginUtils.getCurrentDocument();
 		if (document != null) {
 			try {
 				int lineNumber = document.getLineOfOffset(offset) + 1;
@@ -191,7 +202,7 @@ public class FeaturesMarker {
 		// Setting the charStart and charEnd attributes.
 		MarkerUtilities.setCharStart(attributes, offset);
 		MarkerUtilities.setCharEnd(attributes, offset + length);
-		MarkerUtilities.setMessage(attributes, "Feature: " + featureName);
+		MarkerUtilities.setMessage(attributes, infoMessage.replaceAll("\n", "<br />").replaceAll("\r", ""));
 		attributes.put("featureId", new Integer(featureId));
 		attributes.put("length", new Integer(length));
 		//		attributes.put(IMarker.MESSAGE, "A sample marker message!");

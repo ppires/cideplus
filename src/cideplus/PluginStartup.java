@@ -35,6 +35,9 @@ public class PluginStartup implements IStartup {
 				IPartService service = window.getPartService();
 				if (service != null) {
 					service.addPartListener(editorListener);
+
+					if (FeaturerPlugin.DEBUG_PART_LISTENER)
+						System.out.println("registered part listener!\n service class: " + service.getClass());
 				}
 				else {
 					if (FeaturerPlugin.DEBUG_PART_LISTENER)

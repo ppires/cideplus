@@ -259,12 +259,14 @@
             /--> 
       </editor>  
    </extension>
-  <extension
+   
+<!-- Extension para registrar listener do editor -->   
+  <!--extension
         point="org.eclipse.ui.startup">
      <startup
            class="cideplus.PluginStartup">
      </startup>
-  </extension>
+  </extension-->
    
   <!-- extension para criar uma nova ruler -->
   <!--
