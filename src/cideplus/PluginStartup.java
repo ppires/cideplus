@@ -1,6 +1,5 @@
 package cideplus;
 
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IWorkbench;
@@ -15,7 +14,10 @@ public class PluginStartup implements IStartup {
 
 	@Override
 	public void earlyStartup() {
-		Display.getDefault().syncExec(new Runnable() {
+		System.out.println("PluginStartup.earlyStartup()");
+
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+		workbench.getDisplay().syncExec(new Runnable() {
 
 			@Override
 			public void run() {
@@ -28,30 +30,24 @@ public class PluginStartup implements IStartup {
 
 	private void installEditorListener() {
 		IWorkbench workbench = PlatformUI.getWorkbench();
-		if (workbench != null) {
-			editorListener = new EditorListener();
-			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-			if (window != null) {
-				IPartService service = window.getPartService();
-				if (service != null) {
-					service.addPartListener(editorListener);
+		editorListener = new EditorListener();
+		IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+		if (window != null) {
+			IPartService service = window.getPartService();
+			if (service != null) {
+				service.addPartListener(editorListener);
 
-					if (FeaturerPlugin.DEBUG_PART_LISTENER)
-						System.out.println("registered part listener!\n service class: " + service.getClass());
-				}
-				else {
-					if (FeaturerPlugin.DEBUG_PART_LISTENER)
-						System.out.println("part service is null");
-				}
+				if (FeaturerPlugin.DEBUG_PART_LISTENER)
+					System.out.println("registered part listener!\n - service class: " + service.getClass());
 			}
 			else {
 				if (FeaturerPlugin.DEBUG_PART_LISTENER)
-					System.out.println("workbench window is null (no active workbench window or called from outside UI thread...)");
+					System.out.println("part service is null");
 			}
 		}
 		else {
 			if (FeaturerPlugin.DEBUG_PART_LISTENER)
-				System.out.println("workbench == null (install)");
+				System.out.println("workbench window is null (no active workbench window or called from outside UI thread...)");
 		}
 	}
 

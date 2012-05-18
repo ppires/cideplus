@@ -4,7 +4,9 @@ import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension4;
+import org.eclipse.jface.text.source.AnnotationPainter;
 import org.eclipse.jface.text.source.CompositeRuler;
+import org.eclipse.jface.text.source.IAnnotationAccess;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
@@ -20,6 +22,8 @@ import cideplus.ui.presentation.VerticalRulerListener;
 public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 
 	private CustomAnnotationPainter customAnnotationPainter = null;
+
+	AnnotationPainter ap;
 
 	public IVerticalRulerListener verticalRulerListener = null;
 
@@ -38,6 +42,10 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 	//		return new SourceViewerConfig(textTools.getColorManager(), getPreferenceStore(), this, IJavaPartitions.JAVA_PARTITIONING);
 	//	}
 
+	@Override
+	public IAnnotationAccess getAnnotationAccess() {
+		return super.getAnnotationAccess();
+	}
 
 	@Override
 	protected ISourceViewer createJavaSourceViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler, boolean isOverviewRulerVisible, int styles, IPreferenceStore store) {

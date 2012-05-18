@@ -14,8 +14,10 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -29,6 +31,7 @@ import cideplus.ui.astview.ASTView;
 public class PluginUtils {
 
 	//private static Shell shell = null;
+	private static IWorkbenchWindow workbenchWindow;
 
 	private PluginUtils() {
 
@@ -46,12 +49,31 @@ public class PluginUtils {
 
 	/* retorna o editor sendo usado */
 	public static IEditorPart getCurrentEditor() {
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window != null) {
-			IWorkbenchPage page = window.getActivePage();
-			if (page != null) {
-				return page.getActiveEditor();
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+
+		if (workbench != null) {
+
+			// getActiveWorkbenchWindow() retorna null se não for chamado
+			// de uma thread de UI.
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					workbenchWindow = workbench.getActiveWorkbenchWindow();
+				}
+			});
+
+			if (workbenchWindow != null) {
+				IWorkbenchPage page = workbenchWindow.getActivePage();
+				if (page != null) {
+					return page.getActiveEditor();
+				}
+				else {
+					//					throw new RuntimeException("workbench window is null!");
+				}
 			}
+		}
+		else {
+			//			throw new RuntimeException("workbench is null!");
 		}
 		return null;
 	}

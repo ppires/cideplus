@@ -1,13 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-	
-   <!-- Popup menu do editor -->
+
+  <!--extension
+         id="javaeditor"
+         point="org.eclipse.ui.editors">
+      <editor
+            name="Featurer Java Editor"
+            default="true"
+            icon="$nl$/icons/jcu_obj.gif"
+            contributorClass="org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditorActionContributor"
+            class="cideplus.ui.editor.FeaturerCompilationUnitEditor"
+            symbolicFontName="org.eclipse.jdt.ui.editors.textfont"
+            id="cideplus.FeaturerCompilationUnitEditor"
+            extensions="java">
+      </editor>  
+   </extension-->
+   
+<!-- Extension para registrar listener do editor -->   
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="cideplus.ui.editor.EditorListener">
+      </startup>
+   </extension>
+
+
+<!-- Popup menu do editor -->
    <extension
          point="org.eclipse.ui.menus"
          id="cideplus.ui.editor.menuMarkFeature">
       <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.CompilationUnitEditor.EditorContext?after=additions">
+<!--      
             locationURI="popup:cideplus.FeaturerCompilationUnitEditor.EditorContext?after=additions">
+-->
          <menu 
                id="cideplus.editor.features.menu"
                label="Features">
@@ -242,31 +269,6 @@
      </perspectiveExtension>
   </extension>
   
-  <extension
-         id="javaeditor"
-         point="org.eclipse.ui.editors">
-      <editor
-            name="Featurer Java Editor"
-            default="true"
-            icon="$nl$/icons/jcu_obj.gif"
-            contributorClass="org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditorActionContributor"
-            class="cideplus.ui.editor.FeaturerCompilationUnitEditor"
-            symbolicFontName="org.eclipse.jdt.ui.editors.textfont"
-            id="cideplus.FeaturerCompilationUnitEditor"
-            extensions="java">
-            <!--contentTypeBinding
-               contentTypeId="org.eclipse.jdt.core.javaSource"
-            /--> 
-      </editor>  
-   </extension>
-   
-<!-- Extension para registrar listener do editor -->   
-  <!--extension
-        point="org.eclipse.ui.startup">
-     <startup
-           class="cideplus.PluginStartup">
-     </startup>
-  </extension-->
    
   <!-- extension para criar uma nova ruler -->
   <!--

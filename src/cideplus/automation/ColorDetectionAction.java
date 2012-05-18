@@ -94,8 +94,8 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import cideplus.FeaturerPlugin;
 import cideplus.model.Feature;
-import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.IFeaturesManager;
 
 public class ColorDetectionAction implements IObjectActionDelegate {

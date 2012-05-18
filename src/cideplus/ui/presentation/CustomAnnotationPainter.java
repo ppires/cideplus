@@ -64,6 +64,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 import org.eclipse.ui.texteditor.SimpleMarkerAnnotation;
 
 import cideplus.FeaturerPlugin;
@@ -118,6 +119,8 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 * @since 3.0
 	 */
 	private static final Object SQUIGGLES= new Object();
+
+	DefaultMarkerAnnotationAccess d;
 
 	/**
 	 * The squiggly painter strategy.
@@ -301,7 +304,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 		fPaintingStrategyId2PaintingStrategy.put(HIGHLIGHTING, HIGHLIGHTING_STRATEGY);
 
 		addAnnotationType(FeatureAnnotation.TYPE, null);
-		//		addHighlightAnnotationType(FeatureAnnotation.TYPE);
+		addHighlightAnnotationType(FeatureAnnotation.TYPE);
 	}
 
 	/**
@@ -1527,22 +1530,34 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 * @see org.eclipse.jface.text.IPainter#paint(int)
 	 */
 	public void paint(int reason) {
-		if (FeaturerPlugin.DEBUG_PRESENTATION)
+		if (FeaturerPlugin.DEBUG_PRESENTATION) {
 			System.out.println("paint(int reason)");
+			System.out.println(" - viewer class: " + fSourceViewer.getClass());
+		}
 
 		if (fSourceViewer.getDocument() == null) {
+			System.out.println(" - fSourceViewer.getDocument() == null");
 			deactivate(false);
 			return;
 		}
 
 		if (!fIsActive) {
+			System.out.println(" - painter NOT active...");
 			IAnnotationModel model= findAnnotationModel(fSourceViewer);
 			if (model != null) {
 				fIsActive= true;
+				System.out.println(" - painter activated!");
 				setModel(model);
+				System.out.println(" - Annotations model set!");
 			}
-		} else if (isRepaintReason(reason))
+			else
+				System.out.println(" - could not find annotation model from source viewer...");
+
+		}
+		else if (isRepaintReason(reason)) {
+			System.out.println(" - painter active! updating painting... (CustomAnnotationPainter)");
 			updatePainting(null);
+		}
 	}
 
 	/*

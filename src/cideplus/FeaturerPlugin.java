@@ -36,6 +36,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	public static final boolean DEBUG_SELECTION = false;
 	public static final boolean DEBUG_STYLE_CACHE = false;
 	public static final boolean DEBUG_PART_LISTENER = true;
+	public static final boolean DEBUG_PAINTER_MNGR = true;
 
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;
