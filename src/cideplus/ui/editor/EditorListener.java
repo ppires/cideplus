@@ -2,11 +2,19 @@ package cideplus.ui.editor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
+import org.eclipse.jdt.internal.ui.javaeditor.JavaSourceViewer;
+import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension4;
+import org.eclipse.jface.text.source.CompositeRuler;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.IVerticalRulerInfo;
+import org.eclipse.jface.text.source.IVerticalRulerInfoExtension;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener2;
@@ -17,18 +25,24 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
 import cideplus.FeaturerPlugin;
 import cideplus.ui.presentation.CustomAnnotationPainter;
+import cideplus.ui.presentation.RulerMouseListener;
+import cideplus.ui.presentation.VerticalRulerListener;
 
 public class EditorListener implements IPartListener2, IStartup {
 
-	private Map<ISourceViewer, CustomAnnotationPainter> registeredPainters = new HashMap<ISourceViewer, CustomAnnotationPainter>();
-	private Object registeredPaintersLock = new Object();
+	private static Map<ISourceViewer, CustomAnnotationPainter> registeredPainters = new HashMap<ISourceViewer, CustomAnnotationPainter>();
+	private static Object registeredPaintersLock = new Object();
+
+	//	private SelectAnnotationRulerAction rulerListener;
 
 	public EditorListener() {
 		super();
+		System.out.println("EditorListener.EditorListener() - asdf!");
 	}
 
 	@Override
@@ -54,9 +68,8 @@ public class EditorListener implements IPartListener2, IStartup {
 	 */
 	@Override
 	public void partOpened(IWorkbenchPartReference partRef) {
-		if (FeaturerPlugin.DEBUG_PART_LISTENER) {
+		if (FeaturerPlugin.DEBUG_PART_LISTENER)
 			System.out.println("EditorListener.partOpened(" + partRef.getPartName() + ")");
-		}
 
 		IWorkbenchPart part = partRef.getPart(true);
 		if (part != null && part instanceof IEditorPart) {
@@ -69,9 +82,8 @@ public class EditorListener implements IPartListener2, IStartup {
 	 */
 	@Override
 	public void partClosed(IWorkbenchPartReference partRef) {
-		if (FeaturerPlugin.DEBUG_PART_LISTENER) {
+		if (FeaturerPlugin.DEBUG_PART_LISTENER)
 			System.out.println("EditorListener.partClosed(" + partRef.getPartName() + ")");
-		}
 
 		IWorkbenchPart part = partRef.getPart(true);
 		if (part != null && part instanceof IEditorPart) {
@@ -80,23 +92,22 @@ public class EditorListener implements IPartListener2, IStartup {
 	}
 
 	@Override
-	public void partHidden(IWorkbenchPartReference partRef) { }
+	public void partHidden(IWorkbenchPartReference partRef) { if (FeaturerPlugin.DEBUG_PART_LISTENER) printPainters(); }
 
 	@Override
-	public void partVisible(IWorkbenchPartReference partRef) { }
+	public void partVisible(IWorkbenchPartReference partRef) { if (FeaturerPlugin.DEBUG_PART_LISTENER) printPainters(); }
 
 	@Override
-	public void partInputChanged(IWorkbenchPartReference partRef) { }
+	public void partInputChanged(IWorkbenchPartReference partRef) { if (FeaturerPlugin.DEBUG_PART_LISTENER) printPainters(); }
 
 	@Override
-	public void partActivated(IWorkbenchPartReference partRef) { }
+	public void partActivated(IWorkbenchPartReference partRef) { if (FeaturerPlugin.DEBUG_PART_LISTENER) printPainters(); }
 
 	@Override
-	public void partBroughtToTop(IWorkbenchPartReference partRef) { }
-
+	public void partBroughtToTop(IWorkbenchPartReference partRef) { if (FeaturerPlugin.DEBUG_PART_LISTENER) printPainters(); }
 
 	@Override
-	public void partDeactivated(IWorkbenchPartReference partRef) { }
+	public void partDeactivated(IWorkbenchPartReference partRef) { if (FeaturerPlugin.DEBUG_PART_LISTENER) printPainters(); }
 
 	/**
 	 * Register the painter in the editor.
@@ -105,10 +116,18 @@ public class EditorListener implements IPartListener2, IStartup {
 	private void configureJavaEditor(IEditorPart editorPart) {
 		if (editorPart instanceof JavaEditor) {
 			if (FeaturerPlugin.DEBUG_PART_LISTENER) {
-				System.out.println("Configuring editor (" + editorPart.getTitle() + ")");
+				System.out.println("\nConfiguring editor (" + editorPart.getTitle() + ")");
 			}
 
 			ISourceViewer viewer = ((JavaEditor) editorPart).getViewer();
+
+			if (FeaturerPlugin.DEBUG_PART_LISTENER) {
+				IAnnotationModel model = viewer.getAnnotationModel();
+				if (model == null)
+					System.out.println("  - annotationModel == null...");
+				else
+					System.out.println("annotationModel OK!");
+			}
 
 			CustomAnnotationPainter painter = new CustomAnnotationPainter(viewer, new DefaultMarkerAnnotationAccess());
 
@@ -123,9 +142,38 @@ public class EditorListener implements IPartListener2, IStartup {
 				((ITextViewerExtension2) viewer).addPainter(painter);
 			}
 
+			/* Registering listener vertical ruler */
+			Object obj = ((AbstractDecoratedTextEditor) editorPart).getAdapter(IVerticalRulerInfo.class);
+			if (obj != null && obj instanceof IVerticalRulerInfoExtension) {
+				System.out.println("obj IS IVerticalRulerInfoExtension");
+				((IVerticalRulerInfoExtension) obj).addVerticalRulerListener(new VerticalRulerListener());
+				if (obj instanceof CompositeRuler)
+					((CompositeRuler) obj).fireAnnotationSelected(null);
+				else
+					System.out.println("obj is NOT CompositeRuler");
+			}
+			else
+				System.out.println("obj is NOT IVerticalRulerInfoExtension");
+
+
+			/* Registering mouse listener. Workaround for the vertical ruler listener. */
+			if (obj instanceof IVerticalRulerInfo) {
+				Control widget = ((IVerticalRulerInfo) obj).getControl();
+				widget.addMouseListener(new RulerMouseListener(editorPart));
+			}
+			//			Control widget = viewer.getTextWidget();
+			IVerticalRulerInfoExtension c;
+
+
+
 			/* Saving editor and painter for deactivation later */
 			synchronized(registeredPaintersLock) {
 				registeredPainters.put(viewer, painter);
+
+				if (FeaturerPlugin.DEBUG_PART_LISTENER) {
+					System.out.println("   - Painter added");
+					printPainters();
+				}
 			}
 		}
 	}
@@ -157,6 +205,12 @@ public class EditorListener implements IPartListener2, IStartup {
 					((ITextViewerExtension2) viewer).removePainter(painter);
 				}
 
+				/* Unregistering listener vertical ruler */
+				Object obj = ((JavaEditor) editorPart).getAdapter(IVerticalRulerInfo.class);
+				if (obj != null && obj instanceof IVerticalRulerInfoExtension) {
+					//					((IVerticalRulerInfoExtension) obj).removeVerticalRulerListener(listener);
+				}
+
 				painter.deactivate(true);
 
 				synchronized(registeredPaintersLock) {
@@ -164,7 +218,7 @@ public class EditorListener implements IPartListener2, IStartup {
 				}
 			}
 			else
-				if (FeaturerPlugin.DEBUG_PAINTER_MNGR) {
+				if (FeaturerPlugin.DEBUG_PART_LISTENER) {
 					System.out.println("  - painter is null (probably wasn't in map)...");
 				}
 		}
@@ -176,9 +230,9 @@ public class EditorListener implements IPartListener2, IStartup {
 	 * @param window the active workbench window.
 	 */
 	private void updateOpenedEditors(IWorkbenchWindow window) {
-		if (FeaturerPlugin.DEBUG_PART_LISTENER) {
+		if (FeaturerPlugin.DEBUG_PART_LISTENER)
 			System.out.println("Updating opened editors...");
-		}
+
 
 		IWorkbenchPage page = window.getActivePage();
 		if (page != null) {
@@ -188,9 +242,42 @@ public class EditorListener implements IPartListener2, IStartup {
 				configureJavaEditor(editor);
 			}
 		} else {
-			if (FeaturerPlugin.DEBUG_PART_LISTENER) {
+			if (FeaturerPlugin.DEBUG_PART_LISTENER)
 				System.out.println("  - active page is null...");
+
+		}
+	}
+
+	/**
+	 * prints all registered painters.
+	 */
+	private void printPainters() {
+		System.out.println("\n-- Painters --");
+		synchronized(registeredPaintersLock) {
+			for (Entry<ISourceViewer, CustomAnnotationPainter> entry : registeredPainters.entrySet()) {
+				ISourceViewer viewer = entry.getKey();
+				if (viewer instanceof JavaSourceViewer) {
+					System.out.println("  File: " + ((JavaSourceViewer) viewer).getInput());
+				}
+				else {
+					System.out.println("  NOT Java Editor: " + viewer.getDocument());
+				}
+				System.out.println("\n");
 			}
+		}
+		System.out.println("--------------\n");
+	}
+
+
+	/**
+	 * returns the painter associated to the viewer.
+	 * @param viewer the viewer to get the painter
+	 * @return the painter associated with the viewer
+	 */
+	public static IPainter getPainter(ISourceViewer viewer) {
+		synchronized(registeredPaintersLock) {
+			IPainter painter = registeredPainters.get(viewer);
+			return painter;
 		}
 	}
 

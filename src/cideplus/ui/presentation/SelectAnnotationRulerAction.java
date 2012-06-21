@@ -82,6 +82,7 @@ public class SelectAnnotationRulerAction extends TextEditorAction implements IVe
 	/*
 	 * @see org.eclipse.ui.texteditor.IVerticalRulerListener#annotationSelected(org.eclipse.ui.texteditor.VerticalRulerEvent)
 	 */
+	@Override
 	public void annotationSelected(VerticalRulerEvent event) {
 		System.out.println("annotationSelected(VerticalRulerEvent event)");
 	}
@@ -89,6 +90,7 @@ public class SelectAnnotationRulerAction extends TextEditorAction implements IVe
 	/*
 	 * @see org.eclipse.ui.texteditor.IVerticalRulerListener#annotationDefaultSelected(org.eclipse.ui.texteditor.VerticalRulerEvent)
 	 */
+	@Override
 	public void annotationDefaultSelected(VerticalRulerEvent event) {
 		System.out.println("annotationDefaultSelected(VerticalRulerEvent event)");
 		Annotation a= event.getSelectedAnnotation();
@@ -103,6 +105,7 @@ public class SelectAnnotationRulerAction extends TextEditorAction implements IVe
 	/*
 	 * @see org.eclipse.ui.texteditor.IVerticalRulerListener#annotationContextMenuAboutToShow(org.eclipse.ui.texteditor.VerticalRulerEvent, org.eclipse.swt.widgets.Menu)
 	 */
+	@Override
 	public void annotationContextMenuAboutToShow(VerticalRulerEvent event, Menu menu) {
 		System.out.println("annotationContextMenuAboutToShow(VerticalRulerEvent event, Menu menu)");
 	}

@@ -11,7 +11,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.menus.UIElement;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
@@ -39,13 +38,12 @@ public class ToggleFeatureHandler extends AbstractHandler implements IElementUpd
 
 	}
 
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		/* Testando */
 		//		ITextEditor editor = PluginUtils.getCurrentTextEditor();
-		//		System.out.println();
-		ITextEditor editor = PluginUtils.getCurrentTextEditor();
-		System.out.println("editor class: " + editor.getClass());
+		//		System.out.println("editor class: " + editor.getClass());
 
 
 		int featureId = Integer.parseInt(event.getParameter(MenuContentProvider.paramFeatureId));
@@ -78,6 +76,7 @@ public class ToggleFeatureHandler extends AbstractHandler implements IElementUpd
 		return null;
 	}
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public void updateElement(UIElement element, Map parameters) {
 		Boolean checked = new Boolean((String) parameters.get(MenuContentProvider.paramChecked));

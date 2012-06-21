@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -40,6 +41,7 @@ import org.eclipse.jface.text.JFaceTextUtil;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextPresentation;
+import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.AnnotationModelEvent;
 import org.eclipse.jface.text.source.AnnotationPainter;
@@ -65,6 +67,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
+import org.eclipse.ui.texteditor.MarkerUtilities;
 import org.eclipse.ui.texteditor.SimpleMarkerAnnotation;
 
 import cideplus.FeaturerPlugin;
@@ -86,6 +89,24 @@ import cideplus.utils.PluginUtils;
  * @since 2.1
  */
 public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnotationModelListener, IAnnotationModelListenerExtension, ITextPresentationListener {
+
+	/**
+	 * Controle para saber se o annottion model já foi setado
+	 */
+	private boolean annotationModelFirstSet = false;
+
+	/**
+	 * Map para guardar o marker a ser colorido no modo light.
+	 */
+	private Map<IResource, Long> markerToPaint = new HashMap<IResource, Long>();
+
+	/**
+	 * boolean que controla se o painter está no modo "light".
+	 */
+	private boolean isLightModeOn;
+
+
+
 
 
 	/**
@@ -340,8 +361,9 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 		if (fIsPainting) {
 			fIsPainting= false;
 			fTextWidget.removePaintListener(this);
-			if (redraw && hasDecorations())
+			if (redraw && hasDecorations()) {
 				handleDrawRequest(null);
+			}
 		}
 	}
 
@@ -353,14 +375,16 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 */
 	private void setModel(IAnnotationModel model) {
 		if (fModel != model) {
-			if (fModel != null)
+			if (fModel != null) {
 				fModel.removeAnnotationModelListener(this);
+			}
 			fModel= model;
 			if (fModel != null) {
 				try {
 					fIsSettingModel= true;
 					fModel.addAnnotationModelListener(this);
 				} finally {
+					annotationModelFirstSet = true;
 					fIsSettingModel= false;
 				}
 			}
@@ -375,10 +399,15 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void catchupWithModel(AnnotationModelEvent event) {
+		if (FeaturerPlugin.DEBUG_PRESENTATION)
+			System.out.println("CustomAnnotationPainter.catchupWithModel()");
 
 		synchronized (fDecorationMapLock) {
-			if (fDecorationsMap == null)
+			if (fDecorationsMap == null) {
+				if (FeaturerPlugin.DEBUG_PRESENTATION)
+					System.out.println("  - fDecorationsMap == null.\n      - returning...");
 				return;
+			}
 		}
 
 		if (fModel == null) {
@@ -388,6 +417,11 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 			}
 			synchronized (fHighlightedDecorationsMapLock) {
 				fHighlightedDecorationsMap.clear();
+			}
+			if (FeaturerPlugin.DEBUG_PRESENTATION) {
+				System.out.println("  - fModel == null");
+				System.out.println("      - clearing maps...");
+				System.out.println("      - returning...");
 			}
 			return;
 		}
@@ -419,7 +453,9 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 			isWorldChange= true;
 
 			if (DEBUG && event == null)
+			{
 				System.out.println("AP: INTERNAL CHANGE"); //$NON-NLS-1$
+			}
 
 			Iterator iter= decorationsMap.entrySet().iterator();
 			while (iter.hasNext()) {
@@ -475,8 +511,9 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 					isHighlighting= true;
 					// The call below updates the decoration - no need to create new decoration
 					decoration= getDecoration(annotation, decoration);
-					if (decoration == null)
+					if (decoration == null) {
 						highlightedDecorationsMap.remove(annotation);
+					}
 				} else {
 					decoration= getDecoration(annotation, decoration);
 					if (decoration != null && decoration.fPaintingStrategy instanceof ITextStyleStrategy) {
@@ -488,10 +525,11 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 				boolean usesDrawingStrategy= !isHighlighting && decoration != null;
 
 				Position position= null;
-				if (decoration == null)
+				if (decoration == null) {
 					position= fModel.getPosition(annotation);
-				else
+				} else {
 					position= decoration.fPosition;
+				}
 
 				if (position != null && !position.isDeleted()) {
 					if (isHighlighting) {
@@ -510,10 +548,11 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 					Decoration oldDecoration= (Decoration)decorationsMap.get(annotation);
 					if (oldDecoration != null) {
 						drawDecoration(oldDecoration, null, annotation, clippingRegion, document);
-						if (decoration != null)
+						if (decoration != null) {
 							decorationsMap.put(annotation, decoration);
-						else
+						} else {
 							decorationsMap.remove(annotation);
+						}
 					}
 				}
 			}
@@ -569,10 +608,12 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 				maxRangeEnd= Math.max(maxRangeEnd, fTotalHighlightAnnotationRange.offset + fTotalHighlightAnnotationRange.length);
 			}
 
-			if (fTotalHighlightAnnotationRange == null)
+			if (fTotalHighlightAnnotationRange == null) {
 				fTotalHighlightAnnotationRange= new Position(0);
-			if (fCurrentHighlightAnnotationRange == null)
+			}
+			if (fCurrentHighlightAnnotationRange == null) {
 				fCurrentHighlightAnnotationRange= new Position(0);
+			}
 
 			if (isWorldChange) {
 				fTotalHighlightAnnotationRange.offset= highlightAnnotationRangeStart;
@@ -617,10 +658,12 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 				maxRangeEnd= Math.max(maxRangeEnd, fTotalDrawRange.offset + fTotalDrawRange.length);
 			}
 
-			if (fTotalDrawRange == null)
+			if (fTotalDrawRange == null) {
 				fTotalDrawRange= new Position(0);
-			if (fCurrentDrawRange == null)
+			}
+			if (fCurrentDrawRange == null) {
 				fCurrentDrawRange= new Position(0);
+			}
 
 			if (isWorldChange) {
 				fTotalDrawRange.offset= drawRangeStart;
@@ -690,8 +733,9 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 		if (position == null || position.isDeleted())
 			return null;
 
-		if (decoration == null)
+		if (decoration == null) {
 			decoration= new Decoration();
+		}
 
 		decoration.fPosition= position;
 		decoration.fColor= color;
@@ -805,9 +849,8 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 				e.printStackTrace();
 			}
 
-			if (feature != null) {
+			if (feature != null)
 				return new Color(Display.getDefault(), FeaturesConfigurationUtil.getRGB(feature));
-			}
 		}
 		return null;
 	}
@@ -820,14 +863,15 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 */
 	private void updatePainting(AnnotationModelEvent event) {
 		if (FeaturerPlugin.DEBUG_PRESENTATION)
-			System.out.println("updatePainting(AnnotationModelEvent event)");
+			System.out.println("CustomAnnotationPainter.updatePainting()");
 
 		disablePainting(event == null);
 
 		catchupWithModel(event);
 
-		if (!fInputDocumentAboutToBeChanged)
+		if (!fInputDocumentAboutToBeChanged) {
 			invalidateTextPresentation();
+		}
 
 		enablePainting();
 	}
@@ -835,15 +879,18 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	private void invalidateTextPresentation() {
 		IRegion r= null;
 		synchronized (fHighlightedDecorationsMapLock) {
-			if (fCurrentHighlightAnnotationRange != null)
+			if (fCurrentHighlightAnnotationRange != null) {
 				r= new Region(fCurrentHighlightAnnotationRange.getOffset(), fCurrentHighlightAnnotationRange.getLength());
+			}
 		}
 		if (r == null)
 			return;
 
 		if (fSourceViewer instanceof ITextViewerExtension2) {
 			if (DEBUG)
+			{
 				System.out.println("AP: invalidating offset: " + r.getOffset() + ", length= " + r.getLength()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 
 			((ITextViewerExtension2)fSourceViewer).invalidateTextPresentation(r.getOffset(), r.getLength());
 
@@ -856,16 +903,22 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 * @see org.eclipse.jface.text.ITextPresentationListener#applyTextPresentation(org.eclipse.jface.text.TextPresentation)
 	 * @since 3.0
 	 */
+	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void applyTextPresentation(TextPresentation tp) {
 		if (FeaturerPlugin.DEBUG_PRESENTATION)
-			System.out.println("Applying text presentation from CustomAnnotationPainter!");
+			System.out.println("CustomAnnotationPainter.applyTextPresentation()");
 
 		Set decorations;
 
 		synchronized (fHighlightedDecorationsMapLock) {
-			if (fHighlightedDecorationsMap == null || fHighlightedDecorationsMap.isEmpty())
+			if (fHighlightedDecorationsMap == null || fHighlightedDecorationsMap.isEmpty()) {
+				if (FeaturerPlugin.DEBUG_PRESENTATION) {
+					System.out.println("  - fHighlightedDecorationsMap == null || fHighlightedDecorationsMap.isEmpty()");
+					System.out.println("      - returning...");
+				}
 				return;
+			}
 
 			decorations= new HashSet(fHighlightedDecorationsMap.entrySet());
 		}
@@ -873,7 +926,9 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 		IRegion region= tp.getExtent();
 
 		if (DEBUG)
+		{
 			System.out.println("AP: applying text presentation offset: " + region.getOffset() + ", length= " + region.getLength()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 
 		for (int layer= 0, maxLayer= 1;	layer < maxLayer; layer++) {
 
@@ -881,20 +936,45 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 				Map.Entry entry= (Map.Entry)iter.next();
 
 				Annotation a= (Annotation)entry.getKey();
-				if (a.isMarkedDeleted())
+				if (a.isMarkedDeleted()) {
 					continue;
+				}
+
+
+				// FIXME: Não é necessário iterar sobre todas as annotations para pintar somente uma.
+				// Traps to paint only one marker, when the light mode is on
+				if (isLightModeOn) {
+					if (!(a instanceof SimpleMarkerAnnotation)) {
+						continue;
+					}
+					else {
+						IMarker marker = ((SimpleMarkerAnnotation) a).getMarker();
+						IResource resource = marker.getResource();
+						if (!markerToPaint.containsKey(resource)) {
+							continue;
+						}
+						else {
+							if (marker.getId() != markerToPaint.get(resource))
+								continue;
+						}
+					}
+				}
+
+
 
 				Decoration pp = (Decoration)entry.getValue();
 
 				maxLayer= Math.max(maxLayer, pp.fLayer + 1); // dynamically update layer maximum
-				if (pp.fLayer != layer)	// wrong layer: skip annotation
+				if (pp.fLayer != layer) {
 					continue;
+				}
 
 				Position p= pp.fPosition;
 				if (fSourceViewer instanceof ITextViewerExtension5) {
 					ITextViewerExtension5 extension3= (ITextViewerExtension5) fSourceViewer;
-					if (null == extension3.modelRange2WidgetRange(new Region(p.getOffset(), p.getLength())))
+					if (null == extension3.modelRange2WidgetRange(new Region(p.getOffset(), p.getLength()))) {
 						continue;
+					}
 				} else if (!fSourceViewer.overlapsWithVisibleRegion(p.offset, p.length)) {
 					continue;
 				}
@@ -916,9 +996,12 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	/*
 	 * @see org.eclipse.jface.text.source.IAnnotationModelListener#modelChanged(org.eclipse.jface.text.source.IAnnotationModel)
 	 */
+	@Override
 	public synchronized void modelChanged(final IAnnotationModel model) {
 		if (DEBUG)
+		{
 			System.err.println("AP: OLD API of AnnotationModelListener called"); //$NON-NLS-1$
+		}
 
 		modelChanged(new AnnotationModelEvent(model));
 	}
@@ -926,6 +1009,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	/*
 	 * @see org.eclipse.jface.text.source.IAnnotationModelListenerExtension#modelChanged(org.eclipse.jface.text.source.AnnotationModelEvent)
 	 */
+	@Override
 	public void modelChanged(final AnnotationModelEvent event) {
 		Display textWidgetDisplay;
 		try {
@@ -941,15 +1025,14 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 
 		if (fIsSettingModel) {
 			// inside the UI thread -> no need for posting
-			if (textWidgetDisplay == Display.getCurrent())
+			if (textWidgetDisplay == Display.getCurrent()) {
 				updatePainting(event);
-			else {
+			} else
 				/*
 				 * we can throw away the changes since
 				 * further update painting will happen
 				 */
 				return;
-			}
 		} else {
 			if (DEBUG && event != null && event.isWorldChange()) {
 				System.out.println("AP: WORLD CHANGED, stack trace follows:"); //$NON-NLS-1$
@@ -962,9 +1045,11 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 			// now and running the posted runnable, the position information
 			// is not accurate any longer.
 			textWidgetDisplay.asyncExec(new Runnable() {
+				@Override
 				public void run() {
-					if (fTextWidget != null && !fTextWidget.isDisposed())
+					if (fTextWidget != null && !fTextWidget.isDisposed()) {
 						updatePainting(event);
+					}
 				}
 			});
 		}
@@ -978,10 +1063,11 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 */
 	@SuppressWarnings("unchecked")
 	public void setAnnotationTypeColor(Object annotationType, Color color) {
-		if (color != null)
+		if (color != null) {
 			fAnnotationType2Color.put(annotationType, color);
-		else
+		} else {
 			fAnnotationType2Color.remove(annotationType);
+		}
 		fCachedAnnotationType2Color.clear();
 	}
 
@@ -1022,6 +1108,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 				/*
 				 * @see org.eclipse.jface.text.ITextInputListener#inputDocumentAboutToBeChanged(org.eclipse.jface.text.IDocument, org.eclipse.jface.text.IDocument)
 				 */
+				@Override
 				public void inputDocumentAboutToBeChanged(IDocument oldInput, IDocument newInput) {
 					fInputDocumentAboutToBeChanged= true;
 				}
@@ -1029,6 +1116,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 				/*
 				 * @see org.eclipse.jface.text.ITextInputListener#inputDocumentChanged(org.eclipse.jface.text.IDocument, org.eclipse.jface.text.IDocument)
 				 */
+				@Override
 				public void inputDocumentChanged(IDocument oldInput, IDocument newInput) {
 					fInputDocumentAboutToBeChanged= false;
 				}
@@ -1157,6 +1245,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	/*
 	 * @see org.eclipse.jface.text.IPainter#dispose()
 	 */
+	@Override
 	public void dispose() {
 
 		if (fAnnotationType2Color != null) {
@@ -1224,8 +1313,9 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 			try {
 				IDocument document= fSourceViewer.getDocument();
 
-				if (bottom >= document.getNumberOfLines())
+				if (bottom >= document.getNumberOfLines()) {
 					bottom= document.getNumberOfLines() - 1;
+				}
 
 				return document.getLineOffset(bottom) + document.getLineLength(bottom);
 			} catch (BadLocationException x) {
@@ -1238,9 +1328,11 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	/*
 	 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
 	 */
+	@Override
 	public void paintControl(PaintEvent event) {
-		if (fTextWidget != null)
+		if (fTextWidget != null) {
 			handleDrawRequest(event);
+		}
 	}
 
 	/**
@@ -1251,10 +1343,9 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void handleDrawRequest(PaintEvent event) {
 
-		if (fTextWidget == null) {
+		if (fTextWidget == null)
 			// is already disposed
 			return;
-		}
 
 		IRegion clippingRegion= computeClippingRegion(event, false);
 		if (clippingRegion == null)
@@ -1285,8 +1376,9 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 			// prune any annotation that is not drawable or does not need drawing
 			if (!(a.isMarkedDeleted() || skip(a) || !regionsTouchOrOverlap(pp.fPosition.getOffset(), pp.fPosition.getLength(), vOffset, vLength))) {
 				// ensure sized appropriately
-				for (int i= toBeDrawn.size(); i <= pp.fLayer; i++)
+				for (int i= toBeDrawn.size(); i <= pp.fLayer; i++) {
 					toBeDrawn.add(new LinkedList());
+				}
 				((List) toBeDrawn.get(pp.fLayer)).add(entry);
 			}
 		}
@@ -1391,11 +1483,12 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 			// happens if the editor is not "full", e.g. the last line of the document is visible in the editor
 			try {
 				int lastVisibleLine= JFaceTextUtil.getPartialBottomIndex(fTextWidget);
-				if (lastVisibleLine == fTextWidget.getLineCount() - 1)
+				if (lastVisibleLine == fTextWidget.getLineCount() - 1) {
 					// last line
 					widgetEndOffset= fTextWidget.getCharCount();
-				else
+				} else {
 					widgetEndOffset= fTextWidget.getOffsetAtLine(lastVisibleLine + 1) - 1;
+				}
 			} catch (IllegalArgumentException ex2) { // above try code might fail too
 				widgetEndOffset= fTextWidget.getCharCount();
 			}
@@ -1493,6 +1586,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	/*
 	 * @see org.eclipse.jface.text.IPainter#deactivate(boolean)
 	 */
+	@Override
 	public void deactivate(boolean redraw) {
 		if (fIsActive) {
 			fIsActive= false;
@@ -1521,41 +1615,62 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 * @since 3.0
 	 */
 	protected IAnnotationModel findAnnotationModel(ISourceViewer sourceViewer) {
+		if (FeaturerPlugin.DEBUG_PRESENTATION)
+			System.out.println("CustomAnnotationPainter.findAnnotationModel()");
+
 		if(sourceViewer != null)
 			return sourceViewer.getAnnotationModel();
+
+		if (FeaturerPlugin.DEBUG_PRESENTATION)
+			System.out.println("  - sourceViewer == null\n  - returning null...");
 		return null;
 	}
 
 	/*
 	 * @see org.eclipse.jface.text.IPainter#paint(int)
 	 */
+	@Override
 	public void paint(int reason) {
-		if (FeaturerPlugin.DEBUG_PRESENTATION) {
-			System.out.println("paint(int reason)");
-			System.out.println(" - viewer class: " + fSourceViewer.getClass());
-		}
+		if (FeaturerPlugin.DEBUG_PRESENTATION)
+			System.out.println("CustomAnnotationPainter.paint()");
 
 		if (fSourceViewer.getDocument() == null) {
-			System.out.println(" - fSourceViewer.getDocument() == null");
+			if (FeaturerPlugin.DEBUG_PRESENTATION)
+				System.out.println("  - fSourceViewer.getDocument() == null");
 			deactivate(false);
 			return;
 		}
 
 		if (!fIsActive) {
-			System.out.println(" - painter NOT active...");
+			if (FeaturerPlugin.DEBUG_PRESENTATION)
+				System.out.println("  - painter NOT active...");
+
 			IAnnotationModel model= findAnnotationModel(fSourceViewer);
 			if (model != null) {
 				fIsActive= true;
-				System.out.println(" - painter activated!");
+				if (FeaturerPlugin.DEBUG_PRESENTATION)
+					System.out.println("  - painter activated!");
 				setModel(model);
-				System.out.println(" - Annotations model set!");
+				if (FeaturerPlugin.DEBUG_PRESENTATION)
+					System.out.println("  - Annotations model set!");
+			} else {
+				if (FeaturerPlugin.DEBUG_PRESENTATION) {
+					System.out.println("  - could not find annotations model from source viewer.");
+					System.out.println("      - painter still disabled...");
+				}
 			}
-			else
-				System.out.println(" - could not find annotation model from source viewer...");
 
 		}
 		else if (isRepaintReason(reason)) {
-			System.out.println(" - painter active! updating painting... (CustomAnnotationPainter)");
+			if (FeaturerPlugin.DEBUG_PRESENTATION)
+				System.out.println("  - painter active! updating painting...");
+
+			if (!annotationModelFirstSet) {
+				IAnnotationModel model = findAnnotationModel(fSourceViewer);
+				setModel(model);
+				if (FeaturerPlugin.DEBUG_PRESENTATION)
+					System.out.println("  - model wasn't set...");
+			}
 			updatePainting(null);
 		}
 	}
@@ -1563,6 +1678,114 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	/*
 	 * @see org.eclipse.jface.text.IPainter#setPositionManager(org.eclipse.jface.text.IPaintPositionManager)
 	 */
+	@Override
 	public void setPositionManager(IPaintPositionManager manager) {
+	}
+
+
+	/* Métodos para ligar/desligar modo "light" */
+
+	private void setLightModeOn() {
+		disablePainting(true);
+		isLightModeOn = true;
+		markerToPaint.clear();
+		invalidateTextPresentation();
+		paint(INTERNAL);
+		enablePainting();
+
+		if (FeaturerPlugin.DEBUG_LIGHT_MODE)
+			System.out.println("  light mode turned ON");
+	}
+
+	private void setLightModeOff() {
+		disablePainting(true);
+		isLightModeOn = false;
+		markerToPaint.clear();
+		invalidateTextPresentation();
+		paint(INTERNAL);
+		enablePainting();
+
+		if (FeaturerPlugin.DEBUG_LIGHT_MODE)
+			System.out.println("  light mode turned OFF");
+	}
+
+
+	/**
+	 * sets the annotation to be painted in light mode,
+	 * when the user clicks on vertical ruler.
+	 * 
+	 * @param annotation
+	 */
+	public void setAnnotationToPaint(Annotation annotation) {
+		if (FeaturerPlugin.DEBUG_LIGHT_MODE) {
+			System.out.println("CustomAnnotationPainter.setAnnotationToPaint()");
+			System.out.println("  painter active? " + (fIsActive ? "YES!" : "NO..."));
+		}
+
+		if (isLightModeOn) {
+			if (FeaturerPlugin.DEBUG_LIGHT_MODE)
+				System.out.println("  light mode is ON");
+
+			disablePainting(true);
+			markerToPaint.clear();
+			if (annotation instanceof SimpleMarkerAnnotation) {
+				IMarker marker = ((SimpleMarkerAnnotation) annotation).getMarker();
+				IResource resource = marker.getResource();
+				markerToPaint.put(resource, marker.getId());
+
+				if (FeaturerPlugin.DEBUG_LIGHT_MODE) {
+					System.out.println("  - resource: " + resource.getName());
+					System.out.println("  - line: " + marker.getAttribute(IMarker.LINE_NUMBER, 0));
+				}
+			}
+			else {
+				if (FeaturerPlugin.DEBUG_LIGHT_MODE)
+					System.out.println("  Annotation isn't marker annotation...");
+			}
+			invalidateTextPresentation();
+			enablePainting();
+			TextViewer v;
+
+		}
+		else {
+			if (FeaturerPlugin.DEBUG_LIGHT_MODE)
+				System.out.println("  light mode is OFF");
+		}
+	}
+
+	/**
+	 * if the line number line_number has an annotation associated
+	 * with it, sets this annotation to be painted when in "light mode".
+	 * 
+	 * @param annotation
+	 */
+	public void setAnnotationToPaint(int line_number) {
+		IAnnotationModel model = fSourceViewer.getAnnotationModel();
+		@SuppressWarnings("rawtypes")
+		Iterator it = model.getAnnotationIterator();
+		while (it.hasNext()) {
+			Annotation a = (Annotation) it.next();
+			if (a instanceof SimpleMarkerAnnotation) {
+				IMarker marker = ((SimpleMarkerAnnotation) a).getMarker();
+				// FIXME: if there's more than 1 annotation in the same line
+				// it will get the first. Must implement some way to
+				// enable the user to choose which annotation to paint.
+				if (line_number == MarkerUtilities.getLineNumber(marker)) {
+					setAnnotationToPaint(a);
+					break;
+				}
+			}
+		}
+	}
+
+	public boolean isLightModeOn() {
+		return isLightModeOn;
+	}
+
+	public void toggleLightMode() {
+		if (isLightModeOn)
+			setLightModeOff();
+		else
+			setLightModeOn();
 	}
 }

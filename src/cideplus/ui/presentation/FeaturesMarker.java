@@ -18,6 +18,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.MarkerUtilities;
@@ -40,6 +41,9 @@ public class FeaturesMarker {
 
 		if (FeaturerPlugin.DEBUG_MARKERS)
 			printAllRelatedMarkers(resource, false);
+
+		IWorkbenchActionConstants a;
+		SelectAnnotationRulerAction sra;
 
 		return marker;
 	}
@@ -130,7 +134,9 @@ public class FeaturesMarker {
 	}
 
 
-	/* Returns a list of markers that are linked to the resource or any sub resource of the resource */
+	/**
+	 *  Returns a list of markers that are linked to the resource or any sub resource of the resource
+	 */
 	public static List<IMarker> findAllRelatedMarkers(IResource  resource) {
 		try {
 			return Arrays.asList(resource.findMarkers(TYPE, true, IResource.DEPTH_INFINITE));
@@ -139,7 +145,11 @@ public class FeaturesMarker {
 		}
 	}
 
-	/* Returns a list of markers that are linked to the resource or any sub resource of the resource */
+	/**
+	 * Returns a list of markers that are linked to the resource or any sub resource of the resource
+	 * 
+	 * @return the list of markers
+	 */
 	public static List<IMarker> findAllMarkers() {
 		IWorkspaceRoot root = PluginUtils.getWorkspaceRoot();
 		try {
@@ -173,13 +183,7 @@ public class FeaturesMarker {
 			String featureName = feature.getName();
 			//			String code = document.get(offset, length);
 			//			infoMessage = "(" + featureName + ") " + code;
-			infoMessage = "Feature: " + featureName;
-
-			String lineSeparator = System.getProperty("line.separator");
-			infoMessage.replaceAll(lineSeparator, "<br />");
-			System.out.println("info: " + infoMessage.replaceAll(lineSeparator, "<br />").replaceAll("\r", ""));
-
-			System.out.println("'\\n' matches \n ? " + "\n".matches("\n"));
+			infoMessage = " Feature: " + featureName;
 
 		} catch (CoreException e1) {
 			// TODO Auto-generated catch block
@@ -202,7 +206,7 @@ public class FeaturesMarker {
 		// Setting the charStart and charEnd attributes.
 		MarkerUtilities.setCharStart(attributes, offset);
 		MarkerUtilities.setCharEnd(attributes, offset + length);
-		MarkerUtilities.setMessage(attributes, infoMessage.replaceAll("\n", "<br />").replaceAll("\r", ""));
+		MarkerUtilities.setMessage(attributes, infoMessage);
 		attributes.put("featureId", new Integer(featureId));
 		attributes.put("length", new Integer(length));
 		//		attributes.put(IMarker.MESSAGE, "A sample marker message!");

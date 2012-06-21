@@ -9,10 +9,12 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
+import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -216,6 +218,13 @@ public class PluginUtils {
 		if (editor != null)
 			return editor.getDocumentProvider().getAnnotationModel(editor.getEditorInput());
 
+		return null;
+	}
+
+	public static ISourceViewer getCurrentSourceViewer() {
+		IEditorPart editor = getCurrentEditor();
+		if (editor != null && editor instanceof JavaEditor)
+			return ((JavaEditor) editor).getViewer();
 		return null;
 	}
 

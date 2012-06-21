@@ -4,12 +4,17 @@ import java.io.InputStream;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.text.IPainter;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import cideplus.ui.astview.ASTViewPlugin;
+import cideplus.ui.editor.EditorListener;
+import cideplus.ui.presentation.CustomAnnotationPainter;
+import cideplus.utils.PluginUtils;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -35,8 +40,8 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	public static final boolean DEBUG_RULER_LISTENER = false;
 	public static final boolean DEBUG_SELECTION = false;
 	public static final boolean DEBUG_STYLE_CACHE = false;
-	public static final boolean DEBUG_PART_LISTENER = true;
-	public static final boolean DEBUG_PAINTER_MNGR = true;
+	public static final boolean DEBUG_PART_LISTENER = false;
+	public static final boolean DEBUG_LIGHT_MODE = true;
 
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;
@@ -104,29 +109,16 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 
-	//	private void installEditorListener() {
-	//		IWorkbench workbench = PlatformUI.getWorkbench();
-	//		if (workbench != null) {
-	//			editorListener = new EditorListener();
-	//			IPartService service = (IPartService) workbench.getService(IPartService.class);
-	//			service.addPartListener(editorListener);
-	//		}
-	//		else {
-	//			if (FeaturerPlugin.DEBUG_PART_LISTENER)
-	//				System.out.println("workbench == null (install)");
-	//		}
-	//	}
-	//
-	//	private void uninstallEditorListener() {
-	//		IWorkbench workbench = PlatformUI.getWorkbench();
-	//		if (workbench != null) {
-	//			IPartService service = (IPartService) workbench.getService(IPartService.class);
-	//			service.removePartListener(editorListener);
-	//			editorListener = null;
-	//		}
-	//		else {
-	//			if (FeaturerPlugin.DEBUG_PART_LISTENER)
-	//				System.out.println("workbench == null (uninstall)");
-	//		}
-	//	}
+	/**
+	 * Toggles the plugin "light mode" (hidden colors).
+	 */
+	public static void toggleLightMode() {
+		ISourceViewer viewer = PluginUtils.getCurrentSourceViewer();
+		IPainter painter = EditorListener.getPainter(viewer);
+		if (painter instanceof CustomAnnotationPainter)
+			((CustomAnnotationPainter) painter).toggleLightMode();
+		else
+			if (DEBUG_LIGHT_MODE)
+				System.out.println("toggling light mode: painter is NOT CustomAnnotationPainter");
+	}
 }
