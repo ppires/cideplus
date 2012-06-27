@@ -41,10 +41,8 @@ import org.eclipse.jface.text.JFaceTextUtil;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextPresentation;
-import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.AnnotationModelEvent;
-import org.eclipse.jface.text.source.AnnotationPainter;
 import org.eclipse.jface.text.source.AnnotationPainter.HighlightingStrategy;
 import org.eclipse.jface.text.source.AnnotationPainter.IDrawingStrategy;
 import org.eclipse.jface.text.source.AnnotationPainter.ITextStyleStrategy;
@@ -179,7 +177,6 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 		 */
 		private Object fPaintingStrategy;
 
-		AnnotationPainter ap;
 	}
 
 
@@ -877,24 +874,29 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	}
 
 	private void invalidateTextPresentation() {
-		IRegion r= null;
+		IRegion r = null;
 		synchronized (fHighlightedDecorationsMapLock) {
 			if (fCurrentHighlightAnnotationRange != null) {
 				r= new Region(fCurrentHighlightAnnotationRange.getOffset(), fCurrentHighlightAnnotationRange.getLength());
 			}
 		}
-		if (r == null)
+		if (!isLightModeOn() && r == null)
 			return;
 
-		if (fSourceViewer instanceof ITextViewerExtension2) {
-			if (DEBUG)
-			{
-				System.out.println("AP: invalidating offset: " + r.getOffset() + ", length= " + r.getLength()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (r != null) {
+			if (fSourceViewer instanceof ITextViewerExtension2) {
+				if (DEBUG)
+				{
+					System.out.println("AP: invalidating offset: " + r.getOffset() + ", length= " + r.getLength()); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				((ITextViewerExtension2)fSourceViewer).invalidateTextPresentation(r.getOffset(), r.getLength());
+
+			} else {
+				fSourceViewer.invalidateTextPresentation();
 			}
-
-			((ITextViewerExtension2)fSourceViewer).invalidateTextPresentation(r.getOffset(), r.getLength());
-
-		} else {
+		}
+		else {
 			fSourceViewer.invalidateTextPresentation();
 		}
 	}
@@ -1673,6 +1675,11 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 			}
 			updatePainting(null);
 		}
+		else {
+			if (FeaturerPlugin.DEBUG_PRESENTATION) {
+				System.out.println("  = painter active but reason isn't good enough...");
+			}
+		}
 	}
 
 	/*
@@ -1683,8 +1690,12 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	}
 
 
-	/* Métodos para ligar/desligar modo "light" */
 
+	/**
+	 * LIGHT MODE
+	 */
+
+	/* Métodos para ligar/desligar modo "light" */
 	private void setLightModeOn() {
 		disablePainting(true);
 		isLightModeOn = true;
@@ -1728,8 +1739,9 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 
 			disablePainting(true);
 			markerToPaint.clear();
+			IMarker marker = null;
 			if (annotation instanceof SimpleMarkerAnnotation) {
-				IMarker marker = ((SimpleMarkerAnnotation) annotation).getMarker();
+				marker = ((SimpleMarkerAnnotation) annotation).getMarker();
 				IResource resource = marker.getResource();
 				markerToPaint.put(resource, marker.getId());
 
@@ -1743,8 +1755,11 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 					System.out.println("  Annotation isn't marker annotation...");
 			}
 			invalidateTextPresentation();
+			//			int offset = MarkerUtilities.getCharStart(marker);
+			//			int length = MarkerUtilities.getCharEnd(marker) - offset;
+			//			((ITextViewerExtension2)fSourceViewer).invalidateTextPresentation(0, 1000);
 			enablePainting();
-			TextViewer v;
+			//			TextViewer v;
 
 		}
 		else {
@@ -1757,7 +1772,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 * if the line number line_number has an annotation associated
 	 * with it, sets this annotation to be painted when in "light mode".
 	 * 
-	 * @param annotation
+	 * @param the line number where the annotation is
 	 */
 	public void setAnnotationToPaint(int line_number) {
 		IAnnotationModel model = fSourceViewer.getAnnotationModel();

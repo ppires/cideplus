@@ -121,6 +121,26 @@ public class EditorListener implements IPartListener2, IStartup {
 
 			ISourceViewer viewer = ((JavaEditor) editorPart).getViewer();
 
+
+			//			Object object = ((JavaEditor) editorPart).getAdapter(AnnotationPainter.class);
+			//			if (object != null) {
+			//				if (object instanceof AnnotationPainter)
+			//					System.out.println("object IS AnnotationPainter!");
+			//				else
+			//					System.out.println("object is NOT AnnotationPainter...");
+			//			}
+			//			else {
+			//				System.out.println("object IS null...");
+			//			}
+
+			//			((JavaEditor) editorPart).getSourceViewerDecorationSupport(viewer);
+
+
+
+
+
+
+
 			if (FeaturerPlugin.DEBUG_PART_LISTENER) {
 				IAnnotationModel model = viewer.getAnnotationModel();
 				if (model == null)

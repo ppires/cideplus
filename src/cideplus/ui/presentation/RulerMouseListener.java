@@ -2,7 +2,6 @@ package cideplus.ui.presentation;
 
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.text.IPainter;
-import org.eclipse.jface.text.source.AnnotationRulerColumn;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRulerInfo;
 import org.eclipse.swt.events.MouseEvent;
@@ -20,7 +19,6 @@ public class RulerMouseListener implements MouseListener {
 
 	public RulerMouseListener() {
 		super();
-		AnnotationRulerColumn a;
 		System.out.println("RulerMouseListener.RulerMouseListener()");
 	}
 

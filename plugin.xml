@@ -256,7 +256,7 @@
 			verticalRulerPreferenceValue="true"
 			symbolicIcon="info"
 			label="Features Annotation"
-			icon="icons/view.gif"
+			icon="icons/Letter-F-16x16.png"
 			includeOnPreferencePage="false">
 		</specification>
 	</extension>
