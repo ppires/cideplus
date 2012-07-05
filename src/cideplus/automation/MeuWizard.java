@@ -28,6 +28,7 @@ public class MeuWizard extends Wizard {
 		addPage(this.page2);
 	}
 
+	@Override
 	public boolean performFinish() {
 		if(this.page1.featuresCombo.getSelectionIndex() > -1 && this.page2.tree.getSelectionCount() > 0) {
 			this.feature = this.page1.featuresCombo.getSelectionIndex();
@@ -36,7 +37,7 @@ public class MeuWizard extends Wizard {
 				if(i.getData() instanceof String)
 					this.seeds.add((String)i.getData());
 				else if(i.getData() instanceof IPackageFragmentRoot) {
-					MessageDialog.openInformation(this.getShell(), "Semi-automatic Feature Extraction", "PackageRoot not supported yet!");
+					MessageDialog.openInformation(this.getShell(), "Semi-automatic Feature Extraction", "You can only select packages, classes, methods or fields.");
 					return false;
 				}
 				else if(i.getData() instanceof IPackageFragment) {
