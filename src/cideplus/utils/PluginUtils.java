@@ -8,7 +8,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
@@ -16,9 +15,11 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -32,29 +33,50 @@ import cideplus.ui.astview.ASTView;
 
 public class PluginUtils {
 
-	//private static Shell shell = null;
+	/**
+	 * workbench window estático para poder ser atribuído de
+	 * uma thread de UI.
+	 */
 	private static IWorkbenchWindow workbenchWindow;
 
-	private PluginUtils() {
+	/**
+	 * Usado para retornar o project em getCurrentSelectedProject
+	 */
+	private static IProject project;
 
+	/**
+	 * usado para retorna ISelection em getCurrentSelection
+	 */
+	private static ISelection selection;
+
+	/**
+	 * ID do Package Explorer
+	 */
+	private static final String PEXLORER_ID = "org.eclipse.jdt.ui.PackageExplorer";
+
+
+	private PluginUtils() {
 	}
+
 
 	/* retorna o workspace root */
 	public static IWorkspaceRoot getWorkspaceRoot() {
 		return ResourcesPlugin.getWorkspace().getRoot();
 	}
 
+
 	/* retorna o shell sendo usado */
 	public static Shell getActiveShell() {
-		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+		return Display.getDefault().getActiveShell();
 	}
 
-	/* retorna o editor sendo usado */
+
+	/**
+	 * retorna o editor sendo usado
+	 */
 	public static IEditorPart getCurrentEditor() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
-
 		if (workbench != null) {
-
 			// getActiveWorkbenchWindow() retorna null se não for chamado
 			// de uma thread de UI.
 			Display.getDefault().syncExec(new Runnable() {
@@ -80,6 +102,7 @@ public class PluginUtils {
 		return null;
 	}
 
+
 	/**
 	 *  Get the editor that is currently being used, if it
 	 *  is a text editor.
@@ -94,6 +117,7 @@ public class PluginUtils {
 		return null;
 	}
 
+
 	public static ASTView getASTView() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window != null) {
@@ -106,6 +130,7 @@ public class PluginUtils {
 		}
 		return null;
 	}
+
 
 	/**
 	 * Get the project to which the currently opened file belongs to.
@@ -120,10 +145,13 @@ public class PluginUtils {
 		return null;
 	}
 
+
+
 	public static IJavaProject getCurrentJavaProject() {
 		IProject project = getCurrentProject();
 		return JavaCore.create(project);
 	}
+
 
 	/* retorna o arquivo sendo editado */
 	public static IFile getCurrentFile() {
@@ -134,12 +162,68 @@ public class PluginUtils {
 				return (IFile) obj;
 			}
 			else {
-				showPopup("Não foi possível definir qual arquivo está sendo editado.");
+				showPopup("Não foi possível definir qual arquivo está aberto no editor.");
 				return null;
 			}
 		}
 		return null;
 	}
+
+
+
+	/* Retorna a current selection */
+	public static ISelection getCurrentSelection() {
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+		if (workbench != null) {
+			// getActiveWorkbenchWindow() retorna null se não for chamado
+			// de uma thread de UI.
+			Display.getDefault().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					workbenchWindow = workbench.getActiveWorkbenchWindow();
+					if (workbenchWindow != null) {
+						ISelectionService service = workbenchWindow.getSelectionService();
+						selection = service.getSelection();
+					}
+					else {
+						System.out.println("\n\nwindow is NULL even in a UI thread!");
+					}
+				}
+			});
+		}
+		else {
+			workbenchWindow = null;
+		}
+
+		return selection;
+	}
+
+
+	/**
+	 * Get the project selected in the package explorer
+	 * @return the project
+	 */
+	public static IProject getCurrentSelectedProject() {
+		ISelection selection = getCurrentSelection();
+		if (selection instanceof IStructuredSelection) {
+			Object obj = ((IStructuredSelection) selection).getFirstElement();
+			//				System.out.println("\n\nselection first element class: " + obj.getClass());
+			if (obj instanceof IProject) {
+				return (IProject) obj;
+			}
+			else if (obj instanceof IJavaProject) {
+				return ((IJavaProject) obj).getProject();
+			}
+			else {
+				System.out.println("\n\nobject isn't IProject nor IJavaProject!");
+			}
+		}
+		else {
+			System.out.println("\n\nselection isn't structured selection!");
+		}
+		return null;
+	}
+
 
 	/* retorna a current selection do editor */
 	public static ISelection getCurrentEditorSelection() {
@@ -150,12 +234,8 @@ public class PluginUtils {
 		return null;
 	}
 
-	/* Retorna a current selection */
-	public static ISelection getCurrentSelection() {
-		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
-	}
 
-	/* retorna o texto selecionado no editor. */
+	/* retorna a current selection do editor como um ITextSelection */
 	public static ITextSelection getCurrentEditorTextSelection() {
 		ISelection selection = getCurrentEditorSelection();
 		if (selection instanceof ITextSelection) {
@@ -173,33 +253,24 @@ public class PluginUtils {
 				return (ICompilationUnit) element;
 		}
 		return null;
-		//		//		IEditorInput inputElement = getCurrentEditor().getEditorInput();
-		//		IJavaElement editorCU = EditorUtility.getActiveEditorJavaInput();
-		//		if (editorCU instanceof ICompilationUnit) {
-		//			//			System.out.println("First if");
-		//			return (ICompilationUnit) editorCU;
-		//		}
-		//		else {
-		//			editorCU = editorCU.getAncestor(IJavaElement.COMPILATION_UNIT);
-		//			if (editorCU instanceof ICompilationUnit) {
-		//				//				System.out.println("Second if");
-		//				return (ICompilationUnit) editorCU;
-		//			}
-		//		}
 	}
 
 
 	/* mostra um popup com title e text */
 	public static void showPopup(String title, String text) {
 		MessageDialog.openInformation(getActiveShell(), title, text);
-		JavaPlugin p;
 	}
+
 
 	/* Overloaded para colocar título default do popup */
 	public static void showPopup(String text) {
 		showPopup("CIDE+", text);
 	}
 
+
+	/**
+	 * 
+	 */
 	public static IDocument getCurrentDocument() {
 		ITextEditor editor = getCurrentTextEditor();
 		if (editor != null) {
@@ -211,6 +282,13 @@ public class PluginUtils {
 		return null;
 	}
 
+
+	/**
+	 * retorna o IAnnotationModel associado a um editor.
+	 * Se o editor passado com parâmetro for null, retorna
+	 * o IAnnotationModel do editor ativo no momento. Retorna
+	 * null se não conseguir pegar o model.
+	 */
 	public static IAnnotationModel getAnnotationsModel(ITextEditor editor) {
 		if (editor == null)
 			editor = getCurrentTextEditor();
@@ -221,6 +299,10 @@ public class PluginUtils {
 		return null;
 	}
 
+
+	/**
+	 * Retorna o ISourceViewer associado ao editor aberto no momento.
+	 */
 	public static ISourceViewer getCurrentSourceViewer() {
 		IEditorPart editor = getCurrentEditor();
 		if (editor != null && editor instanceof JavaEditor)

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
@@ -179,7 +180,16 @@ public class FeaturesMarker {
 		String infoMessage = null;
 		try {
 
-			Feature feature = FeaturesConfigurationUtil.getFeature(PluginUtils.getCurrentProject(), featureId);
+			//			ISelection selection = PluginUtils.getCurrentSelection();
+			//			System.out.println("selection class: " + selection.getClass());
+
+			// FIXME: getCurrentProject() pega o projeto de acordo com o arquivo
+			//		  aberto no editor. Esse project deve ser pegado de acordo com a selection
+			//  	  do package explorer.
+			//			IProject p = PluginUtils.getCurrentSelectedProject();
+			//			IProject project = PluginUtils.getCurrentProject();
+			IProject project = PluginUtils.getCurrentSelectedProject();
+			Feature feature = FeaturesConfigurationUtil.getFeature(project, featureId);
 			String featureName = feature.getName();
 			//			String code = document.get(offset, length);
 			//			infoMessage = "(" + featureName + ") " + code;

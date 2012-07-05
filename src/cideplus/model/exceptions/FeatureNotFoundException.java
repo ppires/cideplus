@@ -1,6 +1,6 @@
 package cideplus.model.exceptions;
 
-public class FeatureNotFoundException extends Exception {
+public class FeatureNotFoundException extends RuntimeException {
 
 	/**
 	 * 

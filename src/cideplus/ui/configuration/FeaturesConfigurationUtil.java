@@ -43,6 +43,7 @@ import cideplus.ui.presentation.FeaturesMarker;
  */
 public class FeaturesConfigurationUtil {
 
+
 	public static final String FEATURES_FILE = "features.feat";
 
 	private static Map<IProject, IFeaturesManager> projectCache = new HashMap<IProject, IFeaturesManager>();
@@ -56,23 +57,28 @@ public class FeaturesConfigurationUtil {
 
 				Map<ICompilationUnit, ICompilationUnitFeaturesManager> compUnitCache = new HashMap<ICompilationUnit, ICompilationUnitFeaturesManager>();
 
+				@Override
 				public void saveFeatures(Set<Feature> features) throws CoreException {
 					FeaturesConfigurationUtil.saveFeatures(project, features);
 				}
 
+				@Override
 				public Set<Feature> getFeatures() throws CoreException, IOException {
 					return FeaturesConfigurationUtil.getFeatures(project);
 				}
 
+				@Override
 				public IProject getProject() {
 					return project;
 				}
 
+				@Override
 				public ICompilationUnitFeaturesManager getManagerForFile(final IFile file) throws IOException, FeatureNotFoundException, CoreException {
 					ICompilationUnit compilationUnit = (ICompilationUnit) JavaCore.create(file);
 					return getManagerForFile(compilationUnit);
 				}
 
+				@Override
 				public ICompilationUnitFeaturesManager getManagerForFile(final ICompilationUnit compilationUnit) throws IOException, CoreException, FeatureNotFoundException {
 					ICompilationUnitFeaturesManager compilationUnitFeaturesManager;
 					if((compilationUnitFeaturesManager = compUnitCache.get(compilationUnit)) == null){
@@ -90,6 +96,7 @@ public class FeaturesConfigurationUtil {
 						//						compilationUnitFeaturesManager = new CompilationUnitFeaturesManager(model, compilationUnit);
 						compilationUnitFeaturesManager = new ICompilationUnitFeaturesManager() {
 
+							@Override
 							public Set<ASTNodeReference> getNodeReferences() {
 								return model.getNodeReferences();
 							}
@@ -101,6 +108,7 @@ public class FeaturesConfigurationUtil {
 								return model.getFeatures(getNodeReferenceFromAST(astNode), true);
 							}
 
+							@Override
 							public void setFeature(ASTNode astNode, Feature feature) {
 								if(astNode == null)
 									throw new IllegalArgumentException("AST node cannot be null to set feature");
@@ -116,18 +124,22 @@ public class FeaturesConfigurationUtil {
 								}
 							}
 
+							@Override
 							public boolean hasFeature(ASTNode astNode, Feature feature) {
 								return getASTFeatures(astNode).contains(feature);
 							}
 
+							@Override
 							public Set<Feature> getFeatures(ASTNode astNode) {
 								return getASTFeatures(astNode);
 							}
 
+							@Override
 							public Set<Feature> getFeatures(ASTNodeReference reference){
 								return model.getFeatures(reference);
 							}
 
+							@Override
 							public void removeFeature(ASTNode node, Feature feature) {
 								getASTFeatures(node).remove(feature);
 								try {
@@ -139,6 +151,7 @@ public class FeaturesConfigurationUtil {
 								}
 							}
 
+							@Override
 							public synchronized void commitChanges() throws CoreException {
 								ByteArrayOutputStream out = new ByteArrayOutputStream();
 								FeaturesUtil.saveFeaturesForCompilationUnit(out, model);
@@ -150,6 +163,7 @@ public class FeaturesConfigurationUtil {
 								}
 							}
 
+							@Override
 							public ICompilationUnit getCompilationUnit() {
 								return compilationUnit;
 							}
@@ -185,15 +199,20 @@ public class FeaturesConfigurationUtil {
 
 	//	TODO: Não iterar nas features para buscar o id.
 	public static Feature getFeature(IProject project, int featureId) throws CoreException, IOException {
-		Set<Feature> features = getFeatures(project);
-		for (Feature feature : features) {
-			if (feature.getId() == featureId) {
-				return feature;
+		if (project != null) {
+			Set<Feature> features = getFeatures(project);
+			for (Feature feature : features) {
+				if (feature.getId() == featureId) {
+					return feature;
+				}
 			}
+			// TODO: Verificar o impacto de lançar uma exception aqui
+			//       ao invés de retornar null
+			//		throw new FeatureNotFoundException(featureId);
 		}
-		// TODO: Verificar o impacto de lançar uma exception aqui
-		//       ao invés de retornar null
-		//		throw new FeatureNotFoundException(featureId);
+		else {
+			System.out.println("PluginUtils.getFeature(): project is NULL!");
+		}
 		return null;
 	}
 
@@ -257,6 +276,7 @@ public class FeaturesConfigurationUtil {
 
 	public static void updateEditors(Display display, final ASTNode compilationUnit) {
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				doUpdateEditors(compilationUnit);
 			}
