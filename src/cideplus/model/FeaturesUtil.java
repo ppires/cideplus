@@ -10,13 +10,13 @@ import java.io.PrintWriter;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 
-import cideplus.automation.Util;
-import cideplus.model.ast.utils.NodeFinder;
+import cideplus.model.ast.utils.ASTUtils;
 import cideplus.model.exceptions.FeatureNotFoundException;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
 import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
@@ -24,8 +24,8 @@ import cideplus.ui.configuration.IFeaturesManager;
 import cideplus.utils.PluginUtils;
 
 /**
- * Classe utilit�ria para trabalhar com as features.
- * As funcionalidades dessa classe s�o independentes da interface gr�fica
+ * Classe utilitária para trabalhar com as features.
+ * As funcionalidades dessa classe são independentes da interface gráfica
  * @author rogel
  *
  */
@@ -37,7 +37,7 @@ public class FeaturesUtil {
 	private static final String FEATURES_SEPARATOR = "\06>>>FEATURES:";
 
 	/**
-	 * L� as features de determinado arquivo
+	 * Lê as features de determinado arquivo
 	 * @param contents
 	 * @return
 	 * @throws IOException
@@ -154,11 +154,13 @@ public class FeaturesUtil {
 	// TODO: Dar um merge nesses métodos!
 	/* Marca uma feature a partir de um offset e um length */
 	public static void markFeature(int featureId, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
+		System.out.println("  marking feature: offset: " + offset + "length: " + length);
 		IProject project = PluginUtils.getCurrentProject();
 		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
 		IFeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
 		ICompilationUnitFeaturesManager managerForFile = manager.getManagerForFile(compUnit);
-		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), offset, length);
+		ASTNode node = ASTUtils.getNode(compUnit, offset, length);
+		//		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), offset, length);
 		if (node == null) {
 			System.out.println("No node found...");
 		}
@@ -171,11 +173,13 @@ public class FeaturesUtil {
 
 	/* Desmarca uma feature a partir de um offset e um length */
 	public static void unmarkFeature(int featureId, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
+		System.out.println("  unmarking feature: offset: " + offset + "length: " + length);
 		IProject project = PluginUtils.getCurrentProject();
 		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
 		IFeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
 		ICompilationUnitFeaturesManager managerForFile = manager.getManagerForFile(compUnit);
-		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), offset, length);
+		ASTNode node = ASTUtils.getNode(compUnit, offset, length);
+		//		ASTNode node = NodeFinder.perform(Util.getAst(compUnit), offset, length);
 		if (node == null) {
 			System.out.println("No node found...");
 		}
@@ -184,5 +188,26 @@ public class FeaturesUtil {
 			managerForFile.removeFeature(node, feature);
 			managerForFile.commitChanges();
 		}
+	}
+
+	public static Feature getFeatureFromMarker(IMarker marker) {
+		int featureId = marker.getAttribute("featureId", -1);
+		IProject project = PluginUtils.getCurrentProject();
+		if (project == null)
+			return null;
+		Feature feature = null;
+		try {
+			feature = FeaturesConfigurationUtil.getFeature(project, featureId);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return feature;
+	}
+
+	public static void updateFeaturePosition(int feature_id) {
+
 	}
 }

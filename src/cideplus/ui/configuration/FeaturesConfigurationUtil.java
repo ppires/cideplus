@@ -37,14 +37,14 @@ import cideplus.ui.editor.FeaturerCompilationUnitEditor;
 import cideplus.ui.presentation.FeaturesMarker;
 
 /**
- * Class utilit�ria para trabalhar com a configura��o das features junto a Interface Gr�fica
+ * Class utilitária para trabalhar com a configuração das features junto a Interface Gráfica
  * @author rogel
  *
  */
 public class FeaturesConfigurationUtil {
 
 
-	public static final String FEATURES_FILE = "features.feat";
+	public static final String FEATURES_FILE = ".features.feat";
 
 	private static Map<IProject, IFeaturesManager> projectCache = new HashMap<IProject, IFeaturesManager>();
 
@@ -84,7 +84,12 @@ public class FeaturesConfigurationUtil {
 					if((compilationUnitFeaturesManager = compUnitCache.get(compilationUnit)) == null){
 						if (FeaturerPlugin.DEBUG_MANAGER_CACHE)
 							System.out.println("compUnitCache MISS\n");
+						// um '.' (ponto) é colocado no início do nome do arquivo para ele não ficar visível pro usuário
 						IPath path = compilationUnit.getPath().removeFileExtension().addFileExtension("feat");
+						String filename = "." + path.lastSegment();
+						path = path.removeLastSegments(1).append(filename);
+						System.out.println("features file: " + path);
+
 						final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 						final CompilationUnitFeaturesModel model;
 						if(file.exists()){

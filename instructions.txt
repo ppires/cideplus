@@ -2,18 +2,18 @@
 
 1. About CIDE+
 
-	The extraction of non-trivial software product lines (SPL) from 
-	a legacy application is a time-consuming task. First, developers 
-	need to identify the components responsible for the implementation 
-	of each program feature. Next, they must locate the lines of code 
-	that reference the components discovered in the previous step. 
-	Finally, they must extract such lines to independent modules or 
-	they must annotate the lines in some way. In order to speed up 
-	product line extraction, CIDE+ is a tool that supports a semi-automatic 
-	approach to annotate the code of optional features in SPL. The 
-	proposed approach is based on an existing tool to product line 
-	development, called CIDE, that enhances standard IDE with the ability 
-	to associate background colors to the lines of code that implement 
+	The extraction of non-trivial software product lines (SPL) from
+	a legacy application is a time-consuming task. First, developers
+	need to identify the components responsible for the implementation
+	of each program feature. Next, they must locate the lines of code
+	that reference the components discovered in the previous step.
+	Finally, they must extract such lines to independent modules or
+	they must annotate the lines in some way. In order to speed up
+	product line extraction, CIDE+ is a tool that supports a semi-automatic
+	approach to annotate the code of optional features in SPL. The
+	proposed approach is based on an existing tool to product line
+	development, called CIDE, that enhances standard IDE with the ability
+	to associate background colors to the lines of code that implement
 	a feature.
 
 
@@ -22,7 +22,7 @@
 	CIDE+ is available at http://homepages.dcc.ufmg.br/~mtov/cideplus/.
 	Download the zip archive, unzip it, and copy the jar archive to the
 	/plugins folder of your eclipse installation.
-	
+
 	If you want to browse the source code, it is available for checkout
 	at http://code.google.com/p/cideplus/.
 
@@ -30,54 +30,54 @@
 3. Configuring a project to use CIDE+
 
 	After installing CIDE+, you need to configure a project to use it.
-	Open eclipse, and right click in a java project in the package 
-	explorer, go to 'Features', and click in 'Configure Features...'.
-	
-	A dialog will open, where you can add/remove features, give them a 
-	name, and associate a color with each one. After configuring the 
+	Open eclipse, and right click on a java project in the package
+	explorer, go to 'Features', and click on 'Configure Features...'.
+
+	A dialog will open, where you can add/remove features, give them a
+	name, and associate a color with each one. After configuring the
 	features, you're ready to annotate the code.
-	
+
 
 4. Execute the semi-automatic feature extraction process
 
-	Right click in a java project in the package explorer, go to 'Features',
+	Right click on a java project in the package explorer, go to 'Features',
 	and click in 'Automatic Feature Detection'. In the opened dialog,
 	select the feature you want to extract, and click 'Next'. In the next
 	page, select the seeds to be used in the feature extraction process.
 	It can be packages, classes, methods, or fields. Hold <Ctrl> to select
 	more than one seed. After doing that, click on 'Finish' to start the
-	feature detection. 
-	
+	feature detection.
+
 	When the process finishes, your code will be annotated with the chosen
 	color for the selected feature. Simply open a source file in the editor
 	to view the colored code.
 
-	
+
 5. Complete the process manually
 
-	The semi-automatic extraction isn't 100% accurate. It misses some 
-	of the feature code. To solve this, you have to review the code, 
-	and mark the remaining code manually. 
-	
-	To do that, select some text, right click in the editor area, go 
-	to 'Features', and select the feature which the selected code 
-	belongs to. Keep in mind that you can not annotate arbitrary pieces 
+	The semi-automatic extraction isn't 100% accurate. It misses some
+	of the feature code. To solve this issue, you have to review the code,
+	and mark the remaining feature code manually.
+
+	To do that, select some text, right click in the editor area, go
+	to 'Features', and select the feature which the selected code
+	belongs to. Keep in mind that you can not annotate arbitrary pieces
 	of code, as the annotations are based in the code's AST.
-	
-	When you select some text and mark it, CIDE+ will try to find the 
-	AST node where either the selection exactly matches the node, or 
-	where the text covered before and after the node only consists of 
-	white spaces or comments. If no such node exists, then the node that 
+
+	When you select some text and mark it, CIDE+ will try to find the
+	AST node where either the selection exactly matches the node, or
+	where the text covered before and after the node only consists of
+	white spaces or comments. If no such node exists, then the node that
 	encloses the selection is used.
-	
-	If you made a mistake, or the node found by CIDE+ isn't what you 
+
+	If you made a mistake, or the node found by CIDE+ isn't what you
 	want, you can undo the markings. The process is the same: select
 	some colored code, right click on it, go to 'Features', and click
 	in the selected feature you want to deselect. The process of transla-
 	ting a selection to an AST node is the same, so if you don't see
-	the feature you want to unmark checked, it's because the selection 
+	the feature you want to unmark checked, it's because the selection
 	mapped to a different node than the marked.
-	
+
 
 6. Export your project
 
@@ -85,25 +85,10 @@
 	which features you want to be in the exported code. To do this,
 	right click in the project, in the package explorer, go to 'Features',
 	and click in 'Export project...'. Select where the exported project
-	will be saved and the features that will be in the exported code, 
+	will be saved and the features that will be in the exported code,
 	and click 'OK'.
-	
-	
+
+
 7. More info
 
 	More info about CIDE+ can be found at http://homepages.dcc.ufmg.br/~mtov/cideplus/
-		
-
-	
-	
-
-	
-	
-	
-	
-	   
-	
-	
-
-	
-	

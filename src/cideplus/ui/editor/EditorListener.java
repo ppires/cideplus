@@ -9,7 +9,6 @@ import org.eclipse.jdt.internal.ui.javaeditor.JavaSourceViewer;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension4;
-import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRulerInfo;
@@ -31,7 +30,6 @@ import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 import cideplus.FeaturerPlugin;
 import cideplus.ui.presentation.CustomAnnotationPainter;
 import cideplus.ui.presentation.RulerMouseListener;
-import cideplus.ui.presentation.VerticalRulerListener;
 
 public class EditorListener implements IPartListener2, IStartup {
 
@@ -42,7 +40,6 @@ public class EditorListener implements IPartListener2, IStartup {
 
 	public EditorListener() {
 		super();
-		System.out.println("EditorListener.EditorListener() - asdf!");
 	}
 
 	@Override
@@ -162,18 +159,18 @@ public class EditorListener implements IPartListener2, IStartup {
 				((ITextViewerExtension2) viewer).addPainter(painter);
 			}
 
-			/* Registering listener vertical ruler */
+			/* Registering vertical ruler listener */
 			Object obj = ((AbstractDecoratedTextEditor) editorPart).getAdapter(IVerticalRulerInfo.class);
-			if (obj != null && obj instanceof IVerticalRulerInfoExtension) {
-				System.out.println("obj IS IVerticalRulerInfoExtension");
-				((IVerticalRulerInfoExtension) obj).addVerticalRulerListener(new VerticalRulerListener());
-				if (obj instanceof CompositeRuler)
-					((CompositeRuler) obj).fireAnnotationSelected(null);
-				else
-					System.out.println("obj is NOT CompositeRuler");
-			}
-			else
-				System.out.println("obj is NOT IVerticalRulerInfoExtension");
+			//			if (obj != null && obj instanceof IVerticalRulerInfoExtension) {
+			//				System.out.println("obj IS IVerticalRulerInfoExtension");
+			//				((IVerticalRulerInfoExtension) obj).addVerticalRulerListener(new VerticalRulerListener());
+			//				if (obj instanceof CompositeRuler)
+			//					((CompositeRuler) obj).fireAnnotationSelected(null);
+			//				else
+			//					System.out.println("obj is NOT CompositeRuler");
+			//			}
+			//			else
+			//				System.out.println("obj is NOT IVerticalRulerInfoExtension");
 
 
 			/* Registering mouse listener. Workaround for the vertical ruler listener. */
@@ -182,9 +179,6 @@ public class EditorListener implements IPartListener2, IStartup {
 				widget.addMouseListener(new RulerMouseListener(editorPart));
 			}
 			//			Control widget = viewer.getTextWidget();
-			IVerticalRulerInfoExtension c;
-
-
 
 			/* Saving editor and painter for deactivation later */
 			synchronized(registeredPaintersLock) {

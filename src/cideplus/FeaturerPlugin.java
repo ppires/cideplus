@@ -35,6 +35,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	public static final boolean DEBUG_MANAGER_CACHE = false;
 	public static final boolean DEBUG_MARKERS = false;
 	public static final boolean DEBUG_PRESENTATION = false;
+	public static final boolean DEBUG_PAINTER = false;
 	public static final boolean DEBUG_REFRESH = false;
 	public static final boolean DEBUG_RESOURCE_LISTENER = false;
 	public static final boolean DEBUG_RULER_LISTENER = false;
@@ -121,4 +122,5 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 			if (DEBUG_LIGHT_MODE)
 				System.out.println("toggling light mode: painter is NOT CustomAnnotationPainter");
 	}
+
 }

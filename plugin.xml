@@ -17,12 +17,15 @@
       </editor>  
    </extension-->
    
-<!-- Extension para registrar listener do editor -->   
+<!-- Extension para registrar listener do editor e listener dos markers -->   
    <extension
          point="org.eclipse.ui.startup">
       <startup
             class="cideplus.ui.editor.EditorListener">
       </startup>
+      <startup
+            class="cideplus.ui.presentation.FeatureSynchronizer">
+      </startup>      
    </extension>
 
 
@@ -187,7 +190,7 @@
                class="cideplus.ui.configuration.popup.action.StatisticsAction"
                enablesFor="1"
                id="cideplus.actionStatitics"
-               label="Statitics..."
+               label="Statistics..."
                menubarPath="cideplus.menuFeatures/group2">
          </action>
          <action

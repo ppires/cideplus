@@ -19,7 +19,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.MarkerUtilities;
@@ -36,15 +35,12 @@ public class FeaturesMarker {
 
 
 	public static IMarker createMarker(IResource resource, final int offset, final int length, int featureId) throws CoreException {
-		Map<String, Object> attributes = createMarkerAttributes(offset, length, featureId);
+		Map<String, Object> attributes = createMarkerAttributes(resource.getProject(), offset, length, featureId);
 		IMarker marker = resource.createMarker(TYPE);
 		marker.setAttributes(attributes);
 
 		if (FeaturerPlugin.DEBUG_MARKERS)
 			printAllRelatedMarkers(resource, false);
-
-		IWorkbenchActionConstants a;
-		SelectAnnotationRulerAction sra;
 
 		return marker;
 	}
@@ -171,7 +167,7 @@ public class FeaturesMarker {
 	 * @return The attribute map.
 	 * @author ppires
 	 */
-	private static Map<String, Object> createMarkerAttributes(int offset, int length, int featureId) {
+	private static Map<String, Object> createMarkerAttributes(IProject project, int offset, int length, int featureId) {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		IDocument document = PluginUtils.getCurrentDocument();
 
@@ -188,7 +184,7 @@ public class FeaturesMarker {
 			//  	  do package explorer.
 			//			IProject p = PluginUtils.getCurrentSelectedProject();
 			//			IProject project = PluginUtils.getCurrentProject();
-			IProject project = PluginUtils.getCurrentSelectedProject();
+			//			IProject project = PluginUtils.getCurrentSelectedProject();
 			Feature feature = FeaturesConfigurationUtil.getFeature(project, featureId);
 			String featureName = feature.getName();
 			//			String code = document.get(offset, length);

@@ -85,6 +85,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
@@ -166,6 +167,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 
 
 
+	@Override
 	public void run(IAction action) {
 		try {
 			System.gc();
@@ -200,7 +202,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			dlg.setPageSize(400, 350);
 			dlg.open();
 
-			if(dlg.getReturnCode() == dlg.CANCEL)
+			if(dlg.getReturnCode() == Window.CANCEL)
 				return;
 
 			if((pacotes != null && pacotes.size() > 0) || (seeds != null && seeds.size() > 0)) {
@@ -494,104 +496,104 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		for(BodyDeclaration bd : bds) {
 			//System.out.println(bd.nodeClassForType(bd.getNodeType()));
 			switch(bd.getNodeType()) {
-			case ASTNode.METHOD_DECLARATION: {
-				MethodDeclaration md = (MethodDeclaration)bd;
+				case ASTNode.METHOD_DECLARATION: {
+					MethodDeclaration md = (MethodDeclaration)bd;
 
-				//				System.out.println("=========================================");
-				//				System.out.println(">> METODO: " + md.getName().getFullyQualifiedName() + ":" + md.resolveBinding().getKey());
+					//				System.out.println("=========================================");
+					//				System.out.println(">> METODO: " + md.getName().getFullyQualifiedName() + ":" + md.resolveBinding().getKey());
 
-				//if(Modifier.isPublic(md.getModifiers()));
+					//if(Modifier.isPublic(md.getModifiers()));
 
-				String aux[] = name.split("&");
-				if(aux.length > 1) {
-					assert aux.length > 2;
+					String aux[] = name.split("&");
+					if(aux.length > 1) {
+						assert aux.length > 2;
 
-					if(md.resolveBinding().getKey().equals(aux[0])) {
-						SingleVariableDeclaration arg = (SingleVariableDeclaration)md.parameters().get(Integer.parseInt(aux[1]));
-						marca(managerForFile, arg, feature);
-						searchSTM(md.getBody(), arg.resolveBinding().getKey(), managerForFile, feature, monitor);
-					}
-					searchSTM(md.getBody(), name, managerForFile, feature, monitor);
-					break;
-				}
-
-				if(md.getReturnType2() != null && checkType(md.getReturnType2(), name)) {
-					/* colore a declara��o toda */
-					searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey(), feature, monitor);
-				}
-				else if(md.resolveBinding().getKey().equals(name)) {
-					/* colore a declara��o toda */
-					marca(managerForFile, md, feature);
-				}
-				else {
-					/* procura nos par�metros */
-					int cont = 0;
-					for(SingleVariableDeclaration svd : (List<SingleVariableDeclaration>) md.parameters()) {
-						if(svd.resolveBinding().getKey().equals(name) || checkType(svd.getType(), name)) {
-							/* adiciona "&999" ao BindingKey para referenciar o n�mero do par�metro */
-							searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey() + "&" + cont, feature, monitor);
+						if(md.resolveBinding().getKey().equals(aux[0])) {
+							SingleVariableDeclaration arg = (SingleVariableDeclaration)md.parameters().get(Integer.parseInt(aux[1]));
+							marca(managerForFile, arg, feature);
+							searchSTM(md.getBody(), arg.resolveBinding().getKey(), managerForFile, feature, monitor);
 						}
-						cont++;
+						searchSTM(md.getBody(), name, managerForFile, feature, monitor);
+						break;
 					}
-					searchSTM(md.getBody(), name, managerForFile, feature, monitor);
-				}
-				break;
-			}
 
-			case ASTNode.FIELD_DECLARATION: {
-				FieldDeclaration fd = (FieldDeclaration)bd;
-				List<VariableDeclarationFragment> frag = fd.fragments();
-
-				if(checkType(fd.getType(), name)) {
-					for(VariableDeclarationFragment vd : frag) {
-						searchBODY(bds, vd.resolveBinding().getKey(), managerForFile, feature, monitor);
+					if(md.getReturnType2() != null && checkType(md.getReturnType2(), name)) {
+						/* colore a declara��o toda */
+						searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey(), feature, monitor);
+					}
+					else if(md.resolveBinding().getKey().equals(name)) {
+						/* colore a declara��o toda */
+						marca(managerForFile, md, feature);
+					}
+					else {
+						/* procura nos par�metros */
+						int cont = 0;
+						for(SingleVariableDeclaration svd : (List<SingleVariableDeclaration>) md.parameters()) {
+							if(svd.resolveBinding().getKey().equals(name) || checkType(svd.getType(), name)) {
+								/* adiciona "&999" ao BindingKey para referenciar o n�mero do par�metro */
+								searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey() + "&" + cont, feature, monitor);
+							}
+							cont++;
+						}
+						searchSTM(md.getBody(), name, managerForFile, feature, monitor);
 					}
 					break;
 				}
 
-				boolean todos = true, achou = false;
+				case ASTNode.FIELD_DECLARATION: {
+					FieldDeclaration fd = (FieldDeclaration)bd;
+					List<VariableDeclarationFragment> frag = fd.fragments();
 
-				for(VariableDeclarationFragment vd : frag) {
-					//					System.out.println(">> CAMPO: " + vd.getName().getFullyQualifiedName() + ":" + vd.resolveBinding().getKey());
-					if(vd.resolveBinding().getKey().equals(name)) {
-						marca(managerForFile, vd, feature);
-						achou = true;
-					}
-					else
-						if(searchEXP(vd.getInitializer(), name, managerForFile, feature, monitor)) {
-							//							System.out.println(">> SE4 (FD):" + vd.getName() + ": " + fd.getType().resolveBinding().getQualifiedName());
-							if(podeMarcar(vd, managerForFile, feature))
-								log(4, vd);
+					if(checkType(fd.getType(), name)) {
+						for(VariableDeclarationFragment vd : frag) {
 							searchBODY(bds, vd.resolveBinding().getKey(), managerForFile, feature, monitor);
 						}
-					todos &= managerForFile.hasFeature(vd, feature);
-				}
-
-				if(achou && todos) {
-					/* Se todos os fields da declara��o s�o da feature, colore a declaracao */
-					marca(managerForFile, fd, feature);
-					for(VariableDeclarationFragment vd : frag) {
-						managerForFile.removeFeature(vd, feature);
+						break;
 					}
+
+					boolean todos = true, achou = false;
+
+					for(VariableDeclarationFragment vd : frag) {
+						//					System.out.println(">> CAMPO: " + vd.getName().getFullyQualifiedName() + ":" + vd.resolveBinding().getKey());
+						if(vd.resolveBinding().getKey().equals(name)) {
+							marca(managerForFile, vd, feature);
+							achou = true;
+						}
+						else
+							if(searchEXP(vd.getInitializer(), name, managerForFile, feature, monitor)) {
+								//							System.out.println(">> SE4 (FD):" + vd.getName() + ": " + fd.getType().resolveBinding().getQualifiedName());
+								if(podeMarcar(vd, managerForFile, feature))
+									log(4, vd);
+								searchBODY(bds, vd.resolveBinding().getKey(), managerForFile, feature, monitor);
+							}
+						todos &= managerForFile.hasFeature(vd, feature);
+					}
+
+					if(achou && todos) {
+						/* Se todos os fields da declara��o s�o da feature, colore a declaracao */
+						marca(managerForFile, fd, feature);
+						for(VariableDeclarationFragment vd : frag) {
+							managerForFile.removeFeature(vd, feature);
+						}
+					}
+					break;
 				}
-				break;
-			}
 
-			case ASTNode.TYPE_DECLARATION: {
-				TypeDeclaration td = (TypeDeclaration)bd;
-				searchBODY(td.bodyDeclarations(), name, managerForFile, feature, monitor);
-				break;
-			}
+				case ASTNode.TYPE_DECLARATION: {
+					TypeDeclaration td = (TypeDeclaration)bd;
+					searchBODY(td.bodyDeclarations(), name, managerForFile, feature, monitor);
+					break;
+				}
 
-			case ASTNode.INITIALIZER: {
-				Initializer init = (Initializer)bd;
-				searchSTM(init.getBody(), name, managerForFile, feature, monitor);
-				break;
-			}
+				case ASTNode.INITIALIZER: {
+					Initializer init = (Initializer)bd;
+					searchSTM(init.getBody(), name, managerForFile, feature, monitor);
+					break;
+				}
 
-			default: {
-				System.out.println("BodyDeclaration n�o tratada <" + bd.nodeClassForType(bd.getNodeType()) + ">");
-			}
+				default: {
+					System.out.println("BodyDeclaration n�o tratada <" + bd.nodeClassForType(bd.getNodeType()) + ">");
+				}
 			}
 		}
 	}
@@ -600,86 +602,86 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		if(stm == null) return;
 		//System.out.println(ASTNode.nodeClassForType(z.getNodeType()).getName());
 		switch(stm.getNodeType()) {
-		case ASTNode.BLOCK: {
-			Block b = (Block) stm;
-			List<Statement> stms = b.statements();
-			Boolean todos  = true;
-			for(Statement stmaux : stms) {
-				searchSTM(stmaux, name, managerForFile, feature, monitor);
-				todos &= (managerForFile.hasFeature(stmaux, feature));
-			}
-			if(todos && !stms.isEmpty()) {
-				if(b.getParent() != null && b.getParent().getNodeType() == ASTNode.CATCH_CLAUSE) {
-					break;
-				}
+			case ASTNode.BLOCK: {
+				Block b = (Block) stm;
+				List<Statement> stms = b.statements();
+				Boolean todos  = true;
 				for(Statement stmaux : stms) {
-					managerForFile.removeFeature(stmaux, feature);
+					searchSTM(stmaux, name, managerForFile, feature, monitor);
+					todos &= (managerForFile.hasFeature(stmaux, feature));
 				}
-				if(b.getParent() != null) {
-					System.out.println("TIPO DO PAI: "+b.getParent().nodeClassForType(b.getParent().getNodeType()));
-					if(b.getParent().getNodeType() == ASTNode.METHOD_DECLARATION) {
-						MethodDeclaration md = (MethodDeclaration)b.getParent();
-						searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey(), feature, monitor);
+				if(todos && !stms.isEmpty()) {
+					if(b.getParent() != null && b.getParent().getNodeType() == ASTNode.CATCH_CLAUSE) {
+						break;
+					}
+					for(Statement stmaux : stms) {
+						managerForFile.removeFeature(stmaux, feature);
+					}
+					if(b.getParent() != null) {
+						System.out.println("TIPO DO PAI: "+b.getParent().nodeClassForType(b.getParent().getNodeType()));
+						if(b.getParent().getNodeType() == ASTNode.METHOD_DECLARATION) {
+							MethodDeclaration md = (MethodDeclaration)b.getParent();
+							searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey(), feature, monitor);
+						}
+						else
+							marca(managerForFile, b, feature);
 					}
 					else
 						marca(managerForFile, b, feature);
 				}
-				else
-					marca(managerForFile, b, feature);
+				break;
 			}
-			break;
-		}
-		case ASTNode.VARIABLE_DECLARATION_STATEMENT: {
-			VariableDeclarationStatement vdstm = (VariableDeclarationStatement) stm;
+			case ASTNode.VARIABLE_DECLARATION_STATEMENT: {
+				VariableDeclarationStatement vdstm = (VariableDeclarationStatement) stm;
 
-			if(checkType(vdstm.getType(), name)) {
-				marca(managerForFile, vdstm, feature);
+				if(checkType(vdstm.getType(), name)) {
+					marca(managerForFile, vdstm, feature);
+					List<VariableDeclarationFragment> frag = vdstm.fragments();
+					for(VariableDeclarationFragment vd : frag) {
+						searchSTM((Statement)vdstm.getParent(), vd.resolveBinding().getKey(), managerForFile, feature, monitor);
+					}
+					break;
+				}
+
 				List<VariableDeclarationFragment> frag = vdstm.fragments();
+				boolean todos = true, achou = false;
 				for(VariableDeclarationFragment vd : frag) {
-					searchSTM((Statement)vdstm.getParent(), vd.resolveBinding().getKey(), managerForFile, feature, monitor);
+					//				System.out.println(">> LOCAL: " + vd.getName().getFullyQualifiedName() + ":" + vd.resolveBinding().getKey());
+
+					if(searchEXP(vd.getInitializer(), name, managerForFile, feature, monitor)) {
+						if(podeMarcar(vd, managerForFile, feature)) {
+							//						System.out.println(">> SE4 (VD):" + vd.getName() + ": " + vdstm.getType().resolveBinding().getQualifiedName());
+							marca(managerForFile, vd, feature);
+							log(4, vd);
+						}
+						achou = true;
+						/* Todos os pr�ximos acessos a vari�vel colorida devem ser coloridos.(?) */
+						searchSTM((Statement)vdstm.getParent(), vd.resolveBinding().getKey(), managerForFile, feature, monitor);
+					}
+					todos &= managerForFile.hasFeature(vd, feature);
+				}
+
+				if(achou && todos) {
+					marca(managerForFile, vdstm, feature);
+					for(VariableDeclarationFragment vd : frag) {
+						managerForFile.removeFeature(vd, feature);
+					}
+				}
+
+				break;
+			}
+			case ASTNode.EXPRESSION_STATEMENT: {
+				ExpressionStatement estm = (ExpressionStatement)stm;
+				if(searchEXP(estm.getExpression(), name, managerForFile, feature, monitor)) {
+					marca(managerForFile, stm, feature);
 				}
 				break;
 			}
-
-			List<VariableDeclarationFragment> frag = vdstm.fragments();
-			boolean todos = true, achou = false;
-			for(VariableDeclarationFragment vd : frag) {
-				//				System.out.println(">> LOCAL: " + vd.getName().getFullyQualifiedName() + ":" + vd.resolveBinding().getKey());
-
-				if(searchEXP(vd.getInitializer(), name, managerForFile, feature, monitor)) {
-					if(podeMarcar(vd, managerForFile, feature)) {
-						//						System.out.println(">> SE4 (VD):" + vd.getName() + ": " + vdstm.getType().resolveBinding().getQualifiedName());
-						marca(managerForFile, vd, feature);
-						log(4, vd);
-					}
-					achou = true;
-					/* Todos os pr�ximos acessos a vari�vel colorida devem ser coloridos.(?) */
-					searchSTM((Statement)vdstm.getParent(), vd.resolveBinding().getKey(), managerForFile, feature, monitor);
-				}
-				todos &= managerForFile.hasFeature(vd, feature);
-			}
-
-			if(achou && todos) {
-				marca(managerForFile, vdstm, feature);
-				for(VariableDeclarationFragment vd : frag) {
-					managerForFile.removeFeature(vd, feature);
-				}
-			}
-
-			break;
-		}
-		case ASTNode.EXPRESSION_STATEMENT: {
-			ExpressionStatement estm = (ExpressionStatement)stm;
-			if(searchEXP(estm.getExpression(), name, managerForFile, feature, monitor)) {
-				marca(managerForFile, stm, feature);
-			}
-			break;
-		}
-		case ASTNode.RETURN_STATEMENT: {
-			ReturnStatement rstm = (ReturnStatement)stm;
-			if(searchEXP(rstm.getExpression(), name, managerForFile, feature, monitor)) {
-				/* SE a EXP do RETURN for colorida, colorir o m�todo todo(?) */
-				/*
+			case ASTNode.RETURN_STATEMENT: {
+				ReturnStatement rstm = (ReturnStatement)stm;
+				if(searchEXP(rstm.getExpression(), name, managerForFile, feature, monitor)) {
+					/* SE a EXP do RETURN for colorida, colorir o m�todo todo(?) */
+					/*
 				ASTNode aux = rstm.getParent();
 
 				while(aux != null && aux.getNodeType() != ASTNode.METHOD_DECLARATION)
@@ -698,515 +700,515 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					searchPROJ(nodeColors.getSource().getCompilationUnit().getJavaProject(), ((MethodDeclaration)aux).resolveBinding().getKey(), feature);
 				}
 				else
-				 */
-				marca(managerForFile, rstm, feature); // surreal!!! colore s� o return???
-			}
-			break;
-		}
-		case ASTNode.IF_STATEMENT: {
-			IfStatement ifstm = (IfStatement)stm;
-
-			searchSTM(ifstm.getThenStatement(), name, managerForFile, feature, monitor);
-			searchSTM(ifstm.getElseStatement(), name, managerForFile, feature, monitor);
-
-			if(searchEXP(ifstm.getExpression(), name , managerForFile, feature, monitor)) { // E1
-				if(managerForFile.hasFeature(ifstm.getThenStatement(), feature) &&
-						(ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) {
-					marca(managerForFile, ifstm, feature);
+					 */
+					marca(managerForFile, rstm, feature); // surreal!!! colore s� o return???
 				}
-				else if(ifstm.getThenStatement() != null && (ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) {
-					marca(managerForFile, ifstm.getThenStatement(), feature);
-					marca(managerForFile, ifstm, feature);
+				break;
+			}
+			case ASTNode.IF_STATEMENT: {
+				IfStatement ifstm = (IfStatement)stm;
+
+				searchSTM(ifstm.getThenStatement(), name, managerForFile, feature, monitor);
+				searchSTM(ifstm.getElseStatement(), name, managerForFile, feature, monitor);
+
+				if(searchEXP(ifstm.getExpression(), name , managerForFile, feature, monitor)) { // E1
+					if(managerForFile.hasFeature(ifstm.getThenStatement(), feature) &&
+							(ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) {
+						marca(managerForFile, ifstm, feature);
+					}
+					else if(ifstm.getThenStatement() != null && (ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) {
+						marca(managerForFile, ifstm.getThenStatement(), feature);
+						marca(managerForFile, ifstm, feature);
+					}
+					else {
+						marca(managerForFile, ifstm.getExpression(), feature);
+						if(podeMarcar(ifstm, managerForFile, feature)) log(5, ifstm);
+					}
 				}
 				else {
-					marca(managerForFile, ifstm.getExpression(), feature);
-					if(podeMarcar(ifstm, managerForFile, feature)) log(5, ifstm);
-				}
-			}
-			else {
-				if(managerForFile.hasFeature(ifstm.getThenStatement(), feature) &&
-						(ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) { // E2
-					if(hasSideEffect(ifstm.getExpression())) { // SE6
-						if(podeMarcar(ifstm, managerForFile, feature)) log(6, ifstm);
+					if(managerForFile.hasFeature(ifstm.getThenStatement(), feature) &&
+							(ifstm.getElseStatement() == null || managerForFile.hasFeature(ifstm.getElseStatement(), feature))) { // E2
+						if(hasSideEffect(ifstm.getExpression())) { // SE6
+							if(podeMarcar(ifstm, managerForFile, feature)) log(6, ifstm);
+						}
+						marca(managerForFile, ifstm, feature);
 					}
-					marca(managerForFile, ifstm, feature);
 				}
-			}
 
-			break;
-		}
-		case ASTNode.SWITCH_STATEMENT: {
-			SwitchStatement swstm = (SwitchStatement)stm;
-			if(searchEXP(swstm.getExpression(), name , managerForFile, feature, monitor)){
-				marca(managerForFile, swstm, feature);
+				break;
 			}
-			else {
-				List<Statement> stms = swstm.statements();
-				Boolean todos  = true;
-				for(Statement stmaux : stms) {
-					searchSTM(stmaux, name, managerForFile, feature, monitor);
-					todos &= (managerForFile.hasFeature(stmaux, feature));
-				}
-				if(todos && !stms.isEmpty()) {
-					for(Statement stmaux : stms) {
-						managerForFile.removeFeature(stmaux, feature);
-					}
-					if(hasSideEffect(swstm.getExpression())) { // SE6
-						if(podeMarcar(swstm, managerForFile, feature)) log(6, swstm);
-					}
+			case ASTNode.SWITCH_STATEMENT: {
+				SwitchStatement swstm = (SwitchStatement)stm;
+				if(searchEXP(swstm.getExpression(), name , managerForFile, feature, monitor)){
 					marca(managerForFile, swstm, feature);
 				}
-			}
-			break;
-		}
-		case ASTNode.SWITCH_CASE: {
-			//			SwitchCase swcstm = (SwitchCase)stm;
-			//			swcstm.
-			//			if(searchEXP(swcstm.getExpression(), name , nodeColors, feature)){
-			//				marca(nodeColors, swcstm, feature);
-			//			}
-			break;
-		}
-		case ASTNode.SYNCHRONIZED_STATEMENT: {
-			SynchronizedStatement sstm = (SynchronizedStatement)stm;
-			if(searchEXP(sstm.getExpression(), name, managerForFile, feature, monitor))
-				marca(managerForFile, sstm, feature);
-			else {
-				searchSTM(sstm.getBody(), name, managerForFile, feature, monitor);
-				if(managerForFile.hasFeature(sstm.getBody(), feature)) {
-					if(hasSideEffect(sstm.getExpression())) { // SE6
-						if(podeMarcar(sstm, managerForFile, feature)) log(6, sstm);
+				else {
+					List<Statement> stms = swstm.statements();
+					Boolean todos  = true;
+					for(Statement stmaux : stms) {
+						searchSTM(stmaux, name, managerForFile, feature, monitor);
+						todos &= (managerForFile.hasFeature(stmaux, feature));
 					}
-					marca(managerForFile, sstm, feature);
+					if(todos && !stms.isEmpty()) {
+						for(Statement stmaux : stms) {
+							managerForFile.removeFeature(stmaux, feature);
+						}
+						if(hasSideEffect(swstm.getExpression())) { // SE6
+							if(podeMarcar(swstm, managerForFile, feature)) log(6, swstm);
+						}
+						marca(managerForFile, swstm, feature);
+					}
 				}
+				break;
 			}
-			break;
-		}
-		case ASTNode.FOR_STATEMENT: {
-			ForStatement forstm = (ForStatement)stm;
+			case ASTNode.SWITCH_CASE: {
+				//			SwitchCase swcstm = (SwitchCase)stm;
+				//			swcstm.
+				//			if(searchEXP(swcstm.getExpression(), name , nodeColors, feature)){
+				//				marca(nodeColors, swcstm, feature);
+				//			}
+				break;
+			}
+			case ASTNode.SYNCHRONIZED_STATEMENT: {
+				SynchronizedStatement sstm = (SynchronizedStatement)stm;
+				if(searchEXP(sstm.getExpression(), name, managerForFile, feature, monitor))
+					marca(managerForFile, sstm, feature);
+				else {
+					searchSTM(sstm.getBody(), name, managerForFile, feature, monitor);
+					if(managerForFile.hasFeature(sstm.getBody(), feature)) {
+						if(hasSideEffect(sstm.getExpression())) { // SE6
+							if(podeMarcar(sstm, managerForFile, feature)) log(6, sstm);
+						}
+						marca(managerForFile, sstm, feature);
+					}
+				}
+				break;
+			}
+			case ASTNode.FOR_STATEMENT: {
+				ForStatement forstm = (ForStatement)stm;
 
-			/*
+				/*
 			for(Expression e : (List<Expression>)forstm.initializers()) {
 				searchEXP(e, name, nodeColors, feature);
 			}
 			for(Expression e : (List<Expression>)forstm.updaters()) {
 				searchEXP(e, name, nodeColors, feature);
 			}
-			 */
-			if(searchEXP(forstm.getExpression(), name, managerForFile, feature, monitor)) {
-				marca(managerForFile, forstm.getBody(), feature);
-				marca(managerForFile, forstm, feature);
-			}
-			else {
-				searchSTM(forstm.getBody(), name, managerForFile, feature, monitor);
-				if(managerForFile.hasFeature(forstm.getBody(), feature)) {
-					if(podeMarcar(forstm, managerForFile, feature)) log(6, forstm);
+				 */
+				if(searchEXP(forstm.getExpression(), name, managerForFile, feature, monitor)) {
+					marca(managerForFile, forstm.getBody(), feature);
 					marca(managerForFile, forstm, feature);
 				}
+				else {
+					searchSTM(forstm.getBody(), name, managerForFile, feature, monitor);
+					if(managerForFile.hasFeature(forstm.getBody(), feature)) {
+						if(podeMarcar(forstm, managerForFile, feature)) log(6, forstm);
+						marca(managerForFile, forstm, feature);
+					}
+				}
+				break;
 			}
-			break;
-		}
-		case ASTNode.ENHANCED_FOR_STATEMENT: {
-			EnhancedForStatement forstm = (EnhancedForStatement)stm;
-			SingleVariableDeclaration formal = forstm.getParameter();
-			if(formal.resolveBinding().getKey().equals(name) ||
-					checkType(formal.getType(), name) ||
-					searchEXP(forstm.getExpression(), name, managerForFile, feature, monitor)) {
-				marca(managerForFile, forstm.getBody(), feature);
-				marca(managerForFile, forstm, feature);
-			}
-			else {
-				searchSTM(forstm.getBody(), name, managerForFile, feature, monitor);
-				if(managerForFile.hasFeature(forstm.getBody(), feature)) {
-					if(podeMarcar(forstm, managerForFile, feature)) log(6, forstm);
+			case ASTNode.ENHANCED_FOR_STATEMENT: {
+				EnhancedForStatement forstm = (EnhancedForStatement)stm;
+				SingleVariableDeclaration formal = forstm.getParameter();
+				if(formal.resolveBinding().getKey().equals(name) ||
+						checkType(formal.getType(), name) ||
+						searchEXP(forstm.getExpression(), name, managerForFile, feature, monitor)) {
+					marca(managerForFile, forstm.getBody(), feature);
 					marca(managerForFile, forstm, feature);
 				}
-			}
-			break;
+				else {
+					searchSTM(forstm.getBody(), name, managerForFile, feature, monitor);
+					if(managerForFile.hasFeature(forstm.getBody(), feature)) {
+						if(podeMarcar(forstm, managerForFile, feature)) log(6, forstm);
+						marca(managerForFile, forstm, feature);
+					}
+				}
+				break;
 
-		}
-		case ASTNode.DO_STATEMENT: {
-			DoStatement dostm = (DoStatement)stm;
-			if(searchEXP(dostm.getExpression(), name, managerForFile, feature, monitor)) {
-				marca(managerForFile, dostm.getBody(), feature);
-				marca(managerForFile, dostm, feature);
 			}
-			else {
-				searchSTM(dostm.getBody(), name, managerForFile, feature, monitor);
-				if(managerForFile.hasFeature(dostm.getBody(), feature)) {
-					if(podeMarcar(dostm, managerForFile, feature) && hasSideEffect(dostm.getExpression())) log(6, dostm);
+			case ASTNode.DO_STATEMENT: {
+				DoStatement dostm = (DoStatement)stm;
+				if(searchEXP(dostm.getExpression(), name, managerForFile, feature, monitor)) {
+					marca(managerForFile, dostm.getBody(), feature);
 					marca(managerForFile, dostm, feature);
 				}
+				else {
+					searchSTM(dostm.getBody(), name, managerForFile, feature, monitor);
+					if(managerForFile.hasFeature(dostm.getBody(), feature)) {
+						if(podeMarcar(dostm, managerForFile, feature) && hasSideEffect(dostm.getExpression())) log(6, dostm);
+						marca(managerForFile, dostm, feature);
+					}
+				}
+				break;
 			}
-			break;
-		}
-		case ASTNode.WHILE_STATEMENT: {
-			WhileStatement wstm = (WhileStatement)stm;
-			if(searchEXP(wstm.getExpression(), name, managerForFile, feature, monitor)) {
-				marca(managerForFile, wstm.getBody(), feature);
-				marca(managerForFile, wstm, feature);
-			}
-			else {
-				searchSTM(wstm.getBody(), name, managerForFile, feature, monitor);
-				if(managerForFile.hasFeature(wstm.getBody(), feature)) {
-					if(podeMarcar(wstm, managerForFile, feature) && hasSideEffect(wstm.getExpression())) log(6, wstm);
+			case ASTNode.WHILE_STATEMENT: {
+				WhileStatement wstm = (WhileStatement)stm;
+				if(searchEXP(wstm.getExpression(), name, managerForFile, feature, monitor)) {
+					marca(managerForFile, wstm.getBody(), feature);
 					marca(managerForFile, wstm, feature);
 				}
-			}
-			break;
-		}
-		case ASTNode.TRY_STATEMENT: {
-			TryStatement tstm = (TryStatement)stm;
-			//try
-			searchSTM(tstm.getBody(), name, managerForFile, feature, monitor);
-			// catch
-			for(CatchClause cc : (List<CatchClause>) tstm.catchClauses()) {
-				/* Exce��o capturada na cl�usula Catch */
-				if(checkType(cc.getException().getType(), name))
-					marca(managerForFile, cc.getException(), feature);
 				else {
-					searchSTM(cc.getBody(), name, managerForFile, feature, monitor);
-				}
-				//if(nodeColors.hasColor(cc.getBody(), feature))
-				//marca(nodeColors, cc, feature);
-			}
-			// finally
-			searchSTM(tstm.getFinally(), name, managerForFile, feature, monitor);
-
-			// bloco try todo colorido e n�o tem finally, marcar todo o try/catch
-			if(tstm.getFinally() == null && managerForFile.hasFeature(tstm.getBody(), feature))
-				marca(managerForFile, tstm, feature);
-			break;
-		}
-		case ASTNode.THROW_STATEMENT: {
-			ThrowStatement trstm = (ThrowStatement)stm;
-			if(searchEXP(trstm.getExpression(), name, managerForFile, feature, monitor))
-				marca(managerForFile, trstm, feature);
-			break;
-		}
-		case ASTNode.CONSTRUCTOR_INVOCATION: {
-			ConstructorInvocation ci = (ConstructorInvocation)stm;
-
-			String aux[] = name.split("&");
-			if(aux.length > 1) {
-				assert aux.length > 2;
-
-				if(ci.resolveConstructorBinding().getKey().equals(aux[0])) {
-					Expression arg = (Expression)ci.arguments().get(Integer.parseInt(aux[1]));
-					marca(managerForFile, arg, feature);
+					searchSTM(wstm.getBody(), name, managerForFile, feature, monitor);
+					if(managerForFile.hasFeature(wstm.getBody(), feature)) {
+						if(podeMarcar(wstm, managerForFile, feature) && hasSideEffect(wstm.getExpression())) log(6, wstm);
+						marca(managerForFile, wstm, feature);
+					}
 				}
 				break;
 			}
-
-			if(ci.resolveConstructorBinding().getKey().equals(name))
-				marca(managerForFile, ci, feature);
-
-			List<Expression> args = ci.arguments();
-			for(Expression arg : args) {
-				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
-					if(podeMarcar(ci, managerForFile, feature)) {
-						if(ci.resolveConstructorBinding() != null)
-							se3.add(ci.resolveConstructorBinding().getKey());
-						log(3, ci);
-						marca(managerForFile, ci, feature);
+			case ASTNode.TRY_STATEMENT: {
+				TryStatement tstm = (TryStatement)stm;
+				//try
+				searchSTM(tstm.getBody(), name, managerForFile, feature, monitor);
+				// catch
+				for(CatchClause cc : (List<CatchClause>) tstm.catchClauses()) {
+					/* Exce��o capturada na cl�usula Catch */
+					if(checkType(cc.getException().getType(), name))
+						marca(managerForFile, cc.getException(), feature);
+					else {
+						searchSTM(cc.getBody(), name, managerForFile, feature, monitor);
 					}
-					break; // novidade
+					//if(nodeColors.hasColor(cc.getBody(), feature))
+					//marca(nodeColors, cc, feature);
 				}
+				// finally
+				searchSTM(tstm.getFinally(), name, managerForFile, feature, monitor);
+
+				// bloco try todo colorido e n�o tem finally, marcar todo o try/catch
+				if(tstm.getFinally() == null && managerForFile.hasFeature(tstm.getBody(), feature))
+					marca(managerForFile, tstm, feature);
+				break;
 			}
-			break;
-		}
-		case ASTNode.SUPER_CONSTRUCTOR_INVOCATION: {
-			SuperConstructorInvocation ci = (SuperConstructorInvocation)stm;
+			case ASTNode.THROW_STATEMENT: {
+				ThrowStatement trstm = (ThrowStatement)stm;
+				if(searchEXP(trstm.getExpression(), name, managerForFile, feature, monitor))
+					marca(managerForFile, trstm, feature);
+				break;
+			}
+			case ASTNode.CONSTRUCTOR_INVOCATION: {
+				ConstructorInvocation ci = (ConstructorInvocation)stm;
 
-			String aux[] = name.split("&");
-			if(aux.length > 1) {
-				assert aux.length > 2;
+				String aux[] = name.split("&");
+				if(aux.length > 1) {
+					assert aux.length > 2;
 
-				if(ci.resolveConstructorBinding().getKey().equals(aux[0])) {
-					Expression arg = (Expression)ci.arguments().get(Integer.parseInt(aux[1]));
-					marca(managerForFile, arg, feature);
+					if(ci.resolveConstructorBinding().getKey().equals(aux[0])) {
+						Expression arg = (Expression)ci.arguments().get(Integer.parseInt(aux[1]));
+						marca(managerForFile, arg, feature);
+					}
+					break;
+				}
+
+				if(ci.resolveConstructorBinding().getKey().equals(name))
+					marca(managerForFile, ci, feature);
+
+				List<Expression> args = ci.arguments();
+				for(Expression arg : args) {
+					if(searchEXP(arg, name, managerForFile, feature, monitor)) {
+						if(podeMarcar(ci, managerForFile, feature)) {
+							if(ci.resolveConstructorBinding() != null)
+								se3.add(ci.resolveConstructorBinding().getKey());
+							log(3, ci);
+							marca(managerForFile, ci, feature);
+						}
+						break; // novidade
+					}
 				}
 				break;
 			}
+			case ASTNode.SUPER_CONSTRUCTOR_INVOCATION: {
+				SuperConstructorInvocation ci = (SuperConstructorInvocation)stm;
 
-			if(searchEXP(ci.getExpression(), name, managerForFile, feature, monitor))
-				marca(managerForFile, ci, feature);
+				String aux[] = name.split("&");
+				if(aux.length > 1) {
+					assert aux.length > 2;
 
-			if(ci.resolveConstructorBinding().getKey().equals(name))
-				marca(managerForFile, ci, feature);
-
-			List<Expression> args = ci.arguments();
-			for(Expression arg : args) {
-				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
-					if(podeMarcar(ci, managerForFile, feature)) {
-						if(ci.resolveConstructorBinding() != null)
-							se3.add(ci.resolveConstructorBinding().getKey());
-						log(3, ci);
-						marca(managerForFile, ci, feature);
+					if(ci.resolveConstructorBinding().getKey().equals(aux[0])) {
+						Expression arg = (Expression)ci.arguments().get(Integer.parseInt(aux[1]));
+						marca(managerForFile, arg, feature);
 					}
-					break; // novidade
+					break;
 				}
-			}
-			break;
 
-		}
+				if(searchEXP(ci.getExpression(), name, managerForFile, feature, monitor))
+					marca(managerForFile, ci, feature);
+
+				if(ci.resolveConstructorBinding().getKey().equals(name))
+					marca(managerForFile, ci, feature);
+
+				List<Expression> args = ci.arguments();
+				for(Expression arg : args) {
+					if(searchEXP(arg, name, managerForFile, feature, monitor)) {
+						if(podeMarcar(ci, managerForFile, feature)) {
+							if(ci.resolveConstructorBinding() != null)
+								se3.add(ci.resolveConstructorBinding().getKey());
+							log(3, ci);
+							marca(managerForFile, ci, feature);
+						}
+						break; // novidade
+					}
+				}
+				break;
+
+			}
 		}
 	}
 
 	public boolean searchEXP(Expression exp, String name, ICompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
 		if(exp == null) return false;
 		switch(exp.getNodeType()) {
-		case ASTNode.CONDITIONAL_EXPRESSION: {// tern�rio
-			ConditionalExpression cond = (ConditionalExpression)exp;
-			boolean a = searchEXP(cond.getExpression(), name, managerForFile, feature, monitor);
-			boolean b = searchEXP(cond.getThenExpression(), name, managerForFile, feature, monitor);
-			boolean c = searchEXP(cond.getElseExpression(), name, managerForFile, feature, monitor);
+			case ASTNode.CONDITIONAL_EXPRESSION: {// tern�rio
+				ConditionalExpression cond = (ConditionalExpression)exp;
+				boolean a = searchEXP(cond.getExpression(), name, managerForFile, feature, monitor);
+				boolean b = searchEXP(cond.getThenExpression(), name, managerForFile, feature, monitor);
+				boolean c = searchEXP(cond.getElseExpression(), name, managerForFile, feature, monitor);
 
-			if((a || b || c) && !(a && b && c)) {
-				if(podeMarcar(cond, managerForFile, feature)) log(1, cond);
-			}
+				if((a || b || c) && !(a && b && c)) {
+					if(podeMarcar(cond, managerForFile, feature)) log(1, cond);
+				}
 
-			/* tem que ver isso aqui no futuro !!! */
-			return a || b || c;
-		}
-		case ASTNode.INSTANCEOF_EXPRESSION: {
-			InstanceofExpression inst = (InstanceofExpression)exp;
-			boolean a = searchEXP(inst.getLeftOperand(), name, managerForFile, feature, monitor);
-			boolean b = checkType(inst.getRightOperand(), name);
-			if((a || b) && !(a && b)) {
-				if(podeMarcar(inst, managerForFile, feature)) log(1, inst);
+				/* tem que ver isso aqui no futuro !!! */
+				return a || b || c;
 			}
-			return a || b;
-		}
-		case ASTNode.PARENTHESIZED_EXPRESSION: {
-			ParenthesizedExpression par = (ParenthesizedExpression)exp;
-			return searchEXP(par.getExpression(), name, managerForFile, feature, monitor);
-		}
-		case ASTNode.CAST_EXPRESSION: {
-			CastExpression cast = (CastExpression)exp;
-			boolean a = searchEXP(cast.getExpression(), name, managerForFile, feature, monitor);
-			boolean b = checkType(cast.getType(), name);
-			if((a || b) && !(a && b)) {
-				if(podeMarcar(cast, managerForFile, feature)) log(1, cast);
+			case ASTNode.INSTANCEOF_EXPRESSION: {
+				InstanceofExpression inst = (InstanceofExpression)exp;
+				boolean a = searchEXP(inst.getLeftOperand(), name, managerForFile, feature, monitor);
+				boolean b = checkType(inst.getRightOperand(), name);
+				if((a || b) && !(a && b)) {
+					if(podeMarcar(inst, managerForFile, feature)) log(1, inst);
+				}
+				return a || b;
 			}
-			return a || b;
-		}
-		case ASTNode.PREFIX_EXPRESSION: {
-			PrefixExpression pre = (PrefixExpression)exp;
-			return searchEXP(pre.getOperand(), name, managerForFile, feature, monitor);
-		}
-		case ASTNode.POSTFIX_EXPRESSION: {
-			PostfixExpression pos = (PostfixExpression)exp;
-			return searchEXP(pos.getOperand(), name, managerForFile, feature, monitor);
-		}
-		case ASTNode.INFIX_EXPRESSION: {
-			int contMarcada = 0, cont = 2;
-			InfixExpression inf = (InfixExpression)exp;
-			if(searchEXP(inf.getLeftOperand(), name, managerForFile, feature, monitor))
-				contMarcada++;
-			if(searchEXP(inf.getRightOperand(), name, managerForFile, feature, monitor))
-				contMarcada++;
-			for(Expression e : (List<Expression>)inf.extendedOperands()) {
-				if(searchEXP(e, name, managerForFile, feature, monitor))
+			case ASTNode.PARENTHESIZED_EXPRESSION: {
+				ParenthesizedExpression par = (ParenthesizedExpression)exp;
+				return searchEXP(par.getExpression(), name, managerForFile, feature, monitor);
+			}
+			case ASTNode.CAST_EXPRESSION: {
+				CastExpression cast = (CastExpression)exp;
+				boolean a = searchEXP(cast.getExpression(), name, managerForFile, feature, monitor);
+				boolean b = checkType(cast.getType(), name);
+				if((a || b) && !(a && b)) {
+					if(podeMarcar(cast, managerForFile, feature)) log(1, cast);
+				}
+				return a || b;
+			}
+			case ASTNode.PREFIX_EXPRESSION: {
+				PrefixExpression pre = (PrefixExpression)exp;
+				return searchEXP(pre.getOperand(), name, managerForFile, feature, monitor);
+			}
+			case ASTNode.POSTFIX_EXPRESSION: {
+				PostfixExpression pos = (PostfixExpression)exp;
+				return searchEXP(pos.getOperand(), name, managerForFile, feature, monitor);
+			}
+			case ASTNode.INFIX_EXPRESSION: {
+				int contMarcada = 0, cont = 2;
+				InfixExpression inf = (InfixExpression)exp;
+				if(searchEXP(inf.getLeftOperand(), name, managerForFile, feature, monitor))
 					contMarcada++;
-				cont++;
-			}
-			if(contMarcada > 0 && contMarcada < cont) {
-				if(podeMarcar(inf, managerForFile, feature)) log(1, inf);
-			}
-			return contMarcada > 0;
-		}
-		case ASTNode.ASSIGNMENT: {
-			Assignment asg = (Assignment)exp;
-			boolean esq = searchEXP(asg.getLeftHandSide(), name, managerForFile, feature, monitor);
-			boolean dir = searchEXP(asg.getRightHandSide(), name, managerForFile, feature, monitor);
-			if(!esq && dir) {
-				//				System.out.println(">> SE4 (ASSIGN): " + asg.toString());
-				if(podeMarcar(asg, managerForFile, feature)) log(4, asg);
-				switch(asg.getLeftHandSide().getNodeType()) {
-				case ASTNode.SIMPLE_NAME: {
-					//System.out.println(exp.getParent().nodeClassForType(exp.getParent().getNodeType()));
-					if(exp.getParent() != null && exp.getParent().getParent() != null)
-						searchSTM((Statement)exp.getParent().getParent(), ((SimpleName)asg.getLeftHandSide()).resolveBinding().getKey(), managerForFile, feature, monitor);
-					break;
+				if(searchEXP(inf.getRightOperand(), name, managerForFile, feature, monitor))
+					contMarcada++;
+				for(Expression e : (List<Expression>)inf.extendedOperands()) {
+					if(searchEXP(e, name, managerForFile, feature, monitor))
+						contMarcada++;
+					cont++;
 				}
-				case ASTNode.FIELD_ACCESS: {
-					searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), ((FieldAccess)asg.getLeftHandSide()).resolveFieldBinding().getKey(), feature, monitor);
-					break;
+				if(contMarcada > 0 && contMarcada < cont) {
+					if(podeMarcar(inf, managerForFile, feature)) log(1, inf);
 				}
-				default:
-					System.out.println("ERRO: "+asg.getLeftHandSide().nodeClassForType(asg.getLeftHandSide().getNodeType()));
-				}
-				return false;
+				return contMarcada > 0;
 			}
-			return esq;
-		}
-		case ASTNode.CLASS_INSTANCE_CREATION: {
-			ClassInstanceCreation cic = (ClassInstanceCreation)exp;
-			List<Expression> args = cic.arguments();
-
-			String aux[] = name.split("&");
-			if(aux.length > 1) {
-				//System.out.println("� CIC: "+cic.toString()+"\nAux:" + name);
-				assert aux.length > 2;
-
-				if(cic.resolveConstructorBinding().getKey().equals(aux[0])) {
-					Expression arg = (Expression)cic.arguments().get(Integer.parseInt(aux[1]));
-					marca(managerForFile, arg, feature);
-				}
-				return false;
-			}
-			else if(checkType(cic.getType(), name)) {
-				for(Expression arg : args)
-					managerForFile.removeFeature(arg, feature);
-				return true;
-			}
-
-			for(Expression arg : args) {
-				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
-					if(podeMarcar(cic, managerForFile, feature)) {
-						if(cic.resolveConstructorBinding() != null)
-							se3.add(cic.resolveConstructorBinding().getKey());
-						log(3, cic);
-						//marca(nodeColors, cic, feature);
+			case ASTNode.ASSIGNMENT: {
+				Assignment asg = (Assignment)exp;
+				boolean esq = searchEXP(asg.getLeftHandSide(), name, managerForFile, feature, monitor);
+				boolean dir = searchEXP(asg.getRightHandSide(), name, managerForFile, feature, monitor);
+				if(!esq && dir) {
+					//				System.out.println(">> SE4 (ASSIGN): " + asg.toString());
+					if(podeMarcar(asg, managerForFile, feature)) log(4, asg);
+					switch(asg.getLeftHandSide().getNodeType()) {
+						case ASTNode.SIMPLE_NAME: {
+							//System.out.println(exp.getParent().nodeClassForType(exp.getParent().getNodeType()));
+							if(exp.getParent() != null && exp.getParent().getParent() != null)
+								searchSTM((Statement)exp.getParent().getParent(), ((SimpleName)asg.getLeftHandSide()).resolveBinding().getKey(), managerForFile, feature, monitor);
+							break;
+						}
+						case ASTNode.FIELD_ACCESS: {
+							searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), ((FieldAccess)asg.getLeftHandSide()).resolveFieldBinding().getKey(), feature, monitor);
+							break;
+						}
+						default:
+							System.out.println("ERRO: "+asg.getLeftHandSide().nodeClassForType(asg.getLeftHandSide().getNodeType()));
 					}
-					return true; // novidade
+					return false;
 				}
+				return esq;
 			}
+			case ASTNode.CLASS_INSTANCE_CREATION: {
+				ClassInstanceCreation cic = (ClassInstanceCreation)exp;
+				List<Expression> args = cic.arguments();
 
-			if(cic.getAnonymousClassDeclaration() != null) {
-				AnonymousClassDeclaration acd  = cic.getAnonymousClassDeclaration();
-				searchBODY(acd.bodyDeclarations(), name, managerForFile, feature, monitor);
-			}
+				String aux[] = name.split("&");
+				if(aux.length > 1) {
+					//System.out.println("� CIC: "+cic.toString()+"\nAux:" + name);
+					assert aux.length > 2;
 
-			break;
-		}
-		case ASTNode.SUPER_METHOD_INVOCATION: {
-			SuperMethodInvocation mi = (SuperMethodInvocation)exp;
-			List<Expression> args = mi.arguments();
-
-			String aux[] = name.split("&");
-			if(aux.length > 1) {
-				assert aux.length > 2;
-				if(mi.resolveMethodBinding().getKey().equals(aux[0])) {
-					Expression arg = (Expression)mi.arguments().get(Integer.parseInt(aux[1]));
-					marca(managerForFile, arg, feature);
-				}
-				return false;
-			}
-			else if(mi.resolveMethodBinding().getKey().equals(name)) {
-				for(Expression arg : args)
-					managerForFile.removeFeature(arg, feature);
-				return true;
-			}
-
-			for(Expression arg : args) {
-				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
-					if(podeMarcar(mi, managerForFile, feature)) {
-						if(mi.resolveMethodBinding() != null)
-							se3.add(mi.resolveMethodBinding().getKey());
-						log(3, mi);
-						//marca(nodeColors, mi, feature);
+					if(cic.resolveConstructorBinding().getKey().equals(aux[0])) {
+						Expression arg = (Expression)cic.arguments().get(Integer.parseInt(aux[1]));
+						marca(managerForFile, arg, feature);
 					}
-					return true; // novidade
+					return false;
 				}
-			}
-			break;
-		}
-		case ASTNode.METHOD_INVOCATION: {
-			MethodInvocation mi = (MethodInvocation)exp;
-			List<Expression> args = mi.arguments();
-
-			/* verificar isso */
-			if(searchEXP(mi.getExpression(), name, managerForFile, feature, monitor))
-				return true;
-			/* fim verificar */
-
-			String aux[] = name.split("&");
-			if(aux.length > 1) {
-				assert aux.length > 2;
-				if(mi.resolveMethodBinding().getKey().equals(aux[0])) {
-					Expression arg = (Expression)mi.arguments().get(Integer.parseInt(aux[1]));
-					marca(managerForFile, arg, feature);
+				else if(checkType(cic.getType(), name)) {
+					for(Expression arg : args)
+						managerForFile.removeFeature(arg, feature);
+					return true;
 				}
-				return false;
-			}
-			else if(mi.resolveMethodBinding().getKey().equals(name)) {
-				for(Expression arg : args)
-					managerForFile.removeFeature(arg, feature);
-				return true;
-			}
 
-			//int cont = 0;
-			for(Expression arg : args) {
-				if(searchEXP(arg, name, managerForFile, feature, monitor)) {
-					if(podeMarcar(mi, managerForFile, feature)) {
-						if(mi.resolveMethodBinding() != null)
-							se3.add(mi.resolveMethodBinding().getKey());
-						log(3, mi);
-						//marca(nodeColors, cic, feature);
+				for(Expression arg : args) {
+					if(searchEXP(arg, name, managerForFile, feature, monitor)) {
+						if(podeMarcar(cic, managerForFile, feature)) {
+							if(cic.resolveConstructorBinding() != null)
+								se3.add(cic.resolveConstructorBinding().getKey());
+							log(3, cic);
+							//marca(nodeColors, cic, feature);
+						}
+						return true; // novidade
 					}
-					return true; // novidade
-					/* Localiza a decaracao do m�todo para marcar o argumento */
-					//					searchPROJ(nodeColors.getSource().getCompilationUnit().getJavaProject(), mi.resolveMethodBinding().getKey() + "&" + cont, feature);
 				}
-				//cont++;
+
+				if(cic.getAnonymousClassDeclaration() != null) {
+					AnonymousClassDeclaration acd  = cic.getAnonymousClassDeclaration();
+					searchBODY(acd.bodyDeclarations(), name, managerForFile, feature, monitor);
+				}
+
+				break;
 			}
-			break;
-		}
-		case ASTNode.THIS_EXPRESSION: {
-			ThisExpression te = (ThisExpression)exp;
+			case ASTNode.SUPER_METHOD_INVOCATION: {
+				SuperMethodInvocation mi = (SuperMethodInvocation)exp;
+				List<Expression> args = mi.arguments();
 
-			if(te.resolveTypeBinding().getKey().equals(name))
-				return true;
-			break;
-		}
-		case ASTNode.SUPER_FIELD_ACCESS: {
-			SuperFieldAccess fa = (SuperFieldAccess)exp;
+				String aux[] = name.split("&");
+				if(aux.length > 1) {
+					assert aux.length > 2;
+					if(mi.resolveMethodBinding().getKey().equals(aux[0])) {
+						Expression arg = (Expression)mi.arguments().get(Integer.parseInt(aux[1]));
+						marca(managerForFile, arg, feature);
+					}
+					return false;
+				}
+				else if(mi.resolveMethodBinding().getKey().equals(name)) {
+					for(Expression arg : args)
+						managerForFile.removeFeature(arg, feature);
+					return true;
+				}
+
+				for(Expression arg : args) {
+					if(searchEXP(arg, name, managerForFile, feature, monitor)) {
+						if(podeMarcar(mi, managerForFile, feature)) {
+							if(mi.resolveMethodBinding() != null)
+								se3.add(mi.resolveMethodBinding().getKey());
+							log(3, mi);
+							//marca(nodeColors, mi, feature);
+						}
+						return true; // novidade
+					}
+				}
+				break;
+			}
+			case ASTNode.METHOD_INVOCATION: {
+				MethodInvocation mi = (MethodInvocation)exp;
+				List<Expression> args = mi.arguments();
+
+				/* verificar isso */
+				if(searchEXP(mi.getExpression(), name, managerForFile, feature, monitor))
+					return true;
+				/* fim verificar */
+
+				String aux[] = name.split("&");
+				if(aux.length > 1) {
+					assert aux.length > 2;
+					if(mi.resolveMethodBinding().getKey().equals(aux[0])) {
+						Expression arg = (Expression)mi.arguments().get(Integer.parseInt(aux[1]));
+						marca(managerForFile, arg, feature);
+					}
+					return false;
+				}
+				else if(mi.resolveMethodBinding().getKey().equals(name)) {
+					for(Expression arg : args)
+						managerForFile.removeFeature(arg, feature);
+					return true;
+				}
+
+				//int cont = 0;
+				for(Expression arg : args) {
+					if(searchEXP(arg, name, managerForFile, feature, monitor)) {
+						if(podeMarcar(mi, managerForFile, feature)) {
+							if(mi.resolveMethodBinding() != null)
+								se3.add(mi.resolveMethodBinding().getKey());
+							log(3, mi);
+							//marca(nodeColors, cic, feature);
+						}
+						return true; // novidade
+						/* Localiza a decaracao do m�todo para marcar o argumento */
+						//					searchPROJ(nodeColors.getSource().getCompilationUnit().getJavaProject(), mi.resolveMethodBinding().getKey() + "&" + cont, feature);
+					}
+					//cont++;
+				}
+				break;
+			}
+			case ASTNode.THIS_EXPRESSION: {
+				ThisExpression te = (ThisExpression)exp;
+
+				if(te.resolveTypeBinding().getKey().equals(name))
+					return true;
+				break;
+			}
+			case ASTNode.SUPER_FIELD_ACCESS: {
+				SuperFieldAccess fa = (SuperFieldAccess)exp;
 
 
-			//			if(searchEXP(fa.getExpression(), name, nodeColors, feature))
-			//				return true;
-			return searchEXP(fa.getQualifier(), name, managerForFile, feature, monitor);
-		}
-		case ASTNode.FIELD_ACCESS: {
-			/*
-			 * A().B, onde A � uma EXPRESSION e B � um SimpleName
-			 */
-			FieldAccess fa = (FieldAccess)exp;
-			if(searchEXP(fa.getExpression(), name, managerForFile, feature, monitor))
-				return true;
+				//			if(searchEXP(fa.getExpression(), name, nodeColors, feature))
+				//				return true;
+				return searchEXP(fa.getQualifier(), name, managerForFile, feature, monitor);
+			}
+			case ASTNode.FIELD_ACCESS: {
+				/*
+				 * A().B, onde A � uma EXPRESSION e B � um SimpleName
+				 */
+				FieldAccess fa = (FieldAccess)exp;
+				if(searchEXP(fa.getExpression(), name, managerForFile, feature, monitor))
+					return true;
 
-			return searchEXP(fa.getName(), name, managerForFile, feature, monitor);
-		}
-		case ASTNode.QUALIFIED_NAME: {
-			/*
-			 * A.B, onde A � um NAME e B � um SimpleName
-			 */
-			QualifiedName qn = (QualifiedName)exp;
+				return searchEXP(fa.getName(), name, managerForFile, feature, monitor);
+			}
+			case ASTNode.QUALIFIED_NAME: {
+				/*
+				 * A.B, onde A � um NAME e B � um SimpleName
+				 */
+				QualifiedName qn = (QualifiedName)exp;
 
-			if(searchEXP(qn.getQualifier(), name, managerForFile, feature, monitor))
-				return true;
-			return searchEXP(qn.getName(), name, managerForFile, feature, monitor);
-		}
-		case ASTNode.SIMPLE_NAME: {
-			SimpleName sn = (SimpleName)exp;
-			//System.out.println(sn.resolveBinding().getKey());
-			if(sn.resolveBinding().getKey().equals(name) || (sn.resolveTypeBinding() != null && sn.resolveTypeBinding().getKey().equals(name)))
-				return true;
-			break;
-		}
-		case ASTNode.TYPE_LITERAL: {
-			TypeLiteral tl = (TypeLiteral)exp;
-			if(tl.getType() == null || tl.getType().resolveBinding() == null)
-				return false;
-			else
-				return checkType(tl.getType(), name);
+				if(searchEXP(qn.getQualifier(), name, managerForFile, feature, monitor))
+					return true;
+				return searchEXP(qn.getName(), name, managerForFile, feature, monitor);
+			}
+			case ASTNode.SIMPLE_NAME: {
+				SimpleName sn = (SimpleName)exp;
+				//System.out.println(sn.resolveBinding().getKey());
+				if(sn.resolveBinding().getKey().equals(name) || (sn.resolveTypeBinding() != null && sn.resolveTypeBinding().getKey().equals(name)))
+					return true;
+				break;
+			}
+			case ASTNode.TYPE_LITERAL: {
+				TypeLiteral tl = (TypeLiteral)exp;
+				if(tl.getType() == null || tl.getType().resolveBinding() == null)
+					return false;
+				else
+					return checkType(tl.getType(), name);
 
-		}
-		//		default: {
-		//			System.out.println("Expression n�o tratada: " + exp.nodeClassForType(exp.getNodeType()) + exp.toString());
-		//		}
+			}
+			//		default: {
+			//			System.out.println("Expression n�o tratada: " + exp.nodeClassForType(exp.getNodeType()) + exp.toString());
+			//		}
 		}
 		return false;
 	}
@@ -1280,118 +1282,120 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public boolean hasSideEffect(Expression exp) {
 		if(exp == null) return false;
 		switch(exp.getNodeType()) {
-		case ASTNode.CONDITIONAL_EXPRESSION: {// tern�rio
-			ConditionalExpression cond = (ConditionalExpression)exp;
-			if(hasSideEffect(cond.getExpression()))
-				return true;
-			if(hasSideEffect(cond.getThenExpression()))
-				return true;
-			if(hasSideEffect(cond.getElseExpression()))
-				return true;
-			return false;
-		}
-		case ASTNode.INSTANCEOF_EXPRESSION: {
-			InstanceofExpression inst = (InstanceofExpression)exp;
-			return hasSideEffect(inst.getLeftOperand());
-		}
-		case ASTNode.PARENTHESIZED_EXPRESSION: {
-			ParenthesizedExpression par = (ParenthesizedExpression)exp;
-			return hasSideEffect(par.getExpression());
-		}
-		case ASTNode.CAST_EXPRESSION: {
-			CastExpression cast = (CastExpression)exp;
-			return hasSideEffect(cast.getExpression());
-		}
-		case ASTNode.PREFIX_EXPRESSION: {
-			PrefixExpression pre = (PrefixExpression)exp;
-			if(pre.getOperator().equals(Operator.DECREMENT) || pre.getOperator().equals(Operator.INCREMENT))
-				return true;
-			else
-				return hasSideEffect(pre.getOperand());
-		}
-		case ASTNode.POSTFIX_EXPRESSION: {
-			PostfixExpression pos = (PostfixExpression)exp;
-			if(pos.getOperator().equals(Operator.DECREMENT) || pos.getOperator().equals(Operator.INCREMENT))
-				return true;
-			else
-				return hasSideEffect(pos.getOperand());
-		}
-		case ASTNode.INFIX_EXPRESSION: {
-			InfixExpression inf = (InfixExpression)exp;
-			if(hasSideEffect(inf.getLeftOperand()))
-				return true;
-			if(hasSideEffect(inf.getRightOperand()))
-				return true;
-			for(Expression e : (List<Expression>)inf.extendedOperands()) {
-				if(hasSideEffect(e))
+			case ASTNode.CONDITIONAL_EXPRESSION: {// tern�rio
+				ConditionalExpression cond = (ConditionalExpression)exp;
+				if(hasSideEffect(cond.getExpression()))
 					return true;
+				if(hasSideEffect(cond.getThenExpression()))
+					return true;
+				if(hasSideEffect(cond.getElseExpression()))
+					return true;
+				return false;
 			}
-			return false;
-		}
-		case ASTNode.ASSIGNMENT: {
-			Assignment asg = (Assignment)exp;
-			return true;
-		}
-		case ASTNode.CLASS_INSTANCE_CREATION: {
-			ClassInstanceCreation cic = (ClassInstanceCreation)exp;
-			return true;
-		}
-		case ASTNode.SUPER_METHOD_INVOCATION: {
-			SuperMethodInvocation mi = (SuperMethodInvocation)exp;
-			return true;
-		}
-		case ASTNode.METHOD_INVOCATION: {
-			MethodInvocation mi = (MethodInvocation)exp;
-			return true;
-		}
-		case ASTNode.THIS_EXPRESSION: {
-			ThisExpression te = (ThisExpression)exp;
-			return false;
-		}
-		case ASTNode.SUPER_FIELD_ACCESS: {
-			SuperFieldAccess fa = (SuperFieldAccess)exp;
-			return hasSideEffect(fa.getQualifier());
-		}
-		case ASTNode.FIELD_ACCESS: {
-			/*
-			 * A().B, onde A � uma EXPRESSION e B � um SimpleName
-			 */
-			FieldAccess fa = (FieldAccess)exp;
-			if(hasSideEffect(fa.getExpression()))
-				return true;
-			else
+			case ASTNode.INSTANCEOF_EXPRESSION: {
+				InstanceofExpression inst = (InstanceofExpression)exp;
+				return hasSideEffect(inst.getLeftOperand());
+			}
+			case ASTNode.PARENTHESIZED_EXPRESSION: {
+				ParenthesizedExpression par = (ParenthesizedExpression)exp;
+				return hasSideEffect(par.getExpression());
+			}
+			case ASTNode.CAST_EXPRESSION: {
+				CastExpression cast = (CastExpression)exp;
+				return hasSideEffect(cast.getExpression());
+			}
+			case ASTNode.PREFIX_EXPRESSION: {
+				PrefixExpression pre = (PrefixExpression)exp;
+				if(pre.getOperator().equals(Operator.DECREMENT) || pre.getOperator().equals(Operator.INCREMENT))
+					return true;
+				else
+					return hasSideEffect(pre.getOperand());
+			}
+			case ASTNode.POSTFIX_EXPRESSION: {
+				PostfixExpression pos = (PostfixExpression)exp;
+				if(pos.getOperator().equals(Operator.DECREMENT) || pos.getOperator().equals(Operator.INCREMENT))
+					return true;
+				else
+					return hasSideEffect(pos.getOperand());
+			}
+			case ASTNode.INFIX_EXPRESSION: {
+				InfixExpression inf = (InfixExpression)exp;
+				if(hasSideEffect(inf.getLeftOperand()))
+					return true;
+				if(hasSideEffect(inf.getRightOperand()))
+					return true;
+				for(Expression e : (List<Expression>)inf.extendedOperands()) {
+					if(hasSideEffect(e))
+						return true;
+				}
 				return false;
-		}
-		case ASTNode.QUALIFIED_NAME: {
-			/*
-			 * A.B, onde A � um NAME e B � um SimpleName
-			 */
-			QualifiedName qn = (QualifiedName)exp;
+			}
+			case ASTNode.ASSIGNMENT: {
+				Assignment asg = (Assignment)exp;
+				return true;
+			}
+			case ASTNode.CLASS_INSTANCE_CREATION: {
+				ClassInstanceCreation cic = (ClassInstanceCreation)exp;
+				return true;
+			}
+			case ASTNode.SUPER_METHOD_INVOCATION: {
+				SuperMethodInvocation mi = (SuperMethodInvocation)exp;
+				return true;
+			}
+			case ASTNode.METHOD_INVOCATION: {
+				MethodInvocation mi = (MethodInvocation)exp;
+				return true;
+			}
+			case ASTNode.THIS_EXPRESSION: {
+				ThisExpression te = (ThisExpression)exp;
+				return false;
+			}
+			case ASTNode.SUPER_FIELD_ACCESS: {
+				SuperFieldAccess fa = (SuperFieldAccess)exp;
+				return hasSideEffect(fa.getQualifier());
+			}
+			case ASTNode.FIELD_ACCESS: {
+				/*
+				 * A().B, onde A � uma EXPRESSION e B � um SimpleName
+				 */
+				FieldAccess fa = (FieldAccess)exp;
+				if(hasSideEffect(fa.getExpression()))
+					return true;
+				else
+					return false;
+			}
+			case ASTNode.QUALIFIED_NAME: {
+				/*
+				 * A.B, onde A � um NAME e B � um SimpleName
+				 */
+				QualifiedName qn = (QualifiedName)exp;
 
-			if(hasSideEffect(qn.getQualifier()))
-				return true;
-			else
+				if(hasSideEffect(qn.getQualifier()))
+					return true;
+				else
+					return false;
+			}
+			case ASTNode.SIMPLE_NAME: {
+				SimpleName sn = (SimpleName)exp;
 				return false;
-		}
-		case ASTNode.SIMPLE_NAME: {
-			SimpleName sn = (SimpleName)exp;
-			return false;
-		}
-		case ASTNode.TYPE_LITERAL: {
-			TypeLiteral tl = (TypeLiteral)exp;
-			return false;
-		}
-		default: {
-			System.out.println(">>> Expression n�o tratada (hasSideEffect): " + exp.nodeClassForType(exp.getNodeType()) + " - " + exp.toString());
-			return false;
-		}
+			}
+			case ASTNode.TYPE_LITERAL: {
+				TypeLiteral tl = (TypeLiteral)exp;
+				return false;
+			}
+			default: {
+				System.out.println(">>> Expression n�o tratada (hasSideEffect): " + exp.nodeClassForType(exp.getNodeType()) + " - " + exp.toString());
+				return false;
+			}
 		}
 	}
 
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = selection;
 	}
 
+	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		shell = targetPart.getSite().getShell();
 	}
@@ -1426,24 +1430,24 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 
 	private void log(int se, ASTNode n) {
 		switch(se) {
-		case 1:
-			contSE1++;
-			break;
-		case 2:
-			contSE2++;
-			break;
-		case 3:
-			contSE3++;
-			break;
-		case 4:
-			contSE4++;
-			break;
-		case 5:
-			contSE5++;
-			break;
-		case 6:
-			contSE6++;
-			break;
+			case 1:
+				contSE1++;
+				break;
+			case 2:
+				contSE2++;
+				break;
+			case 3:
+				contSE3++;
+				break;
+			case 4:
+				contSE4++;
+				break;
+			case 5:
+				contSE5++;
+				break;
+			case 6:
+				contSE6++;
+				break;
 		}
 
 		if(n.getRoot().getNodeType() == n.COMPILATION_UNIT) {

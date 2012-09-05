@@ -117,7 +117,8 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 * Tells whether this class is in debug mode.
 	 * @since 3.0
 	 */
-	private static boolean DEBUG= false;//"true".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.jface.text/debug/AnnotationPainter"));
+	private static boolean DEBUG = FeaturerPlugin.DEBUG_PAINTER;
+	//	private static boolean DEBUG= false;//"true".equalsIgnoreCase(Platform.getDebugOption("org.eclipse.jface.text/debug/AnnotationPainter"));
 
 	/**
 	 * The squiggly painter strategy.

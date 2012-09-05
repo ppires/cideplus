@@ -22,13 +22,19 @@ public class ASTUtils {
 		return null;
 	}
 
+	public static ASTNode getNode(ICompilationUnit compUnit, int offset, int length) {
+		return NodeFinder.perform(Util.getAst(compUnit), offset, length);
+	}
+
+	public static ASTNode getNode(int offset, int length) {
+		return getNode(PluginUtils.getCurrentCompilationUnit(), offset, length);
+	}
+
 	public static ASTNode getNodeFromSelection(ICompilationUnit compilationUnit, ITextSelection selection) {
-		ASTNode node = NodeFinder.perform(Util.getAst(compilationUnit), selection.getOffset(), selection.getLength());
-		return node;
+		return getNode(compilationUnit, selection.getOffset(), selection.getLength());
 	}
 
 	public static ASTNode getNodeFromSelection(ITextSelection selection) {
-		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
-		return getNodeFromSelection(compUnit, selection);
+		return getNode(selection.getOffset(), selection.getLength());
 	}
 }
