@@ -8,6 +8,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.ui.IEditorPart;
 
+import cideplus.FeaturerPlugin;
 import cideplus.ui.editor.EditorListener;
 
 public class RulerMouseListener implements MouseListener {
@@ -19,11 +20,11 @@ public class RulerMouseListener implements MouseListener {
 
 	public RulerMouseListener() {
 		super();
-		System.out.println("RulerMouseListener.RulerMouseListener()");
+		if (FeaturerPlugin.DEBUG_MOUSE_LISTENER) System.out.println("RulerMouseListener.RulerMouseListener()");
 	}
 
 	public RulerMouseListener(IEditorPart editor) {
-		System.out.println("RulerMouseListener.RulerMouseListener(Control)");
+		if (FeaturerPlugin.DEBUG_MOUSE_LISTENER) System.out.println("RulerMouseListener.RulerMouseListener(Control)");
 		this.editor = editor;
 		Object obj = editor.getAdapter(IVerticalRulerInfo.class);
 		if (obj != null && obj instanceof IVerticalRulerInfo) {
@@ -36,26 +37,26 @@ public class RulerMouseListener implements MouseListener {
 
 	@Override
 	public void mouseDoubleClick(MouseEvent e) {
-		System.out.println("RulerMouseListener.mouseDoubleClick()");
+		if (FeaturerPlugin.DEBUG_MOUSE_LISTENER) System.out.println("RulerMouseListener.mouseDoubleClick()");
 	}
 
 	@Override
 	public void mouseDown(MouseEvent e) {
-		System.out.println("RulerMouseListener.mouseDown()");
+		if (FeaturerPlugin.DEBUG_MOUSE_LISTENER) System.out.println("RulerMouseListener.mouseDown()");
 		line_number = ruler_info.toDocumentLineNumber(e.y) + 1;
 	}
 
 	@Override
 	public void mouseUp(MouseEvent e) {
-		System.out.println("RulerMouseListener.mouseUp()");
+		if (FeaturerPlugin.DEBUG_MOUSE_LISTENER) System.out.println("RulerMouseListener.mouseUp()");
 		line_number = ruler_info.toDocumentLineNumber(e.y) + 1;
-		System.out.println("line clicked: " + line_number);
+		if (FeaturerPlugin.DEBUG_MOUSE_LISTENER) System.out.println("line clicked: " + line_number);
 		IPainter painter = EditorListener.getPainter(viewer);
 		if (painter instanceof CustomAnnotationPainter) {
 			((CustomAnnotationPainter) painter).setAnnotationToPaint(line_number);
 		}
 		else {
-			System.out.println("found painter that is NOT CustomAnnotationPainter!");
+			if (FeaturerPlugin.DEBUG_MOUSE_LISTENER) System.out.println("found painter that is NOT CustomAnnotationPainter!");
 		}
 	}
 

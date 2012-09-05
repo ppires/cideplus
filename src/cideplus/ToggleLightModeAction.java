@@ -9,7 +9,8 @@ public class ToggleLightModeAction implements IObjectActionDelegate {
 
 	public ToggleLightModeAction() {
 		// TODO Auto-generated constructor stub
-		System.out.println("ToggleLightModeAction.ToggleLightModeAction()");
+		if (FeaturerPlugin.DEBUG_LIGHT_MODE)
+			System.out.println("ToggleLightModeAction.ToggleLightModeAction()");
 	}
 
 	@Override
@@ -58,13 +59,15 @@ public class ToggleLightModeAction implements IObjectActionDelegate {
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
-		System.out.println("ToggleLightModeAction.selectionChanged()");
+		if (FeaturerPlugin.DEBUG_LIGHT_MODE)
+			System.out.println("ToggleLightModeAction.selectionChanged()");
 	}
 
 	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		// TODO Auto-generated method stub
-		System.out.println("ToggleLightModeAction.setActivePart()");
+		if (FeaturerPlugin.DEBUG_LIGHT_MODE)
+			System.out.println("ToggleLightModeAction.setActivePart()");
 	}
 
 }

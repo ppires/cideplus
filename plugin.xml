@@ -172,13 +172,13 @@
                label="Configure Features..."
                menubarPath="cideplus.menuFeatures/group1">
          </action>
-        <action
+        <!--action
               class="cideplus.automation.ColorDetectionAction"
               icon="icons/view.gif"
               id="vbo.ColorDetection"
               label="Automatic Feature Detection"
               menubarPath="cideplus.menuFeatures/group1">
-           </action>
+           </action-->
          <action
                class="cideplus.ui.configuration.popup.action.CleanProjectAction"
                enablesFor="1"

@@ -43,6 +43,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	public static final boolean DEBUG_STYLE_CACHE = false;
 	public static final boolean DEBUG_PART_LISTENER = false;
 	public static final boolean DEBUG_LIGHT_MODE = false;
+	public static final boolean DEBUG_MOUSE_LISTENER = false;
 
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;

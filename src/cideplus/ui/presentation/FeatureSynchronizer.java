@@ -16,27 +16,20 @@ import cideplus.FeaturerPlugin;
 import cideplus.model.FeaturesUtil;
 import cideplus.model.exceptions.FeatureNotFoundException;
 
-public class FeatureSynchronizer implements IStartup {
+public class FeatureSynchronizer implements IStartup, IResourceChangeListener {
 
 	/**
 	 * Register for marker changes notification
 	 */
 	@Override
 	public void earlyStartup() {
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(new FeatureSynchronizer.PreSynch(), IResourceChangeEvent.PRE_BUILD);
-		//		ResourcesPlugin.getWorkspace().addResourceChangeListener(new FeatureSynchronizer.PosSynch(), IResourceChangeEvent.POST_BUILD);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.PRE_BUILD);
 	}
 
+	@Override
+	public void resourceChanged(IResourceChangeEvent event) {
 
-	/**
-	 * Removes the feature associated with the old AST node.
-	 * @author ppires
-	 *
-	 */
-	public class PreSynch implements IResourceChangeListener {
-		@Override
-		public void resourceChanged(IResourceChangeEvent event) {
-
+		if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER) {
 			System.out.print("\n\nBuild kind: ");
 			switch (event.getBuildKind()) {
 				case IncrementalProjectBuilder.AUTO_BUILD:
@@ -55,147 +48,55 @@ public class FeatureSynchronizer implements IStartup {
 					System.out.println("None of them...");
 					break;
 			}
-
-			IMarkerDelta[] markerDeltas = event.findMarkerDeltas(FeaturesMarker.TYPE, false);
-			for (IMarkerDelta delta : markerDeltas) {
-				int kind = delta.getKind();
-
-				switch (kind) {
-					case IResourceDelta.ADDED:
-						if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER)
-							System.out.println("Marker ADDED!");
-						//					getInstance().addMarkerToCache(delta.getMarker());
-						break;
-
-					case IResourceDelta.REMOVED:
-						if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER)
-							System.out.println("Marker REMOVED!");
-						//					getInstance().removeMarkerFromCache(delta.getMarker());
-						break;
-
-					case IResourceDelta.CHANGED:
-						if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER)
-							System.out.println("\nMarker CHANGED! (PRE)");
-
-						int oldOffset = delta.getAttribute("charStart", -1);
-						int oldLength = delta.getAttribute("charEnd", -1) - oldOffset;
-						int oldFeatureId = delta.getAttribute("featureId", -1);
-						IMarker marker = delta.getMarker();
-						int offset = marker.getAttribute("charStart", -1);
-						int length = marker.getAttribute("charEnd", -1) - offset;
-						int featureId = marker.getAttribute("featureId", -1);
-						System.out.println("offset: " + oldOffset + "/" + offset);
-						System.out.println("length: " + oldLength + "/" + length);
-						System.out.println("feature id: " + oldFeatureId + "/" + featureId);
-						//						ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
-						//						System.out.println("searchind old node...");
-						//						ASTNode oldNode = ASTUtils.getNode(compUnit, oldOffset, oldLength);
-						//					System.out.println("searchind new node...");
-						//					ASTNode newNode = ASTUtils.getNode(compUnit, offset, length);
-						try {
-							FeaturesUtil.unmarkFeature(oldFeatureId, oldOffset, oldLength);
-							//							FeaturesUtil.unmarkFeature(oldFeatureId, offset, length);
-						} catch (FeatureNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (CoreException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-
-						break;
-				}
-
-				//			if (oldNode == null) {
-				//				System.out.println("old node is null");
-				//			}
-				//			else {
-				//
-				//			}
-
-
-
-
-
-			}
 		}
-	}
 
+		IMarkerDelta[] markerDeltas = event.findMarkerDeltas(FeaturesMarker.TYPE, false);
+		for (IMarkerDelta delta : markerDeltas) {
+			int kind = delta.getKind();
 
-	/**
-	 * adds the previously removed feature.
-	 * @author ppires
-	 *
-	 */
-	public class PosSynch implements IResourceChangeListener {
-		@Override
-		public void resourceChanged(IResourceChangeEvent event) {
-			IMarkerDelta[] markerDeltas = event.findMarkerDeltas(FeaturesMarker.TYPE, false);
-			for (IMarkerDelta delta : markerDeltas) {
-				int kind = delta.getKind();
+			switch (kind) {
+				case IResourceDelta.ADDED:
+					if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER)
+						System.out.println("Marker ADDED!");
+					//					getInstance().addMarkerToCache(delta.getMarker());
+					break;
 
-				switch (kind) {
-					case IResourceDelta.ADDED:
-						if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER)
-							System.out.println("Marker ADDED!");
-						//					getInstance().addMarkerToCache(delta.getMarker());
-						break;
+				case IResourceDelta.REMOVED:
+					if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER)
+						System.out.println("Marker REMOVED!");
+					//					getInstance().removeMarkerFromCache(delta.getMarker());
+					break;
 
-					case IResourceDelta.REMOVED:
-						if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER)
-							System.out.println("Marker REMOVED!");
-						//					getInstance().removeMarkerFromCache(delta.getMarker());
-						break;
+				case IResourceDelta.CHANGED:
+					if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER)
+						System.out.println("\nMarker CHANGED! (PRE)");
 
-					case IResourceDelta.CHANGED:
-						if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER)
-							System.out.println("\nMarker CHANGED (POS)!");
-
-						int oldOffset = delta.getAttribute("charStart", -1);
-						int oldLength = delta.getAttribute("charEnd", -1) - oldOffset;
-						int oldFeatureId = delta.getAttribute("featureId", -1);
-						IMarker marker = delta.getMarker();
-						int offset = marker.getAttribute("charStart", -1);
-						int length = marker.getAttribute("charEnd", -1) - offset;
-						int featureId = marker.getAttribute("featureId", -1);
+					int oldOffset = delta.getAttribute("charStart", -1);
+					int oldLength = delta.getAttribute("charEnd", -1) - oldOffset;
+					int oldFeatureId = delta.getAttribute("featureId", -1);
+					IMarker marker = delta.getMarker();
+					int offset = marker.getAttribute("charStart", -1);
+					int length = marker.getAttribute("charEnd", -1) - offset;
+					int featureId = marker.getAttribute("featureId", -1);
+					if (FeaturerPlugin.DEBUG_RESOURCE_LISTENER) {
 						System.out.println("offset: " + oldOffset + "/" + offset);
 						System.out.println("length: " + oldLength + "/" + length);
 						System.out.println("feature id: " + oldFeatureId + "/" + featureId);
-						//						ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
-						//					System.out.println("searchind old node...");
-						//					ASTNode oldNode = ASTUtils.getNode(compUnit, oldOffset, oldLength);
-						//						System.out.println("searchind new node...");
-						//						ASTNode newNode = ASTUtils.getNode(compUnit, offset, length);
-						try {
-							FeaturesUtil.markFeature(oldFeatureId, offset, length);
-						} catch (FeatureNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (CoreException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+					}
+					try {
+						FeaturesUtil.unmarkFeature(oldFeatureId, oldOffset, oldLength);
+					} catch (FeatureNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
-						break;
-				}
-
-				//			if (oldNode == null) {
-				//				System.out.println("old node is null");
-				//			}
-				//			else {
-				//
-				//			}
-
-
-
-
-
+					break;
 			}
 		}
 	}
