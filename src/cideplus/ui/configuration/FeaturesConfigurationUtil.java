@@ -88,7 +88,7 @@ public class FeaturesConfigurationUtil {
 						IPath path = compilationUnit.getPath().removeFileExtension().addFileExtension("feat");
 						String filename = "." + path.lastSegment();
 						path = path.removeLastSegments(1).append(filename);
-						System.out.println("features file: " + path);
+						//System.out.println("features file: " + path);
 
 						final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
 						final CompilationUnitFeaturesModel model;
@@ -186,7 +186,8 @@ public class FeaturesConfigurationUtil {
 			//projectCache.put(project, featuresManager);
 		}
 		else {
-			if (FeaturerPlugin.DEBUG_MANAGER_CACHE) System.out.println("projectCache HIT");
+			if (FeaturerPlugin.DEBUG_MANAGER_CACHE)
+				System.out.println("projectCache HIT");
 		}
 		return featuresManager;
 	}

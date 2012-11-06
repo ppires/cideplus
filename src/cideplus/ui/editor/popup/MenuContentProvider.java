@@ -61,6 +61,10 @@ public class MenuContentProvider extends CompoundContributionItem {
 			IContributionItem[] menuItems = new IContributionItem[features.size() + 1];
 			ITextSelection selection = PluginUtils.getCurrentEditorTextSelection();
 			ASTNode node = ASTUtils.getNodeFromSelection(managerForFile.getCompilationUnit(), selection);
+
+			//			System.out.println("Selection:\n  offset: " + selection.getOffset() + "\n  length: " + selection.getLength());
+			//			System.out.println("AST Node:\n  offset: " + node.getStartPosition() + "\n  length: " + node.getLength());
+
 			Iterator<Feature> it = features.iterator();
 			int i;
 			for (i = 0; it.hasNext(); i++) {

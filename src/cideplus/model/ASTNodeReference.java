@@ -78,11 +78,10 @@ public class ASTNodeReference {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
+		final int prime = 127;
 		int result = 1;
-		result = prime * result
-				+ ((identifier == null) ? 0 : identifier.hashCode());
-		return result;
+		result = prime * result + (identifier == null ? 0 : identifier.hashCode());
+		return result + offset > bytes ? offset/bytes : bytes/offset;
 	}
 
 	@Override
