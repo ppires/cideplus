@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CIDE+
 Bundle-SymbolicName: cideplus;singleton:=true
-Bundle-Version: 0.2.2.beta
+Bundle-Version: 0.2.3.beta
 Bundle-Activator: cideplus.FeaturerPlugin
 Export-Package: cideplus,
  cideplus.automation,

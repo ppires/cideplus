@@ -68,6 +68,10 @@ public class ASTNodeReference {
 		this.offset = offset;
 	}
 
+	public String getIdentifier() {
+		return this.identifier;
+	}
+
 	public int getOffset() {
 		return offset;
 	}
@@ -93,16 +97,23 @@ public class ASTNodeReference {
 		if (getClass() != obj.getClass())
 			return false;
 		ASTNodeReference other = (ASTNodeReference) obj;
-		if (identifier == null) {
-			if (other.identifier != null)
-				return false;
-		} else if (!identifier.equals(other.identifier))
-			return false;
-		return true;
+
+		if (this.getIdentifier().equals(other.getIdentifier()) &&
+				this.getByteCount() == other.getByteCount() &&
+				this.getOffset() == other.getOffset()) {
+			return true;
+		}
+		return false;
+		//		if (identifier == null) {
+		//			if (other.identifier != null)
+		//				return false;
+		//		} else if (!identifier.equals(other.identifier))
+		//			return false;
+		//		return true;
 	}
 
 	/**
-	 * Retorna true se a referencia passada como parametro � filha desse objeto
+	 * Retorna true se a referencia passada como parametro é filha desse objeto
 	 * @param reference
 	 * @return
 	 */

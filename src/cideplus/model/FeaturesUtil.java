@@ -154,7 +154,7 @@ public class FeaturesUtil {
 	// TODO: Dar um merge nesses métodos!
 	/* Marca uma feature a partir de um offset e um length */
 	public static void markFeature(int featureId, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
-		System.out.println("  marking feature: offset: " + offset + "length: " + length);
+		System.out.println("  marking feature: offset: " + offset + " length: " + length);
 		IProject project = PluginUtils.getCurrentProject();
 		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
 		IFeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
@@ -173,7 +173,7 @@ public class FeaturesUtil {
 
 	/* Desmarca uma feature a partir de um offset e um length */
 	public static void unmarkFeature(int featureId, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
-		System.out.println("  unmarking feature: offset: " + offset + "length: " + length);
+		System.out.println("  unmarking feature: offset: " + offset + " length: " + length);
 		IProject project = PluginUtils.getCurrentProject();
 		ICompilationUnit compUnit = PluginUtils.getCurrentCompilationUnit();
 		IFeaturesManager manager = FeaturesConfigurationUtil.getFeaturesManager(project);
