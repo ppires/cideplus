@@ -186,7 +186,7 @@ public class StatisticsAction implements IObjectActionDelegate {
 			Set<Feature> features = manager.getFeatures(astNodeReference);
 			for (Feature feature : features) {
 				if(statitics.isForFeature(feature)){
-					//se as estatiticas que estao sendo calculadas, s�o para determinada feature, aplicar o valor e passar para o proximo n�
+					//se as estatiticas que estao sendo calculadas, sï¿½o para determinada feature, aplicar o valor e passar para o proximo nï¿½
 					count += 1;
 					break;
 				}
@@ -205,7 +205,7 @@ public class StatisticsAction implements IObjectActionDelegate {
 			Set<Feature> features = manager.getFeatures(astNodeReference);
 			for (Feature feature : features) {
 				if(statitics.isForFeature(feature)){
-					//se as estatiticas que estao sendo calculadas, s�o para determinada feature, aplicar o valor e passar para o proximo n�
+					//se as estatiticas que estao sendo calculadas, sï¿½o para determinada feature, aplicar o valor e passar para o proximo nï¿½
 					count += astNodeReference.getByteCount();
 					break;
 				}

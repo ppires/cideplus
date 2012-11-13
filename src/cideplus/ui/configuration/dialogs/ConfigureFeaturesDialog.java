@@ -36,7 +36,7 @@ import cideplus.ui.configuration.FeaturesConfigurationUtil;
 import cideplus.ui.configuration.IFeaturesManager;
 
 /**
- * Caixa de di�logo para configura��o das features do projeto.
+ * Caixa de diï¿½logo para configuraï¿½ï¿½o das features do projeto.
  * @see ConfigureFeaturesDialog.configure
  * @author rogel
  *
@@ -63,7 +63,7 @@ public class ConfigureFeaturesDialog extends Dialog {
 	
 	
 	/**
-	 * Mostra a caixa de di�logo para configura��o das features do projeto
+	 * Mostra a caixa de diï¿½logo para configuraï¿½ï¿½o das features do projeto
 	 * @throws CoreException 
 	 * @throws IOException 
 	 */
@@ -111,7 +111,7 @@ public class ConfigureFeaturesDialog extends Dialog {
 	}
 
 	/* 
-	 * C�DIGO DE CRIA��O DOS COMPONENTES DA VIEW
+	 * Cï¿½DIGO DE CRIAï¿½ï¿½O DOS COMPONENTES DA VIEW
 	 */
 	
 	protected void createToolBar(Composite comp) {

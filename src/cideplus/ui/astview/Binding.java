@@ -104,7 +104,7 @@ public class Binding extends ASTAttribute {
 					
 				case IBinding.TYPE:
 					if(1==1){
-						break;//não iremos mostrar todas essas informações da classe
+						break;//nÃ£o iremos mostrar todas essas informaÃ§Ãµes da classe
 					}
 					ITypeBinding typeBinding= (ITypeBinding) fBinding;
 					res.add(new BindingProperty(this, "QUALIFIED NAME", typeBinding.getQualifiedName(), true)); //$NON-NLS-1$

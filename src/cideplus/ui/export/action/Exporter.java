@@ -21,11 +21,12 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.swt.widgets.Shell;
 
+import cideplus.FeaturerPlugin;
 import cideplus.model.ASTNodeReference;
 import cideplus.model.Feature;
 import cideplus.model.exceptions.FeatureNotFoundException;
-import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.FeaturesConfigurationUtil;
+import cideplus.ui.configuration.ICompilationUnitFeaturesManager;
 import cideplus.ui.configuration.IFeaturesManager;
 
 public class Exporter {
@@ -51,10 +52,12 @@ public class Exporter {
 	}
 
 	/**
-	 * Exporta os arquivos para um mapa com o nome e conte�do de cada arquivo exportado.<BR>
-	 * Para cada arquivo � adicionado 3 ao trabalho do monitor<BR>
-	 * O m�todo getFileCount retorna o n�mero de arquivos encontrados, esse valor � o mesmo do n�mero de progressos desse m�todo (mas cada progresso conta 3 unidades).
-	 * Os m�todos beginTask e done do objeto monitor, devem ser chamados fora desse m�todo. Um antes e o outro depois respectivamente.
+	 * Exporta os arquivos para um mapa com o nome e conteúdo de cada arquivo exportado.<BR>
+	 * Para cada arquivo é adicionado 3 ao trabalho do monitor<BR>
+	 * O método getFileCount retorna o número de arquivos encontrados, esse valor é o mesmo do
+	 * número de progressos desse método (mas cada progresso conta 3 unidades).
+	 * Os métodos beginTask e done do objeto monitor, devem ser chamados fora desse método.
+	 * Um antes e o outro depois, respectivamente.
 	 * @param monitor
 	 * @return
 	 * @throws CoreException
@@ -66,7 +69,7 @@ public class Exporter {
 		Map<String, byte[]> result = new LinkedHashMap<String, byte[]>();
 		for (IPackageFragmentRoot iPackageFragmentRoot : allPackageFragmentRoots) {
 			if(iPackageFragmentRoot.getKind() == IPackageFragmentRoot.K_SOURCE){
-				//todos os package roots que s�o source folders...
+				//todos os package roots que são source folders...
 				monitor.setTaskName("Exporting... "+iPackageFragmentRoot.getElementName());
 				IJavaElement[] children = iPackageFragmentRoot.getChildren();
 				checkChildren(result, children, monitor);
@@ -107,7 +110,7 @@ public class Exporter {
 		String source = comp.getSource();
 		for (Iterator<ASTNodeReference> iterator = nodeReferences.iterator(); iterator.hasNext();) {
 			ASTNodeReference astNodeReference = iterator.next();
-			//elimina do source o c�digo do n� que n�o ser� exportado
+			//elimina do source o código do nó que não será exportado
 			source = source.substring(0, astNodeReference.getOffset()) +
 					source.substring(astNodeReference.getOffset() + astNodeReference.getByteCount(), source.length());
 		}
@@ -117,7 +120,7 @@ public class Exporter {
 	}
 
 	/**
-	 * Retorna a lista de n�s que devem ser removidos
+	 * Retorna a lista de nós que devem ser removidos
 	 * @param manager
 	 * @return
 	 */
@@ -126,13 +129,29 @@ public class Exporter {
 		Set<ASTNodeReference> nodesToRemove = new HashSet<ASTNodeReference>();
 		for (Iterator<ASTNodeReference> iterator = allNodeReferences.iterator(); iterator.hasNext();) {
 			ASTNodeReference astNodeReference = iterator.next();
-			//iremos remover os items que n�o ser�o exportados... � importante que os n�s estejam ordenados por offset decrescente
+			if (FeaturerPlugin.DEBUG_AST_REFERENCE)
+				astNodeReference.prettyPrint();
+			//iremos remover os items que não serão exportados... é importante que os nós estejam ordenados por offset decrescente
 			Set<Feature> nodeFeatures = manager.getFeatures(astNodeReference);
+			int totalNodeFeatures = nodeFeatures.size();
+			if (FeaturerPlugin.DEBUG_AST_REFERENCE)
+				for (Feature f : nodeFeatures)
+					System.out.println(f.getName());
 			nodeFeatures.removeAll(exportedFeatures);
-			if(nodeFeatures.size() > 0){
-				//se ao remover da lista de features do n�.. a lista de features a ser exportada..
-				//sobrar alguma feature, significa que o n� tem uma feature que n�o est� sendo exportada...
-				//ent�o vamos remover esse n�
+			if (FeaturerPlugin.DEBUG_AST_REFERENCE) {
+				System.out.println("--");
+				for (Feature f : nodeFeatures)
+					System.out.println(f.getName());
+			}
+			if(nodeFeatures.size() == totalNodeFeatures){
+				/*
+				 * se ao remover da lista de features do nó.. a lista de features a ser exportada..
+				 * sobrarem todas as features, significa que todas as features que o nó tem
+				 * não estão sendo exportadas... então vamos remover esse nó
+				 * 
+				 *  Caso alguma feature seja retirada, significa que o nó possui pelo menos
+				 *  uma feature que não está sendo exportada. Então vamos deixar o nó.
+				 */
 				nodesToRemove.add(astNodeReference);
 			}
 		}
@@ -140,13 +159,14 @@ public class Exporter {
 	}
 
 	/**
-	 * Remove as features que est�o se sobrescrevendo... � utilizado o offset e o length para o c�lculo.
-	 * Ordena os n�s em ordem decrescente de offset. Ou seja, offsets maiores vem primeiro.
+	 * Remove as features que estão se sobrescrevendo... é utilizado o offset e o length para o cálculo.
+	 * Ordena os nós em ordem decrescente de offset. Ou seja, offsets maiores vem primeiro.
 	 * @param nodeReferences
 	 * @return
 	 */
 	private Set<ASTNodeReference> removeOverridenAndOrder(Set<ASTNodeReference> nodeReferences) {
 		TreeSet<ASTNodeReference> result = new TreeSet<ASTNodeReference>(new Comparator<ASTNodeReference>() {
+			@Override
 			public int compare(ASTNodeReference o1, ASTNodeReference o2) {
 				return o2.getOffset() - o1.getOffset();//ordem decrescente de offset
 			}
@@ -168,6 +188,7 @@ public class Exporter {
 	private void countProjectFiles() throws CoreException {
 		projectJavaCount = 0;
 		project.getProject().accept(new IResourceVisitor() {
+			@Override
 			public boolean visit(IResource resource) throws CoreException {
 				if(resource.getName().endsWith(".java")){
 					projectJavaCount++;

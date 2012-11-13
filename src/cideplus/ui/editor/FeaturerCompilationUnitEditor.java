@@ -34,7 +34,7 @@ public class FeaturerCompilationUnitEditor extends CompilationUnitEditor {
 	//	private SourceViewerConfig sourceViewerConfig = null;
 
 
-	/* Hover já está funcionando sem esse source viewer config. */
+	/* Hover jÃ¡ estÃ¡ funcionando sem esse source viewer config. */
 	//	@Override
 	//	protected JavaSourceViewerConfiguration createJavaSourceViewerConfiguration() {
 	//		System.out.println("FeaturerCompilationUnitEditor.createJavaSourceViewerConfiguration()");

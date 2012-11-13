@@ -29,6 +29,7 @@ public class ExportProjectAction implements IObjectActionDelegate {
 	private Shell shell;
 	private IJavaProject project;
 
+	@Override
 	public void run(IAction action) {
 		//		ITextEditor editor = PluginUtils.getCurrentTextEditor();
 		//		if (editor instanceof FeaturerCompilationUnitEditor) {
@@ -64,9 +65,9 @@ public class ExportProjectAction implements IObjectActionDelegate {
 				try {
 					Exporter exporter = new Exporter(shell, project, features);
 					int fileCount = exporter.getFileCount(monitor);
-					//o fileCount � multiplicado por 4 para passar ao monitor pois
-					//o m�todo getExportedFiles tem peso 3
-					//e o m�todo writeFilesToDir tem peso 1
+					//o fileCount é multiplicado por 4 para passar ao monitor pois
+					//o método getExportedFiles() tem peso 3
+					//e o método writeFilesToDir() tem peso 1
 					monitor.beginTask("Exporting "+fileCount+" files", fileCount * 4);
 					Map<String, byte[]> exportedFiles = exporter.getExportedFiles(monitor);
 					ExporterWriter writer = new ExporterWriter();
@@ -84,6 +85,7 @@ public class ExportProjectAction implements IObjectActionDelegate {
 		job.schedule();
 	}
 
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		if(selection instanceof IJavaProject){
 			project = (IJavaProject) selection;
@@ -92,6 +94,7 @@ public class ExportProjectAction implements IObjectActionDelegate {
 		}
 	}
 
+	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		shell = targetPart.getSite().getShell();
 	}

@@ -37,7 +37,7 @@ import cideplus.ui.editor.FeaturerCompilationUnitEditor;
 import cideplus.ui.presentation.FeaturesMarker;
 
 /**
- * Class utilitária para trabalhar com a configuração das features junto a Interface Gráfica
+ * Class utilitÃ¡ria para trabalhar com a configuraÃ§Ã£o das features junto a Interface GrÃ¡fica
  * @author rogel
  *
  */
@@ -84,8 +84,8 @@ public class FeaturesConfigurationUtil {
 					if((compilationUnitFeaturesManager = compUnitCache.get(compilationUnit)) == null){
 						if (FeaturerPlugin.DEBUG_MANAGER_CACHE)
 							System.out.println("compUnitCache MISS\n");
-						// um '.' (ponto) é colocado no início do nome do arquivo para ele não ficar visível pro usuário
 						IPath path = compilationUnit.getPath().removeFileExtension().addFileExtension("feat");
+						// um '.' (ponto) é colocado no iní­cio do nome do arquivo para ele não ficar visí­vel pro usuário
 						String filename = "." + path.lastSegment();
 						path = path.removeLastSegments(1).append(filename);
 						//System.out.println("features file: " + path);
@@ -182,7 +182,7 @@ public class FeaturesConfigurationUtil {
 					return compilationUnitFeaturesManager;
 				}
 			};
-			//o project feature manager nao possuirá cache... apenas o compilation unit
+			//o project feature manager nao possuirÃ¡ cache... apenas o compilation unit
 			//projectCache.put(project, featuresManager);
 		}
 		else {
@@ -203,7 +203,7 @@ public class FeaturesConfigurationUtil {
 		return features;
 	}
 
-	//	TODO: Não iterar nas features para buscar o id.
+	//	TODO: NÃ£o iterar nas features para buscar o id.
 	public static Feature getFeature(IProject project, int featureId) throws CoreException, IOException {
 		if (project != null) {
 			Set<Feature> features = getFeatures(project);
@@ -212,8 +212,8 @@ public class FeaturesConfigurationUtil {
 					return feature;
 				}
 			}
-			// TODO: Verificar o impacto de lançar uma exception aqui
-			//       ao invés de retornar null
+			// TODO: Verificar o impacto de lanÃ§ar uma exception aqui
+			//       ao invÃ©s de retornar null
 			//		throw new FeatureNotFoundException(featureId);
 		}
 		else {
@@ -302,7 +302,7 @@ public class FeaturesConfigurationUtil {
 						refresh(iEditorReference);
 					}
 				} else {
-					//se o compilation unit é null, atualizar todos os editores
+					//se o compilation unit Ã© null, atualizar todos os editores
 					refresh(iEditorReference);
 				}
 			}

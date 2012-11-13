@@ -115,7 +115,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	}
 
 
-	/*MÉTODOS UTILITARIOS*/
+	/*MÃTODOS UTILITARIOS*/
 	private Set<Feature> getSafeFeatures(final IFeaturesManager featuresManager){
 		return Util.getSafeFeatures(featuresManager);
 	}
@@ -144,10 +144,10 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			long maxMemory = Runtime.getRuntime().maxMemory();
 			long freeMemory = Runtime.getRuntime().freeMemory();
 
-			if(maxMemory - totalMemory < 350000000){//se a mem�ria ficar em menos de 350MB checar se precisa liberar o cache
+			if(maxMemory - totalMemory < 350000000){//se a memï¿½ria ficar em menos de 350MB checar se precisa liberar o cache
 				if(freeMemory < 450000000){//se tiver menos de 450mb liberar cache
-					//parar de adicionar objetos ao cache.. est� com pouca mem�ria
-					//usar apenas o que j� foi feito cache
+					//parar de adicionar objetos ao cache.. estï¿½ com pouca memï¿½ria
+					//usar apenas o que jï¿½ foi feito cache
 					stopGrowingCache = true;
 				}
 			}
@@ -162,7 +162,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		}
 		return ast;
 	}
-	/*FIM MÉTODOS UTILITARIOS*/
+	/*FIM MÃTODOS UTILITARIOS*/
 
 
 
@@ -224,7 +224,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 							return new Status(IStatus.ERROR, FeaturerPlugin.PLUGIN_ID, e.getMessage());
 						} finally {
 							System.out.println(cacheUtilization);
-							cacheAst = null;//zera o cache para liberar a mem�ria
+							cacheAst = null;//zera o cache para liberar a memï¿½ria
 							ColorDetectionAction.this.manager = null;
 						}
 						return new Status(IStatus.OK, FeaturerPlugin.PLUGIN_ID, "Finish!");
@@ -302,7 +302,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		end.add(Calendar.MINUTE, -start.get(Calendar.MINUTE));
 		end.add(Calendar.SECOND, -start.get(Calendar.SECOND));
 		arqLog.println();
-		System.out.println("Tempo de execu��o: " + end.get(Calendar.HOUR) + ":" + end.get(Calendar.MINUTE) + ":" + end.get(Calendar.SECOND));
+		System.out.println("Tempo de execuï¿½ï¿½o: " + end.get(Calendar.HOUR) + ":" + end.get(Calendar.MINUTE) + ":" + end.get(Calendar.SECOND));
 		System.out.println("\nSE1: " + contSE1);
 		System.out.println("SE2: " + contSE2);
 		System.out.println("SE3: " + contSE3);
@@ -310,7 +310,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 		System.out.println("SE4: " + contSE4);
 		System.out.println("SE5: " + contSE5);
 		System.out.println("SE6: " + contSE6);
-		arqLog.println("Tempo de execu��o: " + end.get(Calendar.HOUR) + ":" + end.get(Calendar.MINUTE) + ":" + end.get(Calendar.SECOND));
+		arqLog.println("Tempo de execuï¿½ï¿½o: " + end.get(Calendar.HOUR) + ":" + end.get(Calendar.MINUTE) + ":" + end.get(Calendar.SECOND));
 		arqLog.println("SE1: " + contSE1);
 		arqLog.println("SE2: " + contSE2);
 		arqLog.println("SE3: " + contSE3);
@@ -354,7 +354,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					//ColoredIDEPlugin.getDefault().notifyListeners(new ColorChangedEvent(this, source.getAST(), source));
 					//nodeColors.endBatch();
 				}
-				System.out.println("concluído!");
+				System.out.println("concluÃ­do!");
 			}
 
 
@@ -362,7 +362,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			monitor.setTaskName("Marking imports of package "+pkg.getElementName());
 			System.out.print("Colorindo todos os <import " + pkg.getElementName() + ".*>... ");
 			searchIMP(jproject, pkg.getElementName().replaceAll("\\.", "/"), feature, monitor);
-			System.out.println("conclu�do!");
+			System.out.println("concluï¿½do!");
 
 
 			if (pkg.getKind() == IPackageFragmentRoot.K_SOURCE) {
@@ -396,7 +396,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				}
 
 			}
-			System.out.println("Conclu�do pacote: " + pkg.getElementName());
+			System.out.println("Concluï¿½do pacote: " + pkg.getElementName());
 		} catch(CoreException ex) {
 			throw new RuntimeException(ex.getMessage(), ex);
 		}
@@ -407,7 +407,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public void searchPROJ(IJavaProject jproject, String name, Feature feature, IProgressMonitor monitor) {
 		System.out.println(">> ENTROU searchPROJ: " + name);
 		try {
-			/* Para todo PACOTE do PROJETO fa�a: */
+			/* Para todo PACOTE do PROJETO faï¿½a: */
 			IPackageFragment[] pkgs = jproject.getPackageFragments();
 			for (IPackageFragment pkg : pkgs) {
 				ICompilationUnit[] compUnits = pkg.getCompilationUnits();
@@ -427,9 +427,9 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 						if(type instanceof TypeDeclaration) {
 							TypeDeclaration td = (TypeDeclaration)type;
 
-							/* se � a PR�PRIA CLASSE */
+							/* se ï¿½ a PRï¿½PRIA CLASSE */
 							if(td.resolveBinding().getKey().equals(name)) {
-								/* marca, se o PAI j� nao estiver marcado */
+								/* marca, se o PAI jï¿½ nao estiver marcado */
 								if(ast.types().size() == 1) {
 									marca(managerForFile, ast, feature);
 								}
@@ -439,7 +439,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 								/* marca os IMPORTS da classe em todo o projeto */
 								searchIMP(jproject, td.resolveBinding().getKey(), feature, monitor);
 							}
-							/* se � um FILHO da classe  */
+							/* se ï¿½ um FILHO da classe  */
 							else if(td.getSuperclassType() != null && checkType(td.getSuperclassType(), name)) {
 								/* procura por esta classe em todo projeto */
 								searchPROJ(jproject, td.resolveBinding().getKey(), feature, monitor);
@@ -448,11 +448,11 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 								for(Type t : (List<Type>)td.superInterfaceTypes()) {
 									if(checkType(t, name)) {
 										// System.out.println("Interface: " + name);
-										/* marca o nome da interface na cl�usula implements */
+										/* marca o nome da interface na clï¿½usula implements */
 										marca(managerForFile, t, feature);
 										IJavaElement ije = jproject.findElement(t.resolveBinding().getKey(), null);
 										if(ije instanceof IType) {
-											/* marca os m�todos da interface */
+											/* marca os mï¿½todos da interface */
 											TreeSet<String> aux = new TreeSet<String>();
 
 											IType inter = (IType) ije;
@@ -477,7 +477,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 							}
 						}
 						else {
-							System.out.println("Tipo n�o tratado: " + type.nodeClassForType(type.getNodeType()) + " - " + type.getName().getFullyQualifiedName());
+							System.out.println("Tipo nï¿½o tratado: " + type.nodeClassForType(type.getNodeType()) + " - " + type.getName().getFullyQualifiedName());
 						}
 					}
 
@@ -518,19 +518,19 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					}
 
 					if(md.getReturnType2() != null && checkType(md.getReturnType2(), name)) {
-						/* colore a declara��o toda */
+						/* colore a declaraï¿½ï¿½o toda */
 						searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey(), feature, monitor);
 					}
 					else if(md.resolveBinding().getKey().equals(name)) {
-						/* colore a declara��o toda */
+						/* colore a declaraï¿½ï¿½o toda */
 						marca(managerForFile, md, feature);
 					}
 					else {
-						/* procura nos par�metros */
+						/* procura nos parï¿½metros */
 						int cont = 0;
 						for(SingleVariableDeclaration svd : (List<SingleVariableDeclaration>) md.parameters()) {
 							if(svd.resolveBinding().getKey().equals(name) || checkType(svd.getType(), name)) {
-								/* adiciona "&999" ao BindingKey para referenciar o n�mero do par�metro */
+								/* adiciona "&999" ao BindingKey para referenciar o nï¿½mero do parï¿½metro */
 								searchPROJ(managerForFile.getCompilationUnit().getJavaProject(), md.resolveBinding().getKey() + "&" + cont, feature, monitor);
 							}
 							cont++;
@@ -570,7 +570,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 					}
 
 					if(achou && todos) {
-						/* Se todos os fields da declara��o s�o da feature, colore a declaracao */
+						/* Se todos os fields da declaraï¿½ï¿½o sï¿½o da feature, colore a declaracao */
 						marca(managerForFile, fd, feature);
 						for(VariableDeclarationFragment vd : frag) {
 							managerForFile.removeFeature(vd, feature);
@@ -592,7 +592,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				}
 
 				default: {
-					System.out.println("BodyDeclaration n�o tratada <" + bd.nodeClassForType(bd.getNodeType()) + ">");
+					System.out.println("BodyDeclaration nï¿½o tratada <" + bd.nodeClassForType(bd.getNodeType()) + ">");
 				}
 			}
 		}
@@ -655,7 +655,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 							log(4, vd);
 						}
 						achou = true;
-						/* Todos os pr�ximos acessos a vari�vel colorida devem ser coloridos.(?) */
+						/* Todos os prï¿½ximos acessos a variï¿½vel colorida devem ser coloridos.(?) */
 						searchSTM((Statement)vdstm.getParent(), vd.resolveBinding().getKey(), managerForFile, feature, monitor);
 					}
 					todos &= managerForFile.hasFeature(vd, feature);
@@ -680,7 +680,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			case ASTNode.RETURN_STATEMENT: {
 				ReturnStatement rstm = (ReturnStatement)stm;
 				if(searchEXP(rstm.getExpression(), name, managerForFile, feature, monitor)) {
-					/* SE a EXP do RETURN for colorida, colorir o m�todo todo(?) */
+					/* SE a EXP do RETURN for colorida, colorir o mï¿½todo todo(?) */
 					/*
 				ASTNode aux = rstm.getParent();
 
@@ -701,7 +701,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				}
 				else
 					 */
-					marca(managerForFile, rstm, feature); // surreal!!! colore s� o return???
+					marca(managerForFile, rstm, feature); // surreal!!! colore sï¿½ o return???
 				}
 				break;
 			}
@@ -863,7 +863,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				searchSTM(tstm.getBody(), name, managerForFile, feature, monitor);
 				// catch
 				for(CatchClause cc : (List<CatchClause>) tstm.catchClauses()) {
-					/* Exce��o capturada na cl�usula Catch */
+					/* Exceï¿½ï¿½o capturada na clï¿½usula Catch */
 					if(checkType(cc.getException().getType(), name))
 						marca(managerForFile, cc.getException(), feature);
 					else {
@@ -875,7 +875,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				// finally
 				searchSTM(tstm.getFinally(), name, managerForFile, feature, monitor);
 
-				// bloco try todo colorido e n�o tem finally, marcar todo o try/catch
+				// bloco try todo colorido e nï¿½o tem finally, marcar todo o try/catch
 				if(tstm.getFinally() == null && managerForFile.hasFeature(tstm.getBody(), feature))
 					marca(managerForFile, tstm, feature);
 				break;
@@ -958,7 +958,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public boolean searchEXP(Expression exp, String name, ICompilationUnitFeaturesManager managerForFile, Feature feature, IProgressMonitor monitor) {
 		if(exp == null) return false;
 		switch(exp.getNodeType()) {
-			case ASTNode.CONDITIONAL_EXPRESSION: {// tern�rio
+			case ASTNode.CONDITIONAL_EXPRESSION: {// ternï¿½rio
 				ConditionalExpression cond = (ConditionalExpression)exp;
 				boolean a = searchEXP(cond.getExpression(), name, managerForFile, feature, monitor);
 				boolean b = searchEXP(cond.getThenExpression(), name, managerForFile, feature, monitor);
@@ -1049,7 +1049,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 
 				String aux[] = name.split("&");
 				if(aux.length > 1) {
-					//System.out.println("� CIC: "+cic.toString()+"\nAux:" + name);
+					//System.out.println("ï¿½ CIC: "+cic.toString()+"\nAux:" + name);
 					assert aux.length > 2;
 
 					if(cic.resolveConstructorBinding().getKey().equals(aux[0])) {
@@ -1149,7 +1149,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 							//marca(nodeColors, cic, feature);
 						}
 						return true; // novidade
-						/* Localiza a decaracao do m�todo para marcar o argumento */
+						/* Localiza a decaracao do mï¿½todo para marcar o argumento */
 						//					searchPROJ(nodeColors.getSource().getCompilationUnit().getJavaProject(), mi.resolveMethodBinding().getKey() + "&" + cont, feature);
 					}
 					//cont++;
@@ -1173,7 +1173,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			}
 			case ASTNode.FIELD_ACCESS: {
 				/*
-				 * A().B, onde A � uma EXPRESSION e B � um SimpleName
+				 * A().B, onde A ï¿½ uma EXPRESSION e B ï¿½ um SimpleName
 				 */
 				FieldAccess fa = (FieldAccess)exp;
 				if(searchEXP(fa.getExpression(), name, managerForFile, feature, monitor))
@@ -1183,7 +1183,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			}
 			case ASTNode.QUALIFIED_NAME: {
 				/*
-				 * A.B, onde A � um NAME e B � um SimpleName
+				 * A.B, onde A ï¿½ um NAME e B ï¿½ um SimpleName
 				 */
 				QualifiedName qn = (QualifiedName)exp;
 
@@ -1207,7 +1207,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 
 			}
 			//		default: {
-			//			System.out.println("Expression n�o tratada: " + exp.nodeClassForType(exp.getNodeType()) + exp.toString());
+			//			System.out.println("Expression nï¿½o tratada: " + exp.nodeClassForType(exp.getNodeType()) + exp.toString());
 			//		}
 		}
 		return false;
@@ -1215,7 +1215,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 
 	public void searchIMP(IJavaProject jproject, String name, Feature feature, IProgressMonitor monitor) {
 		try {
-			/* Para todo PACOTE do PROJETO fa�a: */
+			/* Para todo PACOTE do PROJETO faï¿½a: */
 			if(name == null)
 				return;
 			IPackageFragment[] pkgs = jproject.getPackageFragments();
@@ -1282,7 +1282,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	public boolean hasSideEffect(Expression exp) {
 		if(exp == null) return false;
 		switch(exp.getNodeType()) {
-			case ASTNode.CONDITIONAL_EXPRESSION: {// tern�rio
+			case ASTNode.CONDITIONAL_EXPRESSION: {// ternï¿½rio
 				ConditionalExpression cond = (ConditionalExpression)exp;
 				if(hasSideEffect(cond.getExpression()))
 					return true;
@@ -1356,7 +1356,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			}
 			case ASTNode.FIELD_ACCESS: {
 				/*
-				 * A().B, onde A � uma EXPRESSION e B � um SimpleName
+				 * A().B, onde A ï¿½ uma EXPRESSION e B ï¿½ um SimpleName
 				 */
 				FieldAccess fa = (FieldAccess)exp;
 				if(hasSideEffect(fa.getExpression()))
@@ -1366,7 +1366,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 			}
 			case ASTNode.QUALIFIED_NAME: {
 				/*
-				 * A.B, onde A � um NAME e B � um SimpleName
+				 * A.B, onde A ï¿½ um NAME e B ï¿½ um SimpleName
 				 */
 				QualifiedName qn = (QualifiedName)exp;
 
@@ -1384,7 +1384,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 				return false;
 			}
 			default: {
-				System.out.println(">>> Expression n�o tratada (hasSideEffect): " + exp.nodeClassForType(exp.getNodeType()) + " - " + exp.toString());
+				System.out.println(">>> Expression nï¿½o tratada (hasSideEffect): " + exp.nodeClassForType(exp.getNodeType()) + " - " + exp.toString());
 				return false;
 			}
 		}
@@ -1466,7 +1466,7 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 
 	//	public void searchIFDEF(IJavaProject jproject, Feature feature) {
 	//		try {
-	//			/* Para todo PACOTE do PROJETO fa�a: */
+	//			/* Para todo PACOTE do PROJETO faï¿½a: */
 	//			IPackageFragment[] pkgs = jproject.getPackageFragments();
 	//			if(pkgs == null)
 	//				return;
@@ -1503,8 +1503,8 @@ public class ColorDetectionAction implements IObjectActionDelegate {
 	//									ToggleTextColorContext context = new ToggleTextColorContext(source, new TextSelection(aux, pos+tam - aux + 1));
 	//									context.run(feature, true);
 	//									if(context.getSelectedNodes().isEmpty()) {
-	//										System.out.println(">> Zero n�s marcados: " + compUnit.getSource().substring(aux, pos+tam));
-	//										System.out.println(">> Local: " + compUnit.getElementName() + "; posi��o: " + co.getStartPosition());
+	//										System.out.println(">> Zero nï¿½s marcados: " + compUnit.getSource().substring(aux, pos+tam));
+	//										System.out.println(">> Local: " + compUnit.getElementName() + "; posiï¿½ï¿½o: " + co.getStartPosition());
 	//									}
 	//								}
 	//							}

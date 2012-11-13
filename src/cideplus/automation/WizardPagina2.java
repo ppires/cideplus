@@ -55,12 +55,12 @@ public class WizardPagina2 extends WizardPage {
 		return (false);
 	}
 
-	/*MÉTODOS UTILITARIOS*/
+	/*MÃTODOS UTILITARIOS*/
 	private ICompilationUnitFeaturesManager getSafeCompilationUnit(ICompilationUnit cu) {
 		try {
 			return FeaturesConfigurationUtil.getFeaturesManager(project).getManagerForFile(cu);
 		} catch (Exception e) {
-			MessageDialog.openError(getShell(), "Erro", "Não foi possível criar o compilation unit para o arquivo. " + e.getMessage());
+			MessageDialog.openError(getShell(), "Erro", "NÃ£o foi possÃ­vel criar o compilation unit para o arquivo. " + e.getMessage());
 			throw new RuntimeException(e);
 		}
 	}
@@ -149,7 +149,7 @@ public class WizardPagina2 extends WizardPage {
 										//IColoredJavaSourceFile source = ColoredJavaSourceFile.getColoredJavaSourceFile(cu);
 										CompilationUnit ast = getAst(cu);
 
-										//FIXME Não necessariamente é um TypeDeclaration, pode ser um EnumDeclaration
+										//FIXME NÃ£o necessariamente Ã© um TypeDeclaration, pode ser um EnumDeclaration
 										for(TypeDeclaration t : (java.util.List<TypeDeclaration>)ast.types()) {
 											Item i = new Item();
 											if(t.getSuperclassType() != null)

@@ -34,7 +34,7 @@ import cideplus.ui.astview.ASTView;
 public class PluginUtils {
 
 	/**
-	 * workbench window estático para poder ser atribuído de
+	 * workbench window estÃ¡tico para poder ser atribuÃ­do de
 	 * uma thread de UI.
 	 */
 	private static IWorkbenchWindow workbenchWindow;
@@ -77,7 +77,7 @@ public class PluginUtils {
 	public static IEditorPart getCurrentEditor() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench != null) {
-			// getActiveWorkbenchWindow() retorna null se não for chamado
+			// getActiveWorkbenchWindow() retorna null se nÃ£o for chamado
 			// de uma thread de UI.
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
@@ -162,7 +162,7 @@ public class PluginUtils {
 				return (IFile) obj;
 			}
 			else {
-				showPopup("Não foi possível definir qual arquivo está aberto no editor.");
+				showPopup("NÃ£o foi possÃ­vel definir qual arquivo estÃ¡ aberto no editor.");
 				return null;
 			}
 		}
@@ -175,7 +175,7 @@ public class PluginUtils {
 	public static ISelection getCurrentSelection() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench != null) {
-			// getActiveWorkbenchWindow() retorna null se não for chamado
+			// getActiveWorkbenchWindow() retorna null se nÃ£o for chamado
 			// de uma thread de UI.
 			Display.getDefault().syncExec(new Runnable() {
 				@Override
@@ -262,7 +262,7 @@ public class PluginUtils {
 	}
 
 
-	/* Overloaded para colocar título default do popup */
+	/* Overloaded para colocar tÃ­tulo default do popup */
 	public static void showPopup(String text) {
 		showPopup("CIDE+", text);
 	}
@@ -285,9 +285,9 @@ public class PluginUtils {
 
 	/**
 	 * retorna o IAnnotationModel associado a um editor.
-	 * Se o editor passado com parâmetro for null, retorna
+	 * Se o editor passado com parÃ¢metro for null, retorna
 	 * o IAnnotationModel do editor ativo no momento. Retorna
-	 * null se não conseguir pegar o model.
+	 * null se nÃ£o conseguir pegar o model.
 	 */
 	public static IAnnotationModel getAnnotationsModel(ITextEditor editor) {
 		if (editor == null)

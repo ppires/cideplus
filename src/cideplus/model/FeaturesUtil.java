@@ -24,8 +24,8 @@ import cideplus.ui.configuration.IFeaturesManager;
 import cideplus.utils.PluginUtils;
 
 /**
- * Classe utilitária para trabalhar com as features.
- * As funcionalidades dessa classe são independentes da interface gráfica
+ * Classe utilitÃ¡ria para trabalhar com as features.
+ * As funcionalidades dessa classe sÃ£o independentes da interface grÃ¡fica
  * @author rogel
  *
  */
@@ -37,7 +37,7 @@ public class FeaturesUtil {
 	private static final String FEATURES_SEPARATOR = "\06>>>FEATURES:";
 
 	/**
-	 * Lê as features de determinado arquivo
+	 * LÃª as features de determinado arquivo
 	 * @param contents
 	 * @return
 	 * @throws IOException
@@ -112,7 +112,7 @@ public class FeaturesUtil {
 					if(!projectFeatures.contains(featureObj)){
 						throw new FeatureNotFoundException(featureId);
 					}
-					//pegar o feature completo do projeto, não apenas com o ID
+					//pegar o feature completo do projeto, nÃ£o apenas com o ID
 					for (Feature feature : projectFeatures) {
 						if(featureObj.equals(feature)){
 							featureObj = feature;
@@ -133,9 +133,9 @@ public class FeaturesUtil {
 			for (ASTNodeReference nodeReference : model.getNodeReferences()) {
 				Set<Feature> features = model.getFeatures(nodeReference);
 				if (features.size() > 0) {
-					writer.print(nodeReference.bytes);
+					writer.print(nodeReference.getByteCount());
 					writer.print(BYTES_OFFSET_SEPARATOR);
-					writer.print(nodeReference.offset);
+					writer.print(nodeReference.getOffset());
 					writer.print(NUMBER_INFORMATION_SEPARATOR);
 					writer.print(nodeReference);
 					writer.print(FEATURES_SEPARATOR);
@@ -151,7 +151,7 @@ public class FeaturesUtil {
 		}
 	}
 
-	// TODO: Dar um merge nesses métodos!
+	// TODO: Dar um merge nesses mÃ©todos!
 	/* Marca uma feature a partir de um offset e um length */
 	public static void markFeature(int featureId, int offset, int length) throws CoreException, IOException, FeatureNotFoundException {
 		System.out.println("  marking feature: offset: " + offset + " length: " + length);

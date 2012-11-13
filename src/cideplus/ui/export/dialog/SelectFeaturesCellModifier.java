@@ -21,7 +21,7 @@ public class SelectFeaturesCellModifier implements ICellModifier {
 
 	public boolean canModify(Object element, String property) {
 		Feature feature = (Feature) element;
-		return property.equals("id");//a propriedade ID apenas ser· editada
+		return property.equals("id");//a propriedade ID apenas ser√° editada
 	}
 
 	public Object getValue(Object element, String property) {

@@ -26,7 +26,7 @@ public class SelectFeaturesDialog extends ConfigureFeaturesDialog {
 	}
 
 	/**
-	 * Mostra a caixa para seleção das features do projeto
+	 * Mostra a caixa para seleÃ§Ã£o das features do projeto
 	 * @return
 	 * @throws CoreException
 	 * @throws IOException

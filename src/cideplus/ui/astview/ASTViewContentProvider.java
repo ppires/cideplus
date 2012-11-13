@@ -171,7 +171,7 @@ public class ASTViewContentProvider implements ITreeContentProvider {
 		} else if (node instanceof PackageDeclaration) {
 			IBinding binding= ((PackageDeclaration) node).resolveBinding();
 			//res.add(createBinding(node, binding));
-			return new Object[0];//o package declaration n„o deve ter filhos
+			return new Object[0];//o package declaration n√£o deve ter filhos
 		} else if (node instanceof TypeParameter) {
 			IBinding binding= ((TypeParameter) node).resolveBinding();
 			//res.add(createBinding(node, binding));
@@ -221,7 +221,7 @@ public class ASTViewContentProvider implements ITreeContentProvider {
 			}
 		}
  		
-		//essas propriedades n„o ter„o um parent (o filho ocupar· o lugar do parent)
+		//essas propriedades n√£o ter√£o um parent (o filho ocupar√° o lugar do parent)
 		List<String> childrenProperties = Arrays.asList("TAGS", "FRAGMENTS", "STATEMENTS", "BODY", "PACKAGE", "IMPORTS", "TYPES");
 		List list= node.structuralPropertiesForType();
 		for (int i= 0; i < list.size(); i++) {

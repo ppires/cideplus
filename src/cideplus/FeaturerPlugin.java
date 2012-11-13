@@ -44,6 +44,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 	public static final boolean DEBUG_PART_LISTENER = false;
 	public static final boolean DEBUG_LIGHT_MODE = false;
 	public static final boolean DEBUG_MOUSE_LISTENER = false;
+	public static final boolean DEBUG_AST_REFERENCE = true;
 
 	public ASTViewPlugin getAstViewPlugin() {
 		return astViewPlugin;
@@ -91,7 +92,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 			return FileLocator.find(getDefault().getBundle(),
 					new Path("/icons" + path), null).openStream();
 		} catch (Exception e3) {
-			throw new RuntimeException("Não foi possivel encontrar o arquivo "
+			throw new RuntimeException("NÃ£o foi possivel encontrar o arquivo "
 					+ path);
 		}
 	}
@@ -100,7 +101,7 @@ public class FeaturerPlugin extends AbstractUIPlugin {
 		return new Image(device, FeaturerPlugin.getFile(path));
 	}
 
-	/* M�TODOS UTILITARIOS */
+	/* Mï¿½TODOS UTILITARIOS */
 
 	/**
 	 * Returns the shared instance

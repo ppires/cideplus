@@ -15,6 +15,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
@@ -29,28 +31,35 @@ public class CleanProjectAction  implements IObjectActionDelegate {
 	private Shell shell;
 
 
+	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		shell = targetPart.getSite().getShell();
 	}
 
+	@Override
 	public void run(IAction action) {
-		new Job("Clean project") {
-
-			@Override
-			protected IStatus run(final IProgressMonitor monitor) {
-				monitor.beginTask("Cleaning project...", IProgressMonitor.UNKNOWN);
-				try {
-					doClean(monitor);
-				} catch (CoreException e) {
-					return new Status(IStatus.ERROR, FeaturerPlugin.PLUGIN_ID, e.getMessage());
-				} finally {
-					FeaturesConfigurationUtil.updateEditors(shell.getDisplay(), null);
-					FeaturesConfigurationUtil.clean();
-					monitor.done();
+		MessageBox dialog = new MessageBox(shell, SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
+		dialog.setText("Warning!");
+		dialog.setMessage("This will erase ALL features markings.\nDo you really want to do this?");
+		int returnCode = dialog.open();
+		if (returnCode == SWT.OK) {
+			new Job("Clean project") {
+				@Override
+				protected IStatus run(final IProgressMonitor monitor) {
+					monitor.beginTask("Cleaning project...", IProgressMonitor.UNKNOWN);
+					try {
+						doClean(monitor);
+					} catch (CoreException e) {
+						return new Status(IStatus.ERROR, FeaturerPlugin.PLUGIN_ID, e.getMessage());
+					} finally {
+						FeaturesConfigurationUtil.updateEditors(shell.getDisplay(), null);
+						FeaturesConfigurationUtil.clean();
+						monitor.done();
+					}
+					return Status.OK_STATUS;
 				}
-				return Status.OK_STATUS;
-			}
-		}.schedule();
+			}.schedule();
+		}
 	}
 
 	private void doClean(final IProgressMonitor monitor) throws CoreException {
@@ -62,6 +71,7 @@ public class CleanProjectAction  implements IObjectActionDelegate {
 		}
 
 		project.getProject().accept(new IResourceVisitor() {
+			@Override
 			public boolean visit(IResource resource) throws CoreException {
 				if(resource instanceof IFolder || resource instanceof IProject){
 					return true;
@@ -76,6 +86,7 @@ public class CleanProjectAction  implements IObjectActionDelegate {
 		});
 	}
 
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		if(selection instanceof IJavaProject){
 			project = (IJavaProject) selection;

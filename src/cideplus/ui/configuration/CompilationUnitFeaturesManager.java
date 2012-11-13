@@ -55,7 +55,7 @@ public class CompilationUnitFeaturesManager implements ICompilationUnitFeaturesM
 			e.printStackTrace();
 		}
 
-		/* Cria um RangeMarker para trackear as modificações no texto */
+		/* Cria um RangeMarker para trackear as modificaÃ§Ãµes no texto */
 		//								if (rangeMarkers == null)
 		//									rangeMarkers = new ArrayList<RangeMarker>();
 		RangeMarker rangeMarker = new RangeMarker(astNode.getStartPosition(), astNode.getLength());

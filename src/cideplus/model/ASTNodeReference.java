@@ -13,11 +13,13 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
+import cideplus.utils.HashCodeUtils;
+
 public class ASTNodeReference {
 
-	final String identifier;
-	int bytes;
-	int offset;
+	private final String identifier;
+	private int bytes;
+	private int offset;
 
 	public ASTNodeReference(String identifier, int bytes, int offset) {
 		super();
@@ -69,7 +71,7 @@ public class ASTNodeReference {
 	}
 
 	public String getIdentifier() {
-		return this.identifier;
+		return identifier;
 	}
 
 	public int getOffset() {
@@ -80,12 +82,15 @@ public class ASTNodeReference {
 		return bytes;
 	}
 
+
 	@Override
-	public int hashCode() {
-		final int prime = 127;
-		int result = 1;
-		result = prime * result + (identifier == null ? 0 : identifier.hashCode());
-		return result + offset > bytes ? offset/bytes : bytes/offset;
+	public int hashCode(){
+		int result = HashCodeUtils.SEED;
+		//collect the contributions of various fields
+		result = HashCodeUtils.hash(result, identifier);
+		result = HashCodeUtils.hash(result, offset);
+		result = HashCodeUtils.hash(result, bytes);
+		return result;
 	}
 
 	@Override
@@ -130,5 +135,9 @@ public class ASTNodeReference {
 	@Override
 	public String toString() {
 		return identifier;
+	}
+
+	public void prettyPrint() {
+		System.out.println("(" + offset + ", " + bytes + ") " + identifier);
 	}
 }

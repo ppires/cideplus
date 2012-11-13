@@ -89,7 +89,7 @@ import cideplus.utils.PluginUtils;
 public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnotationModelListener, IAnnotationModelListenerExtension, ITextPresentationListener {
 
 	/**
-	 * Controle para saber se o annottion model já foi setado
+	 * Controle para saber se o annottion model jÃ¡ foi setado
 	 */
 	private boolean annotationModelFirstSet = false;
 
@@ -99,7 +99,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	private Map<IResource, Long> markerToPaint = new HashMap<IResource, Long>();
 
 	/**
-	 * boolean que controla se o painter está no modo "light".
+	 * boolean que controla se o painter estÃ¡ no modo "light".
 	 */
 	private boolean isLightModeOn;
 
@@ -944,7 +944,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 				}
 
 
-				// FIXME: Não é necessário iterar sobre todas as annotations para pintar somente uma.
+				// FIXME: NÃ£o Ã© necessÃ¡rio iterar sobre todas as annotations para pintar somente uma.
 				// Traps to paint only one marker, when the light mode is on
 				if (isLightModeOn) {
 					if (!(a instanceof SimpleMarkerAnnotation)) {
@@ -1696,7 +1696,7 @@ public class CustomAnnotationPainter implements IPainter, PaintListener, IAnnota
 	 * LIGHT MODE
 	 */
 
-	/* Métodos para ligar/desligar modo "light" */
+	/* MÃ©todos para ligar/desligar modo "light" */
 	private void setLightModeOn() {
 		disablePainting(true);
 		isLightModeOn = true;
